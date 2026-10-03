@@ -1,7 +1,7 @@
-﻿# Phase 1.5: Catalog Taxonomy Schema
+# Phase 1.5: Catalog Taxonomy Schema
 
 > **Parent Phase:** [Phase 1: Project Foundation & Database](phase1-project-foundation.md)
-> **Status:** Not Started
+> **Status:** In Progress
 > **Assigned To:** A
 > **Depends On:** — (needs 1.2 to run locally)
 > **Blocks:** 1.8
@@ -24,23 +24,23 @@ Create the tables that classify and describe products (categories, product-categ
 ## Tasks
 
 ### Migrations
-- [ ] `V7__create_categories.sql` — `categories` table with self-referencing `parent_category_id`
-- [ ] `V8__create_variant_attributes.sql` — `variant_attributes` table, unique `attribute_name`
-- [ ] `V12__create_product_categories.sql` — junction table, composite PK `(product_id, category_id)`, `ON DELETE CASCADE` from `products`
-- [ ] `V13__create_variant_attribute_values.sql` — unique `(variant_id, attribute_id)`, `ON DELETE CASCADE` from `product_variants`
-- [ ] Indexes: `categories(parent_category_id)`, `product_categories(category_id)`
+- [x] `V7__create_categories.sql` — `categories` table with self-referencing `parent_category_id`
+- [x] `V8__create_variant_attributes.sql` — `variant_attributes` table, unique `attribute_name`
+- [x] `V12__create_product_categories.sql` — junction table, composite PK `(product_id, category_id)`, `ON DELETE CASCADE` from `products`
+- [x] `V13__create_variant_attribute_values.sql` — unique `(variant_id, attribute_id)`, `ON DELETE CASCADE` from `product_variants`
+- [x] Indexes: `categories(parent_category_id)`, `product_categories(category_id)`
 
 ### Seed — `03_taxonomy.sql`
-- [ ] 10 categories as per the SRS, including parent/child hierarchy
-- [ ] Variant attributes (e.g. Color, Storage, Size, RAM)
-- [ ] **Early:** publish the category and attribute names in this doc's notes so others can reference them
+- [x] 10 categories as per the SRS, including parent/child hierarchy
+- [x] Variant attributes (e.g. Color, Storage, Size, RAM)
+- [x] **Early:** publish the category and attribute names in this doc's notes so others can reference them
 
 ### Seed — `05_catalog_links.sql`
 - [ ] Link all 40 products to categories (products looked up by `base_sku`)
 - [ ] Attribute values for every variant (variants looked up by `variant_sku`)
 
 ### Documentation
-- [ ] Add any new constraints/indexes to [DB_Schema.md](../../Database/DB_Schema.md)
+- [x] Add any new constraints/indexes to [DB_Schema.md](../../Database/DB_Schema.md)
 
 ---
 
@@ -54,5 +54,7 @@ Create the tables that classify and describe products (categories, product-categ
 
 ## Key Decisions & Notes
 
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+- **Categories Published:** Electronics, Smartphones, Laptops, Audio, Home Appliances, Kitchen, Cleaning, Apparel, Men's Clothing, Women's Clothing.
+- **Attributes Published:** Color, Storage, RAM, Size, Material.
+- **Dependencies Update:** Indexes `idx_categories_parent_id` and `idx_product_categories_category_id`, plus `ON DELETE CASCADE` behaviors added to `DB_Schema.md`.
 
