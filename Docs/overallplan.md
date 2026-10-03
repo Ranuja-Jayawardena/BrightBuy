@@ -39,7 +39,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [x] 1.1 Project Scaffolding — **E** → [phase1.1-project-scaffolding.md](Phases/Phase1-Project-Foundation/phase1.1-project-scaffolding.md)
   - [x] 1.2 Database Tooling — **E** → [phase1.2-database-tooling.md](Phases/Phase1-Project-Foundation/phase1.2-database-tooling.md)
   - [x] 1.3 Identity & Location Schema — **E** → [phase1.3-identity-location-schema.md](Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md)
-  - [ ] 1.4 Customer & Cart Schema — **B** → [phase1.4-customer-cart-schema.md](Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md)
+  - [x] 1.4 Customer & Cart Schema — **B** → [phase1.4-customer-cart-schema.md](Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md)
   - [ ] 1.5 Catalog Taxonomy Schema — **A** → [phase1.5-catalog-taxonomy-schema.md](Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md)
   - [ ] 1.6 Product Schema — **C** → [phase1.6-product-schema.md](Phases/Phase1-Project-Foundation/phase1.6-product-schema.md)
   - [ ] 1.7 Order, Payment & Delivery Schema — **D** → [phase1.7-order-payment-delivery-schema.md](Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md)
