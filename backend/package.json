@@ -1,0 +1,33 @@
+{
+  "name": "brightbuy-backend",
+  "version": "1.0.0",
+  "description": "BrightBuy Express Backend API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "lint": "eslint src/"
+  },
+  "keywords": [
+    "brightbuy",
+    "ecommerce",
+    "express",
+    "postgres"
+  ],
+  "author": "BrightBuy Team",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "eslint": "^9.21.0",
+    "nodemon": "^3.1.9"
+  }
+}

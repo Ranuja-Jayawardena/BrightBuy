@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-brightbuy}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./backend/db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-brightbuy}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrations:
+    image: flyway/flyway:9-alpine
+    command: -url=jdbc:postgresql://db:5432/${DB_NAME:-brightbuy} -user=${DB_USER:-postgres} -password=${DB_PASSWORD:-postgres} migrate
+    volumes:
+      - ./backend/db/migrations:/flyway/sql
+    depends_on:
+      db:
+        condition: service_healthy
+
+  seed:
+    image: postgres:15-alpine
+    volumes:
+      - ./backend/db/seed:/seed-data
+    environment:
+      PGPASSWORD: ${DB_PASSWORD:-postgres}
+    command: >
+      sh -c '
+      echo "Running seed files...";
+      for f in $$(ls /seed-data/*.sql 2>/dev/null | sort); do
+        echo "Running $$f..."
+        psql -h db -U ${DB_USER:-postgres} -d ${DB_NAME:-brightbuy} -f $$f || exit 1
+      done;
+      echo "Seed complete!"
+      '
+    depends_on:
+      db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+
+volumes:
+  db-data:
