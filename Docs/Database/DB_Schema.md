@@ -32,6 +32,11 @@ Table addresses {
   city_id int [ref: > cities.city_id, not null]
   zip_code varchar(10) [not null]
   is_default boolean [default: false]
+
+  indexes {
+    (customer_id) [name: 'idx_addresses_customer_id']
+    (customer_id) [unique, name: 'idx_addresses_default', note: 'WHERE is_default = true']
+  }
 }
 
 Table cities {
@@ -109,7 +114,7 @@ Table cart_items {
   cart_item_id serial [pk]
   cart_id int [ref: > carts.cart_id, not null]
   variant_id int [ref: > product_variants.variant_id, not null]
-  quantity int [not null]
+  quantity int [not null, note: 'CHECK (quantity > 0)']
 
   indexes {
     (cart_id, variant_id) [unique]
