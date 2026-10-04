@@ -1,7 +1,7 @@
 # Phase 1.5: Catalog Taxonomy Schema
 
 > **Parent Phase:** [Phase 1: Project Foundation & Database](phase1-project-foundation.md)
-> **Status:** In Progress
+> **Status:** Complete
 > **Assigned To:** A
 > **Depends On:** — (needs 1.2 to run locally)
 > **Blocks:** 1.8
@@ -36,8 +36,8 @@ Create the tables that classify and describe products (categories, product-categ
 - [x] **Early:** publish the category and attribute names in this doc's notes so others can reference them
 
 ### Seed — `05_catalog_links.sql`
-- [ ] Link all 40 products to categories (products looked up by `base_sku`)
-- [ ] Attribute values for every variant (variants looked up by `variant_sku`)
+- [x] Link all 40 products to categories (products looked up by `base_sku`)
+- [x] Attribute values for every variant (variants looked up by `variant_sku`)
 
 ### Documentation
 - [x] Add any new constraints/indexes to [DB_Schema.md](../../Database/DB_Schema.md)
