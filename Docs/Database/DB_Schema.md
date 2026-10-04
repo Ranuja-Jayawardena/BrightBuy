@@ -51,6 +51,10 @@ Table categories {
   category_name varchar(100) [not null]
   parent_category_id int [ref: > categories.category_id]
   is_active boolean [not null, default: true]
+
+  indexes {
+    parent_category_id
+  }
 }
 
 Table products {
@@ -91,7 +95,7 @@ Table variant_attributes {
 
 Table variant_attribute_values {
   value_id serial [pk]
-  variant_id int [ref: > product_variants.variant_id, not null]
+  variant_id int [ref: > product_variants.variant_id, delete: cascade, not null]
   attribute_id int [ref: > variant_attributes.attribute_id, not null]
   attribute_value varchar(100) [not null]
 
@@ -136,10 +140,11 @@ Table order_items {
 
 Table product_categories {
   category_id int [ref: > categories.category_id, not null]
-  product_id int [ref: > products.product_id, not null]
+  product_id int [ref: > products.product_id, delete: cascade, not null]
 
   indexes {
     (product_id, category_id) [pk]
+    category_id
   }
 }
 
