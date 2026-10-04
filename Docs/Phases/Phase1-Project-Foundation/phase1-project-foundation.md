@@ -1,6 +1,6 @@
 # Phase 1: Project Foundation & Database
 
-> **Status:** In Progress (3 / 8 subphases complete)
+> **Status:** In Progress (4 / 8 subphases complete)
 > **Lead:** E
 > **Members:** A, B, C, D, E — every member owns one database schema subphase
 > **Phase Dependencies:** None — this is the starting phase
@@ -19,6 +19,7 @@ Set up the development environment and bring the database to life. E scaffolds t
 - Subphase 1.1 (Project Scaffolding) is complete.
 - Subphase 1.2 (Database Tooling) is complete.
 - Subphase 1.3 (Identity & Location Schema) is complete.
+- Subphase 1.6 (Product Schema) is complete.
 
 ---
 
@@ -31,7 +32,7 @@ Set up the development environment and bring the database to life. E scaffolds t
 | 1.3 | [Identity & Location Schema](phase1.3-identity-location-schema.md) | E | — (1.2 to run locally) | Complete |
 | 1.4 | [Customer & Cart Schema](phase1.4-customer-cart-schema.md) | B | — (1.2 to run locally) | Not Started |
 | 1.5 | [Catalog Taxonomy Schema](phase1.5-catalog-taxonomy-schema.md) | A | — (1.2 to run locally) | In Progress |
-| 1.6 | [Product Schema](phase1.6-product-schema.md) | C | — (1.2 to run locally) | Not Started |
+| 1.6 | [Product Schema](phase1.6-product-schema.md) | C | — (1.2 to run locally) | Complete |
 | 1.7 | [Order, Payment & Delivery Schema](phase1.7-order-payment-delivery-schema.md) | D | — (1.2 to run locally) | Not Started |
 | 1.8 | [Migration Integration & Verification](phase1.8-migration-integration-verification.md) | E (lead) + A, B, C, D | 1.2 – 1.7 | Not Started |
 
