@@ -42,7 +42,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [x] 1.4 Customer & Cart Schema — **B** → [phase1.4-customer-cart-schema.md](Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md)
   - [ ] 1.5 Catalog Taxonomy Schema — **A** → [phase1.5-catalog-taxonomy-schema.md](Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md)
   - [x] 1.6 Product Schema — **C** → [phase1.6-product-schema.md](Phases/Phase1-Project-Foundation/phase1.6-product-schema.md)
-  - [ ] 1.7 Order, Payment & Delivery Schema — **D** → [phase1.7-order-payment-delivery-schema.md](Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md)
+  - [x] 1.7 Order, Payment & Delivery Schema — **D** → [phase1.7-order-payment-delivery-schema.md](Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md)
   - [ ] 1.8 Migration Integration & Verification — **E + all** → [phase1.8-migration-integration-verification.md](Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md)
 - [ ] **Phase 2:** Full-Stack Dockerization → [phase2-full-stack-dockerization.md](Phases/Phase2-Full-Stack-Dockerization/phase2-full-stack-dockerization.md)
   - [ ] 2.1 Development Dockerfiles — **E** → [phase2.1-development-dockerfiles.md](Phases/Phase2-Full-Stack-Dockerization/phase2.1-development-dockerfiles.md)
