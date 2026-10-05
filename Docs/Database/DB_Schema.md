@@ -66,26 +66,39 @@ Table products {
   is_active boolean [not null, default: true]
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
+
+  indexes {
+    product_name
+  }
 }
 
 Table product_images {
   image_id serial [pk]
-  product_id int [ref: > products.product_id, not null]
+  product_id int [ref: > products.product_id, delete: cascade, not null]
   image_data bytea [not null]
   sort_order int [not null, default: 0]
   is_primary boolean [not null, default: false]
   created_at timestamp [default: `now()`]
+
+  indexes {
+    (product_id) [unique, note: 'partial unique index WHERE is_primary = true']
+    (product_id, sort_order)
+  }
 }
 
 Table product_variants {
   variant_id serial [pk]
-  product_id int [ref: > products.product_id, not null]
+  product_id int [ref: > products.product_id, delete: cascade, not null]
   variant_sku varchar(50) [unique, not null]
   variant_name varchar(100)
-  price decimal(10,2) [not null]
-  stock_quantity int [not null, default: 0]
+  price decimal(10,2) [not null, note: 'CHECK price >= 0']
+  stock_quantity int [not null, default: 0, note: 'CHECK stock_quantity >= 0']
   is_active boolean [not null, default: true]
   updated_at timestamp [default: `now()`]
+
+  indexes {
+    product_id
+  }
 }
 
 Table variant_attributes {
