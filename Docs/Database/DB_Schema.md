@@ -138,17 +138,27 @@ Table orders {
   order_id serial [pk]
   customer_id int [ref: > customers.customer_id, not null]
   order_date timestamp [default: `now()`]
-  status varchar(20) [not null, default: 'pending']
-  total_amount decimal(10,2) [not null]
+  status varchar(20) [not null, default: 'pending', note: 'CHECK status IN (pending, paid, shipped, delivered, cancelled)']
+  total_amount decimal(10,2) [not null, note: 'CHECK total_amount >= 0']
   updated_at timestamp [default: `now()`]
+
+  indexes {
+    customer_id
+    (status, order_date)
+  }
 }
 
 Table order_items {
   order_item_id serial [pk]
   order_id int [ref: > orders.order_id, not null]
   variant_id int [ref: > product_variants.variant_id, not null]
-  quantity int [not null]
+  quantity int [not null, note: 'CHECK quantity > 0']
   unit_price decimal(10,2) [not null]
+
+  indexes {
+    order_id
+    variant_id
+  }
 }
 
 Table product_categories {
@@ -164,18 +174,22 @@ Table product_categories {
 Table payments {
   payment_id serial [pk]
   order_id int [ref: > orders.order_id, not null]
-  payment_method varchar(20) [not null]
-  payment_status varchar(20) [not null, default: 'pending']
+  payment_method varchar(20) [not null, note: 'CHECK payment_method IN (card, cod)']
+  payment_status varchar(20) [not null, default: 'pending', note: 'CHECK payment_status IN (pending, cod_pending, completed, failed)']
   amount decimal(10,2) [not null]
   transaction_id varchar(100)
   payment_date timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
+
+  indexes {
+    order_id
+  }
 }
 
 Table deliveries {
   delivery_id serial [pk]
   order_id int [ref: > orders.order_id, not null]
-  delivery_mode varchar(30) [not null]
+  delivery_mode varchar(30) [not null, note: 'CHECK delivery_mode IN (home_delivery, store_pickup)']
   delivery_address_line1 varchar(255) [not null]
   delivery_address_line2 varchar(255)
   delivery_city_id int [ref: > cities.city_id, not null]
@@ -184,6 +198,10 @@ Table deliveries {
   tracking_number varchar(100)
   delivery_status varchar(30) [not null, default: 'pending']
   updated_at timestamp [default: `now()`]
+
+  indexes {
+    order_id
+  }
 }
 
 Table refresh_tokens {
