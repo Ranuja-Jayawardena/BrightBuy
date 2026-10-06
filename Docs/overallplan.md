@@ -35,15 +35,15 @@ Database work is split **equally across all 5 members**. Each member owns one Ph
 
 Each phase is split into subphases. Tick a subphase when **all** tasks in its doc are done; tick the phase when all its subphases are done.
 
-- [ ] **Phase 1:** Project Foundation & Database → [phase1-project-foundation.md](Phases/Phase1-Project-Foundation/phase1-project-foundation.md)
+- [x] **Phase 1:** Project Foundation & Database → [phase1-project-foundation.md](Phases/Phase1-Project-Foundation/phase1-project-foundation.md)
   - [x] 1.1 Project Scaffolding — **E** → [phase1.1-project-scaffolding.md](Phases/Phase1-Project-Foundation/phase1.1-project-scaffolding.md)
   - [x] 1.2 Database Tooling — **E** → [phase1.2-database-tooling.md](Phases/Phase1-Project-Foundation/phase1.2-database-tooling.md)
   - [x] 1.3 Identity & Location Schema — **E** → [phase1.3-identity-location-schema.md](Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md)
   - [x] 1.4 Customer & Cart Schema — **B** → [phase1.4-customer-cart-schema.md](Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md)
-  - [ ] 1.5 Catalog Taxonomy Schema — **A** → [phase1.5-catalog-taxonomy-schema.md](Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md)
+  - [x] 1.5 Catalog Taxonomy Schema — **A** → [phase1.5-catalog-taxonomy-schema.md](Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md)
   - [x] 1.6 Product Schema — **C** → [phase1.6-product-schema.md](Phases/Phase1-Project-Foundation/phase1.6-product-schema.md)
   - [x] 1.7 Order, Payment & Delivery Schema — **D** → [phase1.7-order-payment-delivery-schema.md](Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md)
-  - [ ] 1.8 Migration Integration & Verification — **E + all** → [phase1.8-migration-integration-verification.md](Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md)
+  - [x] 1.8 Migration Integration & Verification — **E + all** → [phase1.8-migration-integration-verification.md](Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md)
 - [ ] **Phase 2:** Full-Stack Dockerization → [phase2-full-stack-dockerization.md](Phases/Phase2-Full-Stack-Dockerization/phase2-full-stack-dockerization.md)
   - [ ] 2.1 Development Dockerfiles — **E** → [phase2.1-development-dockerfiles.md](Phases/Phase2-Full-Stack-Dockerization/phase2.1-development-dockerfiles.md)
   - [ ] 2.2 Compose Orchestration & Networking — **E** → [phase2.2-compose-orchestration-networking.md](Phases/Phase2-Full-Stack-Dockerization/phase2.2-compose-orchestration-networking.md)
