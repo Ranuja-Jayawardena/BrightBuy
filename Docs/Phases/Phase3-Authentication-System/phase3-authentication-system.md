@@ -1,6 +1,6 @@
 # Phase 3: Authentication System
 
-> **Status:** In Progress (3 / 4 subphases complete)
+> **Status:** Complete (4 / 4 subphases complete)
 > **Members:** E (backend auth), B (frontend auth UI)
 > **Phase Dependencies:** Phase 2 must be complete
 > **DB Schema Reference:** [DB_Schema.md](../../Database/DB_Schema.md)
@@ -29,7 +29,7 @@ Build the custom JWT auth flow from scratch. E builds the backend: registration,
 | 3.1 | [Auth API Endpoints](phase3.1-auth-api-endpoints.md) | E | Phase 2 | Complete |
 | 3.2 | [Auth Middleware & Role Guards](phase3.2-auth-middleware-role-guards.md) | E | 3.1 | Complete |
 | 3.3 | [Auth Pages & Zustand Store](phase3.3-auth-pages-zustand-store.md) | B | Phase 2 (build against contracts), 3.1 (to integrate) | Complete |
-| 3.4 | [Session Handling & Route Protection](phase3.4-session-handling-route-protection.md) | B | 3.3, 3.1 | Not Started |
+| 3.4 | [Session Handling & Route Protection](phase3.4-session-handling-route-protection.md) | B | 3.3, 3.1 | Complete |
 
 ---
 
