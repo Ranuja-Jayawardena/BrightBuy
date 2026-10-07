@@ -51,7 +51,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
 - [ ] **Phase 3:** Authentication System → [phase3-authentication-system.md](Phases/Phase3-Authentication-System/phase3-authentication-system.md)
   - [x] 3.1 Auth API Endpoints — **E** → [phase3.1-auth-api-endpoints.md](Phases/Phase3-Authentication-System/phase3.1-auth-api-endpoints.md)
   - [x] 3.2 Auth Middleware & Role Guards — **E** → [phase3.2-auth-middleware-role-guards.md](Phases/Phase3-Authentication-System/phase3.2-auth-middleware-role-guards.md)
-  - [ ] 3.3 Auth Pages & Zustand Store — **B** → [phase3.3-auth-pages-zustand-store.md](Phases/Phase3-Authentication-System/phase3.3-auth-pages-zustand-store.md)
+  - [x] 3.3 Auth Pages & Zustand Store — **B** → [phase3.3-auth-pages-zustand-store.md](Phases/Phase3-Authentication-System/phase3.3-auth-pages-zustand-store.md)
   - [ ] 3.4 Session Handling & Route Protection — **B** → [phase3.4-session-handling-route-protection.md](Phases/Phase3-Authentication-System/phase3.4-session-handling-route-protection.md)
 - [ ] **Phase 4:** Product Catalog & Browsing → [phase4-product-catalog-browsing.md](Phases/Phase4-Product-Catalog-Browsing/phase4-product-catalog-browsing.md)
   - [ ] 4.1 Catalog Read APIs — **C** → [phase4.1-catalog-read-apis.md](Phases/Phase4-Product-Catalog-Browsing/phase4.1-catalog-read-apis.md)
