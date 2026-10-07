@@ -1,4 +1,4 @@
-﻿# Phase 4: Product Catalog & Browsing
+# Phase 4: Product Catalog & Browsing
 
 > **Status:** Not Started (0 / 4 subphases complete)
 > **Members:** C (backend APIs), A (frontend storefront UI)
@@ -27,7 +27,7 @@ _Nothing yet._ Update this section as subphases are completed.
 |---|----------|----------|------------|--------|
 | 4.1 | [Catalog Read APIs](phase4.1-catalog-read-apis.md) | C | Phase 2 | Not Started |
 | 4.2 | [Image Serving Endpoint](phase4.2-image-serving-endpoint.md) | C | Phase 2 | Not Started |
-| 4.3 | [Product Listing, Search & Category Navigation UI](phase4.3-product-listing-search-category-navigation-ui.md) | A | 4.1, 4.2 (can start with mocks) | Not Started |
+| 4.3 | [Product Listing, Search & Category Navigation UI](phase4.3-product-listing-search-category-navigation-ui.md) | A | 4.1, 4.2 (can start with mocks) | In Progress |
 | 4.4 | [Product Detail Page](phase4.4-product-detail-page.md) | A | 4.1, 4.2, 3.4 | Not Started |
 
 ---
