@@ -1,7 +1,7 @@
-﻿# Phase 4.1: Catalog Read APIs
+# Phase 4.1: Catalog Read APIs
 
 > **Parent Phase:** [Phase 4: Product Catalog & Browsing](phase4-product-catalog-browsing.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** C
 > **Depends On:** Phase 2
 > **Blocks:** 4.3, 4.4, 7.1
@@ -17,12 +17,12 @@ Expose public, read-only APIs for products and categories using raw SQL (`pg`).
 
 ## Tasks
 
-- [ ] `GET /api/products` — pagination, search, filter by category (via `product_categories`) and brand, sorting
-- [ ] Category filter includes products from child categories
-- [ ] `GET /api/products/:id` — product detail with variants, attributes, stock levels, and image **metadata** (no binary data)
-- [ ] `GET /api/categories` — category tree (parent → children)
-- [ ] Filter out `is_active = false` products, variants, and categories on every customer-facing endpoint
-- [ ] Use parameterized queries only (`$1, $2`)
+- [x] `GET /api/products` — pagination, search, filter by category (via `product_categories`) and brand, sorting
+- [x] Category filter includes products from child categories
+- [x] `GET /api/products/:id` — product detail with variants, attributes, stock levels, and image **metadata** (no binary data)
+- [x] `GET /api/categories` — category tree (parent → children)
+- [x] Filter out `is_active = false` products, variants, and categories on every customer-facing endpoint
+- [x] Use parameterized queries only (`$1, $2`)
 
 ---
 
@@ -76,5 +76,9 @@ Response 200: {
 
 ## Key Decisions & Notes
 
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+- **Pure Raw SQL:** Implemented exclusively with raw PostgreSQL queries using `pg` connection pool. No ORMs or query builders used.
+- **Child Category Inheritance:** Implemented via a `WITH RECURSIVE category_tree` CTE that traverses the entire active descendant category tree when `category_id` is supplied in `GET /api/products`.
+- **Strict Inactive Filtering:** Filtered out `is_active = false` on products, variants, and categories across all customer endpoints.
+- **Image Metadata Decoupling:** `GET /api/products/:id` selects strictly `image_id, sort_order, is_primary` metadata without querying `BYTEA` `image_data`.
+- **Architecture Layers:** Clean separation into `models/` (raw SQL queries), `services/` (business logic & response contract mapping), `controllers/` (Express HTTP route handlers), and `routes/`. Mounted under `/api/products` and `/api/categories` in `index.js`.
 

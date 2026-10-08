@@ -31,6 +31,13 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// API Routes
+const productRoutes = require('./routes/productRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });

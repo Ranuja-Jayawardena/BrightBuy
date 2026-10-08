@@ -54,7 +54,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [ ] 3.3 Auth Pages & Zustand Store — **B** → [phase3.3-auth-pages-zustand-store.md](Phases/Phase3-Authentication-System/phase3.3-auth-pages-zustand-store.md)
   - [ ] 3.4 Session Handling & Route Protection — **B** → [phase3.4-session-handling-route-protection.md](Phases/Phase3-Authentication-System/phase3.4-session-handling-route-protection.md)
 - [ ] **Phase 4:** Product Catalog & Browsing → [phase4-product-catalog-browsing.md](Phases/Phase4-Product-Catalog-Browsing/phase4-product-catalog-browsing.md)
-  - [ ] 4.1 Catalog Read APIs — **C** → [phase4.1-catalog-read-apis.md](Phases/Phase4-Product-Catalog-Browsing/phase4.1-catalog-read-apis.md)
+  - [x] 4.1 Catalog Read APIs — **C** → [phase4.1-catalog-read-apis.md](Phases/Phase4-Product-Catalog-Browsing/phase4.1-catalog-read-apis.md)
   - [ ] 4.2 Image Serving Endpoint — **C** → [phase4.2-image-serving-endpoint.md](Phases/Phase4-Product-Catalog-Browsing/phase4.2-image-serving-endpoint.md)
   - [ ] 4.3 Product Listing, Search & Category Navigation UI — **A** → [phase4.3-product-listing-search-category-navigation-ui.md](Phases/Phase4-Product-Catalog-Browsing/phase4.3-product-listing-search-category-navigation-ui.md)
   - [ ] 4.4 Product Detail Page — **A** → [phase4.4-product-detail-page.md](Phases/Phase4-Product-Catalog-Browsing/phase4.4-product-detail-page.md)
