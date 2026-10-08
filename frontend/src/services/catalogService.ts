@@ -1,4 +1,4 @@
-import { GetCategoriesResponse, GetProductsResponse } from "../types/catalog";
+import { GetCategoriesResponse, GetProductsResponse, GetProductByIdResponse } from "../types/catalog";
 import { apiFetch } from "./api";
 
 export const catalogService = {
@@ -33,6 +33,17 @@ export const catalogService = {
     const res = await apiFetch(url);
     if (!res.ok) {
       throw new Error('Failed to fetch products');
+    }
+    return res.json();
+  },
+
+  async getProductById(id: string | number): Promise<GetProductByIdResponse> {
+    const res = await apiFetch(`/api/products/${id}`);
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error('Product not found');
+      }
+      throw new Error('Failed to fetch product');
     }
     return res.json();
   }

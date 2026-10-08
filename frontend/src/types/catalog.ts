@@ -32,3 +32,39 @@ export interface GetProductsResponse {
 export interface GetCategoriesResponse {
   categories: Category[];
 }
+
+export interface ProductImage {
+  image_id: number;
+  sort_order: number;
+  is_primary: boolean;
+}
+
+export interface VariantAttribute {
+  attribute_name: string;
+  attribute_value: string;
+}
+
+export interface ProductVariant {
+  variant_id: number;
+  variant_sku: string;
+  variant_name: string;
+  price: string | number;
+  stock_quantity: number;
+  attributes: VariantAttribute[];
+}
+
+export interface ProductDetail {
+  product_id: number;
+  product_name: string;
+  brand: string;
+  description: string;
+  base_sku: string;
+  images: ProductImage[];
+  variants: ProductVariant[];
+  categories: { category_id: number; category_name: string }[];
+}
+
+export interface GetProductByIdResponse {
+  product: ProductDetail;
+}
+

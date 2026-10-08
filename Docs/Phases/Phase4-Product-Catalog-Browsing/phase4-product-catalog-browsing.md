@@ -1,6 +1,6 @@
 # Phase 4: Product Catalog & Browsing
 
-> **Status:** In Progress (2 / 4 subphases complete)
+> **Status:** Complete (4 / 4 subphases complete)
 > **Members:** C (backend APIs), A (frontend storefront UI)
 > **Phase Dependencies:** Phase 2 complete; 4.4 also needs 3.4 (auth-aware "Add to Cart" redirect)
 > **DB Schema Reference:** [DB_Schema.md](../../Database/DB_Schema.md)
@@ -19,6 +19,8 @@ Products and categories with `is_active = false` are excluded from customer-faci
 
 - Subphase 4.1 (Catalog Read APIs) is complete.
 - Subphase 4.2 (Image Serving Endpoint) is complete.
+- Subphase 4.3 (Product Listing UI) is complete.
+- Subphase 4.4 (Product Detail Page) is complete.
 
 ---
 
@@ -29,7 +31,7 @@ Products and categories with `is_active = false` are excluded from customer-faci
 | 4.1 | [Catalog Read APIs](phase4.1-catalog-read-apis.md) | C | Phase 2 | Complete |
 | 4.2 | [Image Serving Endpoint](phase4.2-image-serving-endpoint.md) | C | Phase 2 | Complete |
 | 4.3 | [Product Listing, Search & Category Navigation UI](phase4.3-product-listing-search-category-navigation-ui.md) | A | 4.1, 4.2 (can start with mocks) | Complete |
-| 4.4 | [Product Detail Page](phase4.4-product-detail-page.md) | A | 4.1, 4.2, 3.4 | Not Started |
+| 4.4 | [Product Detail Page](phase4.4-product-detail-page.md) | A | 4.1, 4.2, 3.4 | Complete |
 
 ---
 
