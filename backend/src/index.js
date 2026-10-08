@@ -31,10 +31,14 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Routes
+// API Routes
 const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes);
+const productRoutes = require('./routes/productRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // 404 handler
 app.use((req, res) => {
