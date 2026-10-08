@@ -1,7 +1,7 @@
-﻿# Phase 3.2: Auth Middleware & Role Guards
+# Phase 3.2: Auth Middleware & Role Guards
 
 > **Parent Phase:** [Phase 3: Authentication System](phase3-authentication-system.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** E
 > **Depends On:** 3.1
 > **Blocks:** 5.1, 5.2, 6.1, 7.1 – 7.4, 9.1, 9.2 (all protected endpoints)
@@ -16,10 +16,10 @@ Provide reusable Express middleware that every other backend member uses to prot
 
 ## Tasks
 
-- [ ] `requireAuth` middleware — verify the access token cookie and attach `req.user = { user_id, role, customer_id? }`
-- [ ] `requireRole('admin')` middleware — restrict a route to a given role, return `403` otherwise
-- [ ] Return a consistent `401` response for missing/expired tokens (so the frontend knows to refresh)
-- [ ] Short usage guide in this doc's notes (how C and D mount the middleware on their routers)
+- [x] `requireAuth` middleware — verify the access token cookie and attach `req.user = { user_id, role, customer_id? }`
+- [x] `requireRole('admin')` middleware — restrict a route to a given role, return `403` otherwise
+- [x] Return a consistent `401` response for missing/expired tokens (so the frontend knows to refresh)
+- [x] Short usage guide in this doc's notes (how C and D mount the middleware on their routers)
 
 ---
 
@@ -32,5 +32,35 @@ Provide reusable Express middleware that every other backend member uses to prot
 
 ## Key Decisions & Notes
 
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+### Usage Guide for Middleware
+
+To protect a route so that only authenticated users can access it, use `requireAuth`.
+To protect a route so that only specific roles (e.g., admin) can access it, use `requireAuth` followed by `requireRole('admin')`.
+
+**Example:**
+```javascript
+const express = require('express');
+const router = express.Router();
+const { requireAuth, requireRole } = require('../middleware/authMiddleware');
+
+// Protect a single route for any authenticated user
+router.get('/my-orders', requireAuth, orderController.getMyOrders);
+
+// Protect a route for admins only
+router.post('/products', requireAuth, requireRole('admin'), productController.createProduct);
+
+// Protect an entire router
+router.use(requireAuth);
+router.get('/profile', userController.getProfile);
+```
+
+When `requireAuth` succeeds, `req.user` will be populated with:
+```javascript
+{
+  user_id: 1,
+  role: 'customer',
+  customer_id: 1 // only if the user is a customer
+  // employee_id: 1 // only if the user is an employee/admin
+}
+```
 

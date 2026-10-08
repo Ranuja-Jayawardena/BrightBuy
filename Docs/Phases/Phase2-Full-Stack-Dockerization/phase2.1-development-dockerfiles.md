@@ -1,7 +1,7 @@
-﻿# Phase 2.1: Development Dockerfiles
+# Phase 2.1: Development Dockerfiles
 
 > **Parent Phase:** [Phase 2: Full-Stack Dockerization](phase2-full-stack-dockerization.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** E
 > **Depends On:** 1.8
 > **Blocks:** 2.2
@@ -16,10 +16,10 @@ Build development images for the frontend and backend that support hot-reloading
 
 ## Tasks
 
-- [ ] Write `frontend/Dockerfile.dev` for Next.js with hot-reloading via volume mounts
-- [ ] Write `backend/Dockerfile.dev` for Express.js with hot-reloading (nodemon) via volume mounts
-- [ ] Add `.dockerignore` files for frontend and backend (exclude `node_modules`, `.next`, `.env`)
-- [ ] Make sure `node_modules` inside the container is not overwritten by the host mount (anonymous volume)
+- [x] Write `frontend/Dockerfile.dev` for Next.js with hot-reloading via volume mounts
+- [x] Write `backend/Dockerfile.dev` for Express.js with hot-reloading (nodemon) via volume mounts
+- [x] Add `.dockerignore` files for frontend and backend (exclude `node_modules`, `.next`, `.env`)
+- [x] Make sure `node_modules` inside the container is not overwritten by the host mount (anonymous volume)
 
 ---
 

@@ -1,7 +1,7 @@
-﻿# Phase 1.4: Customer & Cart Schema
+# Phase 1.4: Customer & Cart Schema
 
 > **Parent Phase:** [Phase 1: Project Foundation & Database](phase1-project-foundation.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** B
 > **Depends On:** — (needs 1.2 to run locally)
 > **Blocks:** 1.8
@@ -16,7 +16,7 @@ Create the tables for customer profiles, saved addresses, and shopping carts, pl
 ---
 
 ## Tables Owned
-
+◊
 `customers`, `addresses`, `carts`, `cart_items`
 
 ---
@@ -24,22 +24,22 @@ Create the tables for customer profiles, saved addresses, and shopping carts, pl
 ## Tasks
 
 ### Migrations
-- [ ] `V5__create_customers.sql` — `customers` table, unique FK to `users`
-- [ ] `V6__create_addresses.sql` — `addresses` table, FKs to `customers` and `cities`
-- [ ] `V14__create_carts.sql` — `carts` table, FK to `customers`
-- [ ] `V15__create_cart_items.sql` — `cart_items` table, unique `(cart_id, variant_id)`, CHECK `quantity > 0`, `ON DELETE CASCADE` from `carts`
-- [ ] Indexes: `addresses(customer_id)`, `carts(customer_id)`
-- [ ] Ensure at most one default address per customer (partial unique index on `addresses(customer_id) WHERE is_default`)
+- [x] `V5__create_customers.sql` — `customers` table, unique FK to `users`
+- [x] `V6__create_addresses.sql` — `addresses` table, FKs to `customers` and `cities`
+- [x] `V14__create_carts.sql` — `carts` table, FK to `customers`
+- [x] `V15__create_cart_items.sql` — `cart_items` table, unique `(cart_id, variant_id)`, CHECK `quantity > 0`, `ON DELETE CASCADE` from `carts`
+- [x] Indexes: `addresses(customer_id)`, `carts(customer_id)`
+- [x] Ensure at most one default address per customer (partial unique index on `addresses(customer_id) WHERE is_default`)
 
 ### Seed — `02_customers.sql`
-- [ ] 5–10 customer users (`role = 'customer'`, bcrypt-hashed passwords) with matching `customers` rows
-- [ ] 1–2 addresses per customer, cities looked up by `city_name`
+- [x] 5–10 customer users (`role = 'customer'`, bcrypt-hashed passwords) with matching `customers` rows
+- [x] 1–2 addresses per customer, cities looked up by `city_name`
 
 ### Seed — `06_carts.sql`
-- [ ] A few sample carts with items (variants looked up by `variant_sku` from C's published list)
+- [x] A few sample carts with items (variants looked up by `variant_sku` from C's published list)
 
 ### Documentation
-- [ ] Add any new constraints/indexes to [DB_Schema.md](../../Database/DB_Schema.md)
+- [x] Add any new constraints/indexes to [DB_Schema.md](../../Database/DB_Schema.md)
 
 ---
 

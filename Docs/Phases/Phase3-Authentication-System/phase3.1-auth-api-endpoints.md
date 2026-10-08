@@ -1,7 +1,7 @@
-﻿# Phase 3.1: Auth API Endpoints
+# Phase 3.1: Auth API Endpoints
 
 > **Parent Phase:** [Phase 3: Authentication System](phase3-authentication-system.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** E
 > **Depends On:** Phase 2
 > **Blocks:** 3.2, 3.3 (integration), 3.4, 8.2
@@ -17,14 +17,14 @@ Implement every auth endpoint using a fully custom JWT solution with `HttpOnly` 
 
 ## Tasks
 
-- [ ] JWT and bcrypt helpers in `backend/src/utils/` (sign/verify access + refresh tokens, hash/compare passwords)
-- [ ] `POST /api/auth/register` — create the `users` + `customers` rows in a single transaction with a bcrypt-hashed password
-- [ ] `POST /api/auth/login` — check credentials, issue a short-lived access token and a long-lived refresh token, set both as `HttpOnly` cookies
-- [ ] `POST /api/auth/refresh` — refresh with token rotation (invalidate the old refresh token, issue a new one)
-- [ ] `POST /api/auth/logout` — clear cookies and delete the refresh token from `refresh_tokens`
-- [ ] `GET /api/auth/me` — return the current user profile
-- [ ] Store refresh tokens **hashed** in `refresh_tokens` with an expiry
-- [ ] Cookie flags: `HttpOnly`, `SameSite`, `Secure` in production
+- [x] JWT and bcrypt helpers in `backend/src/utils/` (sign/verify access + refresh tokens, hash/compare passwords)
+- [x] `POST /api/auth/register` — create the `users` + `customers` rows in a single transaction with a bcrypt-hashed password
+- [x] `POST /api/auth/login` — check credentials, issue a short-lived access token and a long-lived refresh token, set both as `HttpOnly` cookies
+- [x] `POST /api/auth/refresh` — refresh with token rotation (invalidate the old refresh token, issue a new one)
+- [x] `POST /api/auth/logout` — clear cookies and delete the refresh token from `refresh_tokens`
+- [x] `GET /api/auth/me` — return the current user profile
+- [x] Store refresh tokens **hashed** in `refresh_tokens` with an expiry
+- [x] Cookie flags: `HttpOnly`, `SameSite`, `Secure` in production
 
 ---
 
