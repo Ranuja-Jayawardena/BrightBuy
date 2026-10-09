@@ -1,7 +1,7 @@
-﻿# Phase 5.3: Order Placement & History APIs
+# Phase 5.3: Order Placement & History APIs
 
 > **Parent Phase:** [Phase 5: Shopping Cart & Checkout](phase5-shopping-cart-checkout.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** D
 > **Depends On:** 5.1, 5.2
 > **Blocks:** 5.5, 5.6, 6.2, 7.3, 8.2
@@ -17,11 +17,11 @@ Turn a cart into an order safely (atomic stock deduction) and let customers view
 
 ## Tasks
 
-- [ ] `POST /api/orders` — in **one transaction**: lock variant rows (`SELECT ... FOR UPDATE`), validate stock, create `orders` + `order_items` (with `unit_price` snapshot) + `deliveries` (address snapshot + ETA), decrement stock, clear the cart
-- [ ] Reject the order if the cart is empty or any item is out of stock (roll back everything)
-- [ ] Calculate `estimated_delivery_days` from the city's `is_main_city` (5 or 7 business days)
-- [ ] `GET /api/orders` — the customer's order history
-- [ ] `GET /api/orders/:id` — order detail with items, delivery info, and payment status (own orders only)
+- [x] `POST /api/orders` — in **one transaction**: lock variant rows (`SELECT ... FOR UPDATE`), validate stock, create `orders` + `order_items` (with `unit_price` snapshot) + `deliveries` (address snapshot + ETA), decrement stock, clear the cart
+- [x] Reject the order if the cart is empty or any item is out of stock (roll back everything)
+- [x] Calculate `estimated_delivery_days` from the city's `is_main_city` (5 or 7 business days)
+- [x] `GET /api/orders` — the customer's order history
+- [x] `GET /api/orders/:id` — order detail with items, delivery info, and payment status (own orders only)
 
 See the [business rules](phase5-shopping-cart-checkout.md#business-rules-apply-across-subphases) in the parent phase.
 
