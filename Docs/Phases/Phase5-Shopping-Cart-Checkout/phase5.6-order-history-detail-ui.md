@@ -1,7 +1,7 @@
-﻿# Phase 5.6: Order History & Detail UI
+# Phase 5.6: Order History & Detail UI
 
 > **Parent Phase:** [Phase 5: Shopping Cart & Checkout](phase5-shopping-cart-checkout.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** B
 > **Depends On:** 5.3 (can start with mocks)
 > **Blocks:** 10.2
@@ -16,9 +16,9 @@ Let customers see their past orders and track each one.
 
 ## Tasks
 
-- [ ] Order history page (`/orders`) — list of past orders with date, status badge, and total
-- [ ] Order detail page (`/orders/[id]`) — items, delivery info (mode, address, status, tracking number, ETA), payment status
-- [ ] Empty state for customers with no orders
+- [x] Order history page (`/orders`) — list of past orders with date, status badge, and total
+- [x] Order detail page (`/orders/[id]`) — items, delivery info (mode, address, status, tracking number, ETA), payment status
+- [x] Empty state for customers with no orders
 
 ---
 
