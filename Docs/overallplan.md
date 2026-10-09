@@ -63,7 +63,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [x] 5.2 Address & City APIs — **D** → [phase5.2-address-city-apis.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.2-address-city-apis.md)
   - [x] 5.3 Order Placement & History APIs — **D** → [phase5.3-order-placement-history-apis.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.3-order-placement-history-apis.md)
   - [x] 5.4 Cart UI & Add-to-Cart Wiring — **B** → [phase5.4-cart-ui-add-to-cart-wiring.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.4-cart-ui-add-to-cart-wiring.md)
-  - [ ] 5.5 Address Management & Checkout UI — **B** → [phase5.5-address-management-checkout-ui.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.5-address-management-checkout-ui.md)
+  - [x] 5.5 Address Management & Checkout UI — **B** → [phase5.5-address-management-checkout-ui.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.5-address-management-checkout-ui.md)
   - [ ] 5.6 Order History & Detail UI — **B** → [phase5.6-order-history-detail-ui.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.6-order-history-detail-ui.md)
 - [ ] **Phase 6:** Payment Integration → [phase6-payment-integration.md](Phases/Phase6-Payment-Integration/phase6-payment-integration.md)
   - [ ] 6.1 Webhook Infrastructure — **E** → [phase6.1-webhook-infrastructure.md](Phases/Phase6-Payment-Integration/phase6.1-webhook-infrastructure.md)
