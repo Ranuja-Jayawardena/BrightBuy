@@ -1,6 +1,6 @@
-﻿# Phase 5: Shopping Cart & Checkout
+# Phase 5: Shopping Cart & Checkout
 
-> **Status:** Not Started (0 / 6 subphases complete)
+> **Status:** In Progress (1 / 6 subphases complete)
 > **Members:** D (backend APIs), B (frontend cart/checkout UI)
 > **Phase Dependencies:** Phase 3 (auth middleware) and Phase 4 (products/detail page)
 > **DB Schema Reference:** [DB_Schema.md](../../Database/DB_Schema.md)
@@ -15,7 +15,7 @@ Let customers build orders and complete purchases. D builds the backend APIs for
 
 ## What's Done
 
-_Nothing yet._ Update this section as subphases are completed.
+- [x] 5.1 Cart APIs (D)
 
 ---
 
@@ -23,7 +23,7 @@ _Nothing yet._ Update this section as subphases are completed.
 
 | # | Subphase | Assigned | Depends On | Status |
 |---|----------|----------|------------|--------|
-| 5.1 | [Cart APIs](phase5.1-cart-apis.md) | D | 3.2 | Not Started |
+| 5.1 | [Cart APIs](phase5.1-cart-apis.md) | D | 3.2 | Complete |
 | 5.2 | [Address & City APIs](phase5.2-address-city-apis.md) | D | 3.2 | Not Started |
 | 5.3 | [Order Placement & History APIs](phase5.3-order-placement-history-apis.md) | D | 5.1, 5.2 | Not Started |
 | 5.4 | [Cart UI & Add-to-Cart Wiring](phase5.4-cart-ui-add-to-cart-wiring.md) | B | 5.1, 4.4 | Not Started |

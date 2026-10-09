@@ -59,7 +59,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [x] 4.3 Product Listing, Search & Category Navigation UI — **A** → [phase4.3-product-listing-search-category-navigation-ui.md](Phases/Phase4-Product-Catalog-Browsing/phase4.3-product-listing-search-category-navigation-ui.md)
   - [x] 4.4 Product Detail Page — **A** → [phase4.4-product-detail-page.md](Phases/Phase4-Product-Catalog-Browsing/phase4.4-product-detail-page.md)
 - [ ] **Phase 5:** Shopping Cart & Checkout → [phase5-shopping-cart-checkout.md](Phases/Phase5-Shopping-Cart-Checkout/phase5-shopping-cart-checkout.md)
-  - [ ] 5.1 Cart APIs — **D** → [phase5.1-cart-apis.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.1-cart-apis.md)
+  - [x] 5.1 Cart APIs — **D** → [phase5.1-cart-apis.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.1-cart-apis.md)
   - [ ] 5.2 Address & City APIs — **D** → [phase5.2-address-city-apis.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.2-address-city-apis.md)
   - [ ] 5.3 Order Placement & History APIs — **D** → [phase5.3-order-placement-history-apis.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.3-order-placement-history-apis.md)
   - [ ] 5.4 Cart UI & Add-to-Cart Wiring — **B** → [phase5.4-cart-ui-add-to-cart-wiring.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.4-cart-ui-add-to-cart-wiring.md)
