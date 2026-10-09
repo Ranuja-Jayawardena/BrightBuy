@@ -1,11 +1,23 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
 import { Button } from '@/components/ui/button';
+import { ShoppingCart } from 'lucide-react';
 
 export function Navbar() {
   const { user, isAuthenticated, isLoading, logout } = useAuthStore();
+  const { itemCount, fetchCart, clearCart } = useCartStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart();
+    } else {
+      clearCart();
+    }
+  }, [isAuthenticated, fetchCart, clearCart]);
 
   const handleLogout = async () => {
     try {
@@ -37,6 +49,16 @@ export function Navbar() {
                       <Button variant="outline" size="sm">Admin</Button>
                     </Link>
                   )}
+                  <Link href="/cart">
+                    <Button variant="ghost" size="sm" className="relative">
+                      <ShoppingCart className="h-5 w-5" />
+                      {itemCount > 0 && (
+                        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                          {itemCount}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
                   <Button variant="ghost" size="sm" onClick={handleLogout}>
                     Logout
                   </Button>

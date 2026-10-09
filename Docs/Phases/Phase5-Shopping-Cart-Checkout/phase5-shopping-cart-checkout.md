@@ -28,7 +28,7 @@ Let customers build orders and complete purchases. D builds the backend APIs for
 | 5.1 | [Cart APIs](phase5.1-cart-apis.md) | D | 3.2 | Complete |
 | 5.2 | [Address & City APIs](phase5.2-address-city-apis.md) | D | 3.2 | Complete |
 | 5.3 | [Order Placement & History APIs](phase5.3-order-placement-history-apis.md) | D | 5.1, 5.2 | Complete |
-| 5.4 | [Cart UI & Add-to-Cart Wiring](phase5.4-cart-ui-add-to-cart-wiring.md) | B | 5.1, 4.4 | Not Started |
+| 5.4 | [Cart UI & Add-to-Cart Wiring](phase5.4-cart-ui-add-to-cart-wiring.md) | B | 5.1, 4.4 | Complete |
 | 5.5 | [Address Management & Checkout UI](phase5.5-address-management-checkout-ui.md) | B | 5.2, 5.3, 5.4 | Not Started |
 | 5.6 | [Order History & Detail UI](phase5.6-order-history-detail-ui.md) | B | 5.3 | Not Started |
 

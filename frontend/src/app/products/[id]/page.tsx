@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { catalogService } from '@/services/catalogService';
 import { ProductDetail, ProductVariant } from '@/types/catalog';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
 import { Loader2, AlertCircle, ShoppingCart, Check, X, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
+  const { addItem, isLoading: isCartLoading } = useCartStore();
   
   const productId = params.id as string;
   
@@ -94,14 +96,18 @@ export default function ProductDetailPage() {
     setQuantity(1); // Reset quantity on variant change
   };
 
-  const onAddToCart = (variantId: number, qty: number) => {
+  const onAddToCart = async (variantId: number, qty: number) => {
     if (!isAuthenticated) {
       router.push(`/login?redirect=/products/${productId}`);
       return;
     }
     
-    // Phase 5.4: B wires the actual cart API here
-    alert(`Phase 5.4 hook: onAddToCart called with variantId: ${variantId}, quantity: ${qty}`);
+    try {
+      await addItem(variantId, qty);
+      // Optional: show a toast or feedback here
+    } catch (error: any) {
+      alert(error.message || 'Failed to add item to cart');
+    }
   };
 
   if (loading) {
