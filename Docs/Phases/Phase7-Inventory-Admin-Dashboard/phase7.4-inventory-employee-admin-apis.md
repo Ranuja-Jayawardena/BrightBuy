@@ -17,11 +17,11 @@ Give admins a stock overview with manual adjustments, plus employee account mana
 
 ## Tasks
 
-- [ ] `GET /api/admin/inventory` — stock levels per variant, with low-stock filtering and search
-- [ ] `PUT /api/admin/inventory/:variantId` — manually adjust stock quantity (with reason)
-- [ ] `POST /api/admin/employees` — create an employee account (`users` + `employees` rows in one transaction, bcrypt-hashed password)
-- [ ] `GET /api/admin/employees` — list all employees
-- [ ] Protect all routes with `requireAuth` + `requireRole('admin')`
+- [x] `GET /api/admin/inventory` — stock levels per variant, with low-stock filtering and search
+- [x] `PUT /api/admin/inventory/:variantId` — manually adjust stock quantity (with reason)
+- [x] `POST /api/admin/employees` — create an employee account (`users` + `employees` rows in one transaction, bcrypt-hashed password)
+- [x] `GET /api/admin/employees` — list all employees
+- [x] Protect all routes with `requireAuth` + `requireRole('admin')`
 
 ---
 
@@ -57,4 +57,6 @@ Response 409: { error: "Email already exists" }
 ## Key Decisions & Notes
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
+
+Added an inventory adjustment audit table so every manual stock change retains the acting employee, previous/new quantity, and reason.
 
