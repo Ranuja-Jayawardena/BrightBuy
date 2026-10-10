@@ -11,6 +11,10 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
 }));
+
+// Webhook route needs raw body, mount before express.json()
+app.use('/api/webhooks', require('./routes/webhookRoutes'));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -42,7 +46,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const cityRoutes = require('./routes/cityRoutes');
 const addressRoutes = require('./routes/addressRoutes');
-const orderRoutes = require('./routes/orderRoutes);
+const orderRoutes = require('./routes/orderRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
