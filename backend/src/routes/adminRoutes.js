@@ -1,12 +1,18 @@
 const express = require('express');
 const adminProductController = require('../controllers/adminProductController');
 const adminCategoryController = require('../controllers/adminCategoryController');
+const adminOrderController = require('../controllers/adminOrderController');
 const { requireAuth, requireRole } = require('../middleware/authMiddleware');
 const multipartImageUpload = require('../middleware/multipartImageUpload');
 
 const router = express.Router();
 
 router.use(requireAuth, requireRole('admin'));
+
+router.get('/orders', adminOrderController.list);
+router.get('/orders/:id', adminOrderController.detail);
+router.put('/orders/:id/status', adminOrderController.status);
+router.put('/deliveries/:id/status', adminOrderController.delivery);
 
 router.get('/categories', adminCategoryController.list);
 router.post('/categories', adminCategoryController.create);
