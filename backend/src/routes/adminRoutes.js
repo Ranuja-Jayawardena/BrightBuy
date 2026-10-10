@@ -2,12 +2,18 @@ const express = require('express');
 const adminProductController = require('../controllers/adminProductController');
 const adminCategoryController = require('../controllers/adminCategoryController');
 const adminOrderController = require('../controllers/adminOrderController');
+const adminInventoryController = require('../controllers/adminInventoryController');
 const { requireAuth, requireRole } = require('../middleware/authMiddleware');
 const multipartImageUpload = require('../middleware/multipartImageUpload');
 
 const router = express.Router();
 
 router.use(requireAuth, requireRole('admin'));
+
+router.get('/inventory', adminInventoryController.list);
+router.put('/inventory/:variantId', adminInventoryController.adjust);
+router.post('/employees', adminInventoryController.createEmployee);
+router.get('/employees', adminInventoryController.listEmployees);
 
 router.get('/orders', adminOrderController.list);
 router.get('/orders/:id', adminOrderController.detail);
