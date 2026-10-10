@@ -1,7 +1,7 @@
 ﻿# Phase 7.2: Category Admin APIs
 
 > **Parent Phase:** [Phase 7: Inventory & Admin Dashboard](phase7-inventory-admin-dashboard.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** C
 > **Depends On:** 3.2
 > **Blocks:** 7.5
@@ -17,11 +17,11 @@ Let admins manage the category tree.
 
 ## Tasks
 
-- [ ] `GET /api/admin/categories` — full tree including inactive categories
-- [ ] `POST /api/admin/categories` — create a category (optional parent)
-- [ ] `PUT /api/admin/categories/:id` — update name/parent (prevent circular parent chains)
-- [ ] `DELETE /api/admin/categories/:id` — soft-delete (`is_active = false`)
-- [ ] Protect all routes with `requireAuth` + `requireRole('admin')`
+- [x] `GET /api/admin/categories` — full tree including inactive categories
+- [x] `POST /api/admin/categories` — create a category (optional parent)
+- [x] `PUT /api/admin/categories/:id` — update name/parent (prevent circular parent chains)
+- [x] `DELETE /api/admin/categories/:id` — soft-delete (`is_active = false`)
+- [x] Protect all routes with `requireAuth` + `requireRole('admin')`
 
 ---
 
@@ -51,4 +51,7 @@ Response 400: { error: "Circular category hierarchy" }
 ## Key Decisions & Notes
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
+
+- Category responses are assembled into a nested `children` tree while retaining inactive nodes and their relationships.
+- Re-parenting uses a recursive ancestor query and returns `400 { error: "Circular category hierarchy" }` when the target is its own descendant.
 
