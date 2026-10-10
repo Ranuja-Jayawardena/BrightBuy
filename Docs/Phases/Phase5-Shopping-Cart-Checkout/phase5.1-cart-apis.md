@@ -1,7 +1,7 @@
-﻿# Phase 5.1: Cart APIs
+# Phase 5.1: Cart APIs
 
 > **Parent Phase:** [Phase 5: Shopping Cart & Checkout](phase5-shopping-cart-checkout.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** D
 > **Depends On:** 3.2
 > **Blocks:** 5.3, 5.4
@@ -17,13 +17,13 @@ Let authenticated customers manage their shopping cart.
 
 ## Tasks
 
-- [ ] Auto-create a cart for the customer if one doesn't exist
-- [ ] `GET /api/cart` — cart with line items, variant details, and subtotals
-- [ ] `POST /api/cart/items` — add a variant (enforce `(cart_id, variant_id)` uniqueness, validate stock, reject inactive variants)
-- [ ] `PUT /api/cart/items/:id` — update quantity (validate against available stock)
-- [ ] `DELETE /api/cart/items/:id` — remove an item
-- [ ] Make sure customers can only touch their own cart items
-- [ ] Protect all routes with `requireAuth` (from 3.2)
+- [x] Auto-create a cart for the customer if one doesn't exist
+- [x] `GET /api/cart` — cart with line items, variant details, and subtotals
+- [x] `POST /api/cart/items` — add a variant (enforce `(cart_id, variant_id)` uniqueness, validate stock, reject inactive variants)
+- [x] `PUT /api/cart/items/:id` — update quantity (validate against available stock)
+- [x] `DELETE /api/cart/items/:id` — remove an item
+- [x] Make sure customers can only touch their own cart items
+- [x] Protect all routes with `requireAuth` (from 3.2)
 
 ---
 

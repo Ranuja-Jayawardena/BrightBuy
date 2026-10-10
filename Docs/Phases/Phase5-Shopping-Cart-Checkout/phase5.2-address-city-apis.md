@@ -1,7 +1,7 @@
-﻿# Phase 5.2: Address & City APIs
+# Phase 5.2: Address & City APIs
 
 > **Parent Phase:** [Phase 5: Shopping Cart & Checkout](phase5-shopping-cart-checkout.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** D
 > **Depends On:** 3.2
 > **Blocks:** 5.3, 5.5
@@ -17,13 +17,13 @@ Let customers manage saved delivery addresses, and expose the list of deliverabl
 
 ## Tasks
 
-- [ ] `GET /api/cities` — public list of cities (with `is_main_city` for ETA display)
-- [ ] `GET /api/addresses` — list the customer's saved addresses
-- [ ] `POST /api/addresses` — add a new address
-- [ ] `PUT /api/addresses/:id` — update an address
-- [ ] `DELETE /api/addresses/:id` — remove an address
-- [ ] `PUT /api/addresses/:id/default` — set as default (unset the previous default in the same transaction)
-- [ ] Make sure customers can only touch their own addresses
+- [x] `GET /api/cities` — public list of cities (with `is_main_city` for ETA display)
+- [x] `GET /api/addresses` — list the customer's saved addresses
+- [x] `POST /api/addresses` — add a new address
+- [x] `PUT /api/addresses/:id` — update an address
+- [x] `DELETE /api/addresses/:id` — remove an address
+- [x] `PUT /api/addresses/:id/default` — set as default (unset the previous default in the same transaction)
+- [x] Make sure customers can only touch their own addresses
 
 ---
 
