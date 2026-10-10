@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-brightbuy}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./backend/db/init:/docker-entrypoint-initdb.d
@@ -31,12 +31,19 @@ services:
       - ./backend/db/seed:/seed-data
     environment:
       PGPASSWORD: ${DB_PASSWORD:-postgres}
+    # Seeds are NOT idempotent, so only run them against an empty database.
+    # ON_ERROR_STOP makes psql exit non-zero on any SQL error (otherwise errors are ignored).
     command: >
       sh -c '
+      SEEDED=$$(psql -h db -U ${DB_USER:-postgres} -d ${DB_NAME:-brightbuy} -tAc "SELECT EXISTS (SELECT 1 FROM users)") || exit 1;
+      if [ "$$SEEDED" = "t" ]; then
+        echo "Database already seeded - skipping. (Run: docker compose down -v to reset.)";
+        exit 0;
+      fi;
       echo "Running seed files...";
       for f in $$(ls /seed-data/*.sql 2>/dev/null | sort); do
-        echo "Running $$f..."
-        psql -h db -U ${DB_USER:-postgres} -d ${DB_NAME:-brightbuy} -f $$f || exit 1
+        echo "Running $$f...";
+        psql -v ON_ERROR_STOP=1 -h db -U ${DB_USER:-postgres} -d ${DB_NAME:-brightbuy} -f $$f || exit 1;
       done;
       echo "Seed complete!"
       '
@@ -45,6 +52,49 @@ services:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+    # Override DB settings from backend/.env (which point to localhost for non-Docker dev)
+    # so the container reaches Postgres via the internal `db` service name.
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-brightbuy}
+      CHOKIDAR_USEPOLLING: "true"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    command: npm run dev -- --webpack
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - ./frontend/.env
+    environment:
+      WATCHPACK_POLLING: "true"
+    depends_on:
+      backend:
+        condition: service_started
 
 volumes:
   db-data:

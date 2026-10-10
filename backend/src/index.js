@@ -11,6 +11,10 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
 }));
+
+// Webhook route needs raw body, mount before express.json()
+app.use('/api/webhooks', require('./routes/webhookRoutes'));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -30,6 +34,32 @@ app.get('/api/health', async (req, res) => {
     res.status(500).json({ status: 'error', database: 'disconnected', timestamp: new Date().toISOString() });
   }
 });
+
+// API Routes
+const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const imageRoutes = require('./routes/imageRoutes');
+
+const adminRoutes = require('./routes/adminRoutes');
+
+const cartRoutes = require('./routes/cartRoutes');
+const cityRoutes = require('./routes/cityRoutes');
+const addressRoutes = require('./routes/addressRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/images', imageRoutes);
+
+app.use('/api/admin', adminRoutes);
+
+app.use('/api/cart', cartRoutes);
+app.use('/api/cities', cityRoutes);
+app.use('/api/addresses', addressRoutes);
+app.use('/api/orders', orderRoutes);
+
 
 // 404 handler
 app.use((req, res) => {

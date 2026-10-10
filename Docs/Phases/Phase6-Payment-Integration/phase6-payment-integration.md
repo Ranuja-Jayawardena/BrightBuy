@@ -1,6 +1,6 @@
-﻿# Phase 6: Payment Integration
+# Phase 6: Payment Integration
 
-> **Status:** Not Started (0 / 4 subphases complete)
+> **Status:** In Progress (1 / 4 subphases complete)
 > **Members:** D (Lemon Squeezy integration), E (webhook infrastructure), B (payment UI)
 > **Phase Dependencies:** Phase 5 must be complete (orders exist to pay for)
 > **DB Schema Reference:** [DB_Schema.md](../../Database/DB_Schema.md)
@@ -15,7 +15,7 @@ Connect to Lemon Squeezy to process payments. D creates payment sessions, handle
 
 ## What's Done
 
-_Nothing yet._ Update this section as subphases are completed.
+- **6.1 Webhook Infrastructure:** Webhook route implemented with HMAC signature verification and passed to D's handlers.
 
 ---
 
@@ -23,7 +23,7 @@ _Nothing yet._ Update this section as subphases are completed.
 
 | # | Subphase | Assigned | Depends On | Status |
 |---|----------|----------|------------|--------|
-| 6.1 | [Webhook Infrastructure](phase6.1-webhook-infrastructure.md) | E | 3.2 | Not Started |
+| 6.1 | [Webhook Infrastructure](phase6.1-webhook-infrastructure.md) | E | 3.2 | Complete |
 | 6.2 | [Payment Sessions & Cash on Delivery](phase6.2-payment-sessions-cash-on-delivery.md) | D | 5.3 | Not Started |
 | 6.3 | [Payment Event Handlers & Order Status](phase6.3-payment-event-handlers-order-status.md) | D | 6.1, 6.2 | Not Started |
 | 6.4 | [Payment UI](phase6.4-payment-ui.md) | B | 6.2, 5.5 | Not Started |

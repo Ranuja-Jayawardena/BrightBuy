@@ -1,6 +1,6 @@
 ﻿# Phase 7: Inventory & Admin Dashboard
 
-> **Status:** Not Started (0 / 6 subphases complete)
+> **Status:** In Progress (4 / 6 subphases complete)
 > **Members:** C (backend admin APIs), B (frontend admin UI)
 > **Phase Dependencies:** Phase 3 (role guards) and Phase 4 (product APIs). 7.3 also needs Phase 5 (orders).
 > **DB Schema Reference:** [DB_Schema.md](../../Database/DB_Schema.md)
@@ -15,7 +15,8 @@ Management tools for employees and administrators. C builds admin-only APIs for 
 
 ## What's Done
 
-_Nothing yet._ Update this section as subphases are completed.
+- **7.1 Product, Variant & Image Admin APIs:** Added admin-protected product CRUD, image upload/update/delete, and variant CRUD endpoints under `/api/admin`.
+- **7.2 Category Admin APIs:** Added admin-protected category tree CRUD with soft delete and circular hierarchy protection.
 
 ---
 
@@ -23,10 +24,10 @@ _Nothing yet._ Update this section as subphases are completed.
 
 | # | Subphase | Assigned | Depends On | Status |
 |---|----------|----------|------------|--------|
-| 7.1 | [Product, Variant & Image Admin APIs](phase7.1-product-variant-image-admin-apis.md) | C | 3.2, 4.1 | Not Started |
-| 7.2 | [Category Admin APIs](phase7.2-category-admin-apis.md) | C | 3.2 | Not Started |
-| 7.3 | [Order & Delivery Admin APIs](phase7.3-order-delivery-admin-apis.md) | C | 3.2, 5.3 | Not Started |
-| 7.4 | [Inventory & Employee Admin APIs](phase7.4-inventory-employee-admin-apis.md) | C | 3.2 | Not Started |
+| 7.1 | [Product, Variant & Image Admin APIs](phase7.1-product-variant-image-admin-apis.md) | C | 3.2, 4.1 | Complete |
+| 7.2 | [Category Admin APIs](phase7.2-category-admin-apis.md) | C | 3.2 | Complete |
+| 7.3 | [Order & Delivery Admin APIs](phase7.3-order-delivery-admin-apis.md) | C | 3.2, 5.3 | Complete |
+| 7.4 | [Inventory & Employee Admin APIs](phase7.4-inventory-employee-admin-apis.md) | C | 3.2 | Complete |
 | 7.5 | [Admin Layout & Catalog Management UI](phase7.5-admin-layout-catalog-management-ui.md) | B | 3.4, 7.1, 7.2 | Not Started |
 | 7.6 | [Operations Admin UI (Orders, Inventory, Employees)](phase7.6-operations-admin-ui.md) | B | 7.3, 7.4, 7.5 | Not Started |
 
@@ -49,5 +50,5 @@ B can start the admin layout and forms in 7.5 with mock data while C builds the 
 
 ## Key Decisions & Notes
 
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+- 7.1 uses a route-local multipart parser for image uploads so no new dependency is required in the current environment. Uploaded image bytes are validated by magic bytes before inserting into `product_images.image_data`.
 

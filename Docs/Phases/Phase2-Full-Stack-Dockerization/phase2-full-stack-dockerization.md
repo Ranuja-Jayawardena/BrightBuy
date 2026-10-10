@@ -1,6 +1,6 @@
-﻿# Phase 2: Full-Stack Dockerization
+# Phase 2: Full-Stack Dockerization
 
-> **Status:** Not Started (0 / 3 subphases complete)
+> **Status:** Complete (3 / 3 subphases complete)
 > **Lead:** E (solo)
 > **Members:** E
 > **Phase Dependencies:** Phase 1 must be complete (1.8)
@@ -16,7 +16,9 @@ Containerize every layer of the application for consistent local development. Wh
 
 ## What's Done
 
-_Nothing yet._ Update this section as subphases are completed.
+- **2.1** `frontend/Dockerfile.dev` and `backend/Dockerfile.dev` (node:20-alpine, hot reload via bind mounts) + `.dockerignore` files; `node_modules` (and `.next`) protected by anonymous volumes.
+- **2.2** `docker-compose.yml` runs `db` → `migrations` → `seed` → `backend` → `frontend` using healthchecks and `depends_on` conditions; services reach each other by service name; env loaded from `backend/.env` and `frontend/.env`.
+- **2.3** Full stack verified (backend `/api/health` reports DB connected, frontend serves on :3000, nodemon hot reload confirmed). `README.md` documents first run, DB reset, logs, and common errors.
 
 ---
 
@@ -24,9 +26,9 @@ _Nothing yet._ Update this section as subphases are completed.
 
 | # | Subphase | Assigned | Depends On | Status |
 |---|----------|----------|------------|--------|
-| 2.1 | [Development Dockerfiles](phase2.1-development-dockerfiles.md) | E | 1.8 | Not Started |
-| 2.2 | [Compose Orchestration & Networking](phase2.2-compose-orchestration-networking.md) | E | 2.1 | Not Started |
-| 2.3 | [Stack Verification & Developer Docs](phase2.3-stack-verification-developer-docs.md) | E | 2.2 | Not Started |
+| 2.1 | [Development Dockerfiles](phase2.1-development-dockerfiles.md) | E | 1.8 | Complete |
+| 2.2 | [Compose Orchestration & Networking](phase2.2-compose-orchestration-networking.md) | E | 2.1 | Complete |
+| 2.3 | [Stack Verification & Developer Docs](phase2.3-stack-verification-developer-docs.md) | E | 2.2 | Complete |
 
 ---
 
@@ -44,5 +46,10 @@ graph LR
 
 ## Key Decisions & Notes
 
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+- **Post-completion audit fixes (Oct 2026, E):** A review found that the stack did not actually work end-to-end even though it was marked complete. These fixes were made:
+  - **Backend could not reach the DB inside Docker:** `backend/.env` points to `localhost`, so the backend container got `ECONNREFUSED 127.0.0.1:5432`. Fix: the `backend` service now sets `DB_HOST=db`, `DB_PORT=5432` and DB credentials in `environment:`, which overrides `env_file`.
+  - **Seed re-ran on every `docker compose up`:** the seeds are not idempotent, and `psql -f` ignores SQL errors, so every restart would have duplicated rows. Fix: the seed service skips when `users` already has rows, and runs each file with `-v ON_ERROR_STOP=1` so a failing seed makes the service exit non-zero. To re-seed, use `docker compose down -v`.
+  - **Hot reload on Windows bind mounts:** added `CHOKIDAR_USEPOLLING=true` (backend/nodemon) and `WATCHPACK_POLLING=true` (frontend).
+  - **Env files:** the README told users to create `frontend/.env.local`, but compose requires `frontend/.env`, so the README now says `.env`. `backend/.env.example` DB credentials now match the compose defaults (`postgres`/`postgres`/`brightbuy`, host port `5433`).
+  - README now covers DB reset, viewing logs, and common errors, as 2.3 requires.
 

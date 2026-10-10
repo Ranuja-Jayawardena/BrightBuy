@@ -66,7 +66,7 @@ BrightBuy/
 │   ├── SRS/                # Software Requirements Specification
 │   ├── tech stack/         # Tech stack and constraints
 │   └── overallplan.md      # Master progress tracker and team allocations
-├── docker-compose.yml      # Orchestration for Postgres, Flyway, and Seed runner
+├── docker-compose.yml      # Full-stack orchestration: db, migrations, seed, backend, frontend
 ├── .gitignore
 ├── package.json            # Monorepo runner scripts
 └── README.md
@@ -99,29 +99,42 @@ cd ..
 ```
 
 ### 2. Environment Variables
-Copy the `.env.example` templates in both `frontend` and `backend`:
+Copy the `.env.example` templates in both `frontend` and `backend`. **Both files are required** — `docker-compose.yml` loads them via `env_file` and will refuse to start if they are missing:
 
 ```bash
 # Frontend
-cp frontend/.env.example frontend/.env.local
+cp frontend/.env.example frontend/.env
 
 # Backend
 cp backend/.env.example backend/.env
 ```
 
-### 3. Database Tooling (Postgres, Flyway, Seed)
-To run migrations and seeds locally using Docker Compose, make sure Docker is running and execute:
+> The backend `.env` DB settings (`localhost:5433`) are for running the backend on your host. When the backend runs inside Docker, `docker-compose.yml` overrides them to `db:5432` automatically.
+
+### 3. Running the Full Stack via Docker (Recommended)
+You can run the entire stack (Database, Migrations, Seed, Backend, and Frontend) using Docker Compose with hot-reloading enabled. Ensure Docker is running and execute:
 ```bash
-docker-compose up db migrations seed
+docker compose up --build
 ```
-This will start PostgreSQL on port 5432, run the Flyway migrations from `backend/db/migrations/`, and apply the seed scripts from `backend/db/seed/`.
+Services start in this order: `db` (healthy) → `migrations` (Flyway, exits) → `seed` (exits) → `backend` → `frontend`.
+- PostgreSQL on host port `5433` (internal `db:5432`)
+- Backend API at: `http://localhost:5000` (health: `http://localhost:5000/api/health`)
+- Frontend at: `http://localhost:3000`
+
+Seed scripts only run when the database is empty, so restarting the stack never duplicates data.
+
+Hot-reloading: source folders are bind-mounted into the containers. Edits to `backend/src` restart nodemon, and edits to `frontend/src` trigger Next.js fast refresh. File-watch polling is enabled so this also works with Windows bind mounts.
 
 **Default Seed Credentials:**
 - Admin: `admin@brightbuy.com` / `password123`
 - Employee: `employee1@brightbuy.com` / `password123`
 
-### 4. Running the Development Servers
-From the root directory:
+### 4. Running Locally without Docker (Alternative)
+If you prefer not to use Docker for the frontend and backend, you can start just the database tooling:
+```bash
+docker compose up db migrations seed
+```
+Then, start the frontend and backend development servers manually from the root directory:
 
 ```bash
 npm run dev
@@ -130,6 +143,32 @@ npm run dev
 This will run:
 - Frontend at: `http://localhost:3000`
 - Backend API at: `http://localhost:5000`
+
+### 5. Everyday Docker Commands
+
+| Task | Command |
+|------|---------|
+| Start in background | `docker compose up -d` |
+| Rebuild after `package.json` changes | `docker compose up -d --build` |
+| Stop (keep data) | `docker compose down` |
+| **Reset DB** (wipe data, re-run migrations + seed) | `docker compose down -v` then `docker compose up --build` |
+| View all logs (follow) | `docker compose logs -f` |
+| View one service's logs | `docker compose logs -f backend` (or `frontend`, `db`, `migrations`, `seed`) |
+| Service status | `docker compose ps -a` |
+| Open a psql shell | `docker compose exec db psql -U postgres -d brightbuy` |
+
+### 6. Common Errors
+
+| Symptom | Cause / Fix |
+|---------|-------------|
+| `env file ... not found` on `up` | Create `frontend/.env` and `backend/.env` from the `.env.example` files (step 2). |
+| `port is already allocated` (5433 / 5000 / 3000) | Another process (local Postgres, a running `npm run dev`) is using the port. Stop it, or change the host-side port in `docker-compose.yml`. |
+| `migrations` exits with a Flyway validation/checksum error | An already-applied migration file was edited. Never edit applied migrations — add a new `V__` file. For local dev, reset with `docker compose down -v`. |
+| `seed` exits with an error | A seed script failed (seeds stop on the first SQL error). Check `docker compose logs seed`, fix the script, then reset with `docker compose down -v`. |
+| `backend`/`frontend` never start | They wait for `seed` to complete successfully. Check `docker compose logs migrations seed`. |
+| `/api/health` returns `database: disconnected` | Check `docker compose ps` that `db` is healthy. When running the backend on the host, `backend/.env` must use `DB_HOST=localhost`, `DB_PORT=5433`, and the credentials from `.env.example`. |
+| New npm package not found in the container | `node_modules` lives in an anonymous volume. Rebuild with `docker compose up -d --build --renew-anon-volumes`. |
+| Code changes don't hot-reload | Edit files inside `frontend/` or `backend/` (bind-mounted), or restart the service: `docker compose restart frontend` (or `backend`). |
 
 ---
 
