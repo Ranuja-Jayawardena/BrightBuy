@@ -67,7 +67,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [x] 5.6 Order History & Detail UI — **B** → [phase5.6-order-history-detail-ui.md](Phases/Phase5-Shopping-Cart-Checkout/phase5.6-order-history-detail-ui.md)
 - [ ] **Phase 6:** Payment Integration → [phase6-payment-integration.md](Phases/Phase6-Payment-Integration/phase6-payment-integration.md)
   - [x] 6.1 Webhook Infrastructure — **E** → [phase6.1-webhook-infrastructure.md](Phases/Phase6-Payment-Integration/phase6.1-webhook-infrastructure.md)
-  - [ ] 6.2 Payment Sessions & Cash on Delivery — **D** → [phase6.2-payment-sessions-cash-on-delivery.md](Phases/Phase6-Payment-Integration/phase6.2-payment-sessions-cash-on-delivery.md)
+  - [x] 6.2 Payment Sessions & Cash on Delivery — **D** → [phase6.2-payment-sessions-cash-on-delivery.md](Phases/Phase6-Payment-Integration/phase6.2-payment-sessions-cash-on-delivery.md)
   - [ ] 6.3 Payment Event Handlers & Order Status — **D** → [phase6.3-payment-event-handlers-order-status.md](Phases/Phase6-Payment-Integration/phase6.3-payment-event-handlers-order-status.md)
   - [ ] 6.4 Payment UI — **B** → [phase6.4-payment-ui.md](Phases/Phase6-Payment-Integration/phase6.4-payment-ui.md)
 - [ ] **Phase 7:** Inventory & Admin Dashboard → [phase7-inventory-admin-dashboard.md](Phases/Phase7-Inventory-Admin-Dashboard/phase7-inventory-admin-dashboard.md)
