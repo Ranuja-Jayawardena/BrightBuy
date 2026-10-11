@@ -5,6 +5,7 @@ import { ShoppingCart } from 'lucide-react';
 
 interface ProductCardProps {
   product: ProductSummary;
+  key?: React.Key | number | string | null;
 }
 
 export function ProductCard({ product }: ProductCardProps) {

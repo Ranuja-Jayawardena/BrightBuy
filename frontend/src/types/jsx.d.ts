@@ -9,6 +9,11 @@ declare global {
     interface ElementChildrenAttribute {
       children: {};
     }
+    interface IntrinsicAttributes {
+      key?: any;
+      ref?: any;
+      [key: string]: any;
+    }
   }
 }
 
@@ -19,10 +24,19 @@ declare namespace JSX {
   interface Element {
     [key: string]: any;
   }
+  interface ElementChildrenAttribute {
+    children: {};
+  }
+  interface IntrinsicAttributes {
+    key?: any;
+    ref?: any;
+    [key: string]: any;
+  }
 }
 
 declare namespace React {
   export type ReactNode = any;
+  export type Key = string | number | bigint;
   export type FC<P = any> = any;
   export type ComponentProps<T = any> = any;
   export type FormEvent<T = any> = any;
@@ -35,6 +49,7 @@ declare module 'react' {
   export default React;
   export namespace React {
     export type ReactNode = any;
+    export type Key = string | number | bigint;
     export type FC<P = any> = any;
     export type ComponentProps<T = any> = any;
     export type FormEvent<T = any> = any;
@@ -48,6 +63,7 @@ declare module 'react' {
   export function useRef<T = any>(initialValue?: T | null): { current: T | null };
   export const Suspense: any;
   export type ReactNode = any;
+  export type Key = string | number | bigint;
   export type FC<P = any> = any;
   export type ComponentProps<T = any> = any;
   export type FormEvent<T = any> = any;
@@ -58,6 +74,14 @@ declare module 'react' {
       [elemName: string]: any;
     }
     interface Element {
+      [key: string]: any;
+    }
+    interface ElementChildrenAttribute {
+      children: {};
+    }
+    interface IntrinsicAttributes {
+      key?: any;
+      ref?: any;
       [key: string]: any;
     }
   }
@@ -74,6 +98,14 @@ declare module 'react/jsx-runtime' {
     interface Element {
       [key: string]: any;
     }
+    interface ElementChildrenAttribute {
+      children: {};
+    }
+    interface IntrinsicAttributes {
+      key?: any;
+      ref?: any;
+      [key: string]: any;
+    }
   }
 }
 
@@ -85,6 +117,14 @@ declare module 'react/jsx-dev-runtime' {
       [elemName: string]: any;
     }
     interface Element {
+      [key: string]: any;
+    }
+    interface ElementChildrenAttribute {
+      children: {};
+    }
+    interface IntrinsicAttributes {
+      key?: any;
+      ref?: any;
       [key: string]: any;
     }
   }
