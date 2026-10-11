@@ -24,7 +24,7 @@ test('admin product CRUD validators only accept strict numeric identifiers', () 
   expectsBadRequest(() => adminProduct.parsePositiveInteger(-1, 'id'));
 });
 
-test('category tree construction nests categories and preserves roots', () => {
+test('category tree construction nests categories and preserves roots', async () => {
   const tree = categories.buildTree([
     { category_id: 1, parent_category_id: null, category_name: 'Root' },
     { category_id: 2, parent_category_id: 1, category_name: 'Child' },
@@ -32,7 +32,7 @@ test('category tree construction nests categories and preserves roots', () => {
   assert.equal(tree.length, 1);
   assert.equal(tree[0].children[0].category_id, 2);
   expectsBadRequest(() => categories.positiveId('2.5', 'id'));
-  expectsBadRequest(() => categories.ensureParentExists(1, 1));
+  await assert.rejects(categories.ensureParentExists(1, 1), (error) => error.status === 400);
 });
 
 test('image retrieval identifies accepted image bytes and generates a stable ETag', () => {
