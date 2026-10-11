@@ -9,12 +9,12 @@ const handleLemonSqueezyWebhook = async (req, res) => {
     const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
     if (!secret) {
       console.error('LEMON_SQUEEZY_WEBHOOK_SECRET is not configured');
-      return res.status(500).json({ error: 'Webhook secret not configured' });
+      return res.status(500).json({ error: 'server_error', message: 'Webhook secret not configured', statusCode: 500 });
     }
 
     const signature = req.get('X-Signature');
     if (!signature) {
-      return res.status(401).json({ error: 'Missing signature' });
+      return res.status(401).json({ error: 'unauthorized', message: 'Missing signature', statusCode: 401 });
     }
 
     // Verify signature
@@ -23,7 +23,7 @@ const handleLemonSqueezyWebhook = async (req, res) => {
     const signatureBuffer = Buffer.from(signature, 'utf8');
 
     if (digest.length !== signatureBuffer.length || !crypto.timingSafeEqual(digest, signatureBuffer)) {
-      return res.status(401).json({ error: 'Invalid signature' });
+      return res.status(401).json({ error: 'unauthorized', message: 'Invalid signature', statusCode: 401 });
     }
 
     // Now it's safe to parse the JSON
@@ -73,7 +73,7 @@ const handleLemonSqueezyWebhook = async (req, res) => {
     return res.status(200).json({ received: true });
   } catch (error) {
     console.error('Webhook processing error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'internal_error', message: 'Internal Server Error', statusCode: 500 });
   }
 };
 
