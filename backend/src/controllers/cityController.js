@@ -6,7 +6,7 @@ const getCities = async (req, res) => {
         res.json({ cities });
     } catch (error) {
         console.error('Error fetching cities:', error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: 'internal_error', message: 'Internal Server Error', statusCode: 500 });
     }
 };
 
