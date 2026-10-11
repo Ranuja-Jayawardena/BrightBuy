@@ -25,36 +25,41 @@ export default function ProductDetailPage() {
   const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
+  const [addedSuccess, setAddedSuccess] = useState(false);
+
+  const loadProduct = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await catalogService.getProductById(productId);
+      setProduct(data.product);
+
+      if (data.product?.product_name) {
+        document.title = `${data.product.product_name} | BrightBuy`;
+      }
+      
+      // Initialize default selections
+      if (data.product.images?.length > 0) {
+        const primary = data.product.images.find(img => img.is_primary) || data.product.images[0];
+        setSelectedImageId(primary.image_id);
+      }
+      
+      if (data.product.variants?.length > 0) {
+        const firstVariant = data.product.variants[0];
+        const initialAttrs: Record<string, string> = {};
+        firstVariant.attributes.forEach(attr => {
+          initialAttrs[attr.attribute_name] = attr.attribute_value;
+        });
+        setSelectedAttributes(initialAttrs);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to load product');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadProduct() {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await catalogService.getProductById(productId);
-        setProduct(data.product);
-        
-        // Initialize default selections
-        if (data.product.images?.length > 0) {
-          const primary = data.product.images.find(img => img.is_primary) || data.product.images[0];
-          setSelectedImageId(primary.image_id);
-        }
-        
-        if (data.product.variants?.length > 0) {
-          const firstVariant = data.product.variants[0];
-          const initialAttrs: Record<string, string> = {};
-          firstVariant.attributes.forEach(attr => {
-            initialAttrs[attr.attribute_name] = attr.attribute_value;
-          });
-          setSelectedAttributes(initialAttrs);
-        }
-      } catch (err: any) {
-        setError(err.message || 'Failed to load product');
-      } finally {
-        setLoading(false);
-      }
-    }
-    
     if (productId) {
       loadProduct();
     }
@@ -104,7 +109,10 @@ export default function ProductDetailPage() {
     
     try {
       await addItem(variantId, qty);
-      // Optional: show a toast or feedback here
+      setAddedSuccess(true);
+      setTimeout(() => {
+        setAddedSuccess(false);
+      }, 3000);
     } catch (error: any) {
       alert(error.message || 'Failed to add item to cart');
     }
@@ -112,26 +120,80 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <div className="container mx-auto px-4 py-8 max-w-7xl animate-pulse">
+        {/* Breadcrumb Skeleton */}
+        <div className="flex items-center space-x-2 mb-8">
+          <div className="h-4 w-12 bg-slate-200 rounded" />
+          <div className="h-4 w-4 bg-slate-200 rounded" />
+          <div className="h-4 w-16 bg-slate-200 rounded" />
+          <div className="h-4 w-4 bg-slate-200 rounded" />
+          <div className="h-4 w-28 bg-slate-200 rounded" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* Gallery Skeleton */}
+          <div className="space-y-4">
+            <div className="aspect-square bg-slate-200 rounded-2xl w-full" />
+            <div className="grid grid-cols-5 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="aspect-square bg-slate-200 rounded-lg" />
+              ))}
+            </div>
+          </div>
+
+          {/* Details Skeleton */}
+          <div className="space-y-6">
+            <div className="h-4 w-20 bg-slate-200 rounded-full" />
+            <div className="h-9 w-3/4 bg-slate-200 rounded-lg" />
+            <div className="h-8 w-28 bg-slate-200 rounded-md" />
+            <div className="space-y-2 pt-2">
+              <div className="h-4 w-full bg-slate-200 rounded" />
+              <div className="h-4 w-5/6 bg-slate-200 rounded" />
+              <div className="h-4 w-2/3 bg-slate-200 rounded" />
+            </div>
+            <div className="pt-4 border-t border-slate-100 space-y-3">
+              <div className="h-4 w-24 bg-slate-200 rounded" />
+              <div className="flex gap-2">
+                <div className="h-10 w-20 bg-slate-200 rounded-lg" />
+                <div className="h-10 w-20 bg-slate-200 rounded-lg" />
+              </div>
+            </div>
+            <div className="pt-6 flex gap-4">
+              <div className="h-12 w-32 bg-slate-200 rounded-xl" />
+              <div className="h-12 flex-1 bg-slate-200 rounded-xl" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <AlertCircle className="h-16 w-16 text-destructive mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-        <p className="text-muted-foreground mb-8">
-          {error === 'Product not found' ? 'The product you are looking for does not exist or is no longer available.' : error}
+      <div className="flex flex-col items-center justify-center py-20 px-4 text-center max-w-lg mx-auto">
+        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-4">
+          <AlertCircle className="w-8 h-8" />
+        </div>
+        <h2 className="text-2xl font-bold mb-2 text-slate-900">Product Not Found</h2>
+        <p className="text-slate-500 mb-8 text-sm">
+          {error === 'Product not found' ? 'The product you are looking for does not exist or has been removed.' : error}
         </p>
-        <Link href="/products">
-          <Button variant="default">Back to Products</Button>
-        </Link>
+        <div className="flex gap-3">
+          <Link href="/products">
+            <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
+              Back to Catalog
+            </Button>
+          </Link>
+          {error !== 'Product not found' && (
+            <Button variant="outline" onClick={loadProduct}>
+              Try Again
+            </Button>
+          )}
+        </div>
       </div>
     );
   }
+
 
   const isOutOfStock = selectedVariant ? selectedVariant.stock_quantity === 0 : true;
 
@@ -277,18 +339,47 @@ export default function ProductDetailPage() {
 
               <Button 
                 size="lg" 
-                className="flex-1 h-12 text-lg font-semibold gap-2 transition-all hover:scale-[1.02]"
-                disabled={isOutOfStock || !selectedVariant}
+                className={`flex-1 h-12 text-base font-semibold gap-2 transition-all duration-200 ${
+                  addedSuccess
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20'
+                    : 'hover:scale-[1.01]'
+                }`}
+                disabled={isOutOfStock || !selectedVariant || isCartLoading}
                 onClick={() => selectedVariant && onAddToCart(selectedVariant.variant_id, quantity)}
               >
-                <ShoppingCart className="w-5 h-5" />
-                Add to Cart
+                {isCartLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Adding...
+                  </>
+                ) : addedSuccess ? (
+                  <>
+                    <Check className="w-5 h-5 stroke-[2.5]" />
+                    Added to Cart!
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-5 h-5" />
+                    Add to Cart
+                  </>
+                )}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground text-center mt-4">
+
+            {addedSuccess && (
+              <div className="flex items-center justify-between p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-emerald-800 dark:text-emerald-200 text-xs font-semibold">
+                <span>{quantity} item{quantity > 1 ? 's' : ''} added to your cart.</span>
+                <Link href="/cart" className="inline-flex items-center text-emerald-700 dark:text-emerald-300 font-bold hover:underline">
+                  View Cart &rarr;
+                </Link>
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground text-center mt-3">
               SKU: {selectedVariant ? selectedVariant.variant_sku : product.base_sku}
             </p>
           </div>
+
         </div>
       </div>
     </div>

@@ -1,19 +1,53 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
+const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// Security Headers via Helmet (XSS, HSTS, Sniffing, Frameguard)
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow frontend to load media/images
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:', 'blob:'],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+}));
+
+// CORS Configuration - Restrict to frontend origin and allow credentials
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+  .split(',')
+  .map((origin) => origin.trim());
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'x-skip-rate-limit'],
+  exposedHeaders: ['set-cookie'],
+  maxAge: 86400,
 }));
 
 // Webhook route needs raw body, mount before express.json()
 app.use('/api/webhooks', require('./routes/webhookRoutes'));
+
+// Rate limiting for API endpoints (protect against DoS/abuse)
+app.use('/api', apiLimiter);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -77,6 +111,14 @@ app.use((err, req, res, _next) => {
   res.status(statusCode).json({
     error: err.publicCode || (statusCode === 409 ? 'conflict' : statusCode >= 500 ? 'internal_error' : 'invalid_request'),
     message: statusCode >= 500 ? 'Internal Server Error' : err.code === '23503' ? 'A referenced resource does not exist' : err.message,
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('Server error:', err);
+  }
+  const statusCode = err.status || err.statusCode || 500;
+  const errorName = err.error || (statusCode >= 500 ? 'InternalServerError' : 'BadRequest');
+  res.status(statusCode).json({
+    error: errorName,
+    message: err.message || 'Internal Server Error',
     statusCode,
   });
 });

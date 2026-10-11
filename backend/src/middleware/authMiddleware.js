@@ -5,7 +5,11 @@ const requireAuth = async (req, res, next) => {
   const { access_token } = req.cookies;
 
   if (!access_token) {
-    return res.status(401).json({ error: 'unauthorized', message: 'Not authenticated', statusCode: 401 });
+    return res.status(401).json({
+      error: 'Not authenticated',
+      message: 'Authentication required to access this resource',
+      statusCode: 401,
+    });
   }
 
   try {
@@ -34,15 +38,23 @@ const requireAuth = async (req, res, next) => {
     };
 
     next();
-  } catch (error) {
-    return res.status(401).json({ error: 'unauthorized', message: 'Not authenticated', statusCode: 401 });
+  } catch (_error) {
+    return res.status(401).json({
+      error: 'Not authenticated',
+      message: 'Invalid or expired access token',
+      statusCode: 401,
+    });
   }
 };
 
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'forbidden', message: 'Forbidden: insufficient privileges', statusCode: 403 });
+      return res.status(403).json({
+        error: 'Forbidden: Insufficient privileges',
+        message: 'You do not have permission to access this resource',
+        statusCode: 403,
+      });
     }
     next();
   };

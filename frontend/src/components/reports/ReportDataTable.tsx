@@ -23,6 +23,7 @@ export interface ReportDataTableProps<T> {
   searchFields?: string[];
   pageSize?: number;
   emptyMessage?: string;
+  isLoading?: boolean;
   actions?: React.ReactNode;
 }
 
@@ -36,6 +37,7 @@ export function ReportDataTable<T extends Record<string, any>>({
   searchFields,
   pageSize = 5,
   emptyMessage = 'No records found matching criteria.',
+  isLoading = false,
   actions,
 }: ReportDataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -177,7 +179,17 @@ export function ReportDataTable<T extends Record<string, any>>({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {paginatedData.length === 0 ? (
+            {isLoading ? (
+              Array.from({ length: pageSize }).map((_, rIdx) => (
+                <tr key={`skel-${rIdx}`} className="animate-pulse">
+                  {columns.map((col, cIdx) => (
+                    <td key={`skel-c-${cIdx}`} className="px-4 py-3">
+                      <div className="h-4 bg-muted/60 rounded w-3/4" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="px-4 py-8 text-center text-muted-foreground">
                   {emptyMessage}

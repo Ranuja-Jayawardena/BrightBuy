@@ -29,6 +29,7 @@ export interface ReportBarChartProps {
   formatYAxis?: (val: number) => string;
   formatTooltip?: (value: any, name: string) => [string, string];
   emptyMessage?: string;
+  isLoading?: boolean;
 }
 
 export const ReportBarChart: React.FC<ReportBarChartProps> = ({
@@ -42,6 +43,7 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
   formatYAxis,
   formatTooltip,
   emptyMessage = 'No data available for the selected period.',
+  isLoading = false,
 }) => {
   const [mounted, setMounted] = useState(false);
 
@@ -49,13 +51,14 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
     setMounted(true);
   }, []);
 
-  if (!mounted) {
+  if (!mounted || isLoading) {
     return (
       <div className="bg-card border rounded-xl p-5 shadow-sm">
         {title && <h3 className="font-semibold text-lg">{title}</h3>}
         {description && <p className="text-sm text-muted-foreground mb-4">{description}</p>}
-        <div style={{ height }} className="flex items-center justify-center bg-muted/20 rounded-lg animate-pulse">
-          <span className="text-sm text-muted-foreground">Loading chart...</span>
+        <div style={{ height }} className="flex flex-col items-center justify-center bg-muted/20 rounded-lg border border-dashed border-border/60 animate-pulse">
+          <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin mb-2" />
+          <span className="text-xs text-muted-foreground font-medium">Loading chart data...</span>
         </div>
       </div>
     );

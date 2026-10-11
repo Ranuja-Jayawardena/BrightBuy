@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   TrendingUp,
-  PackageAlert,
+  AlertTriangle,
   Users,
   DollarSign,
   ShoppingCart,
@@ -39,19 +39,36 @@ export default function AdminReportsOverviewPage() {
     preset: 'year',
   });
 
+  const [loading, setLoading] = useState(true);
   const [revenueData, setRevenueData] = useState(MOCK_REVENUE_DATA);
   const [topProducts, setTopProducts] = useState(MOCK_TOP_PRODUCTS);
   const [lowStock, setLowStock] = useState(MOCK_LOW_STOCK);
   const [geographyData, setGeographyData] = useState(MOCK_CUSTOMER_GEOGRAPHY);
 
   useEffect(() => {
-    // Attempt loading from API or fallback
-    reportService.getRevenue({ start_date: dateRange.startDate, end_date: dateRange.endDate })
-      .then(setRevenueData);
-    reportService.getTopProducts({ start_date: dateRange.startDate, end_date: dateRange.endDate })
-      .then(setTopProducts);
-    reportService.getLowStock().then(setLowStock);
-    reportService.getCustomerGeography().then(setGeographyData);
+    let active = true;
+    setLoading(true);
+
+    Promise.all([
+      reportService.getRevenue({ start_date: dateRange.startDate, end_date: dateRange.endDate }),
+      reportService.getTopProducts({ start_date: dateRange.startDate, end_date: dateRange.endDate }),
+      reportService.getLowStock(),
+      reportService.getCustomerGeography({ start_date: dateRange.startDate, end_date: dateRange.endDate }),
+    ])
+      .then(([rev, prods, stock, geo]) => {
+        if (!active) return;
+        setRevenueData(rev || []);
+        setTopProducts(prods || []);
+        setLowStock(stock || []);
+        setGeographyData(geo || []);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [dateRange]);
 
   // Aggregate metrics
@@ -178,7 +195,7 @@ export default function AdminReportsOverviewPage() {
           <div className="flex items-center justify-between text-muted-foreground text-xs uppercase font-medium">
             <span>Low Stock Items</span>
             <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
-              <PackageAlert className="h-4 w-4" />
+              <AlertTriangle className="h-4 w-4" />
             </div>
           </div>
           <div className="text-2xl font-bold text-amber-600">
@@ -204,6 +221,7 @@ export default function AdminReportsOverviewPage() {
             formatYAxis={(val) => `$${(val / 1000).toFixed(0)}k`}
             formatTooltip={(val) => [`$${Number(val).toLocaleString()}`, 'Revenue']}
             height={340}
+            isLoading={loading}
           />
         </div>
 
@@ -217,6 +235,7 @@ export default function AdminReportsOverviewPage() {
             description="Metro vs Regional Texas shipping destinations"
             height={340}
             formatValue={(val) => `${val} orders`}
+            isLoading={loading}
           />
         </div>
       </div>
@@ -235,6 +254,7 @@ export default function AdminReportsOverviewPage() {
             height={320}
             formatYAxis={(val) => `$${(val / 1000).toFixed(0)}k`}
             formatTooltip={(val) => [`$${Number(val).toLocaleString()}`, 'Revenue']}
+            isLoading={loading}
           />
         </div>
 
@@ -246,6 +266,7 @@ export default function AdminReportsOverviewPage() {
             description="Sortable product sales performance"
             pageSize={4}
             searchPlaceholder="Filter product or variant..."
+            isLoading={loading}
           />
         </div>
       </div>
@@ -274,7 +295,7 @@ export default function AdminReportsOverviewPage() {
         >
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
-              <PackageAlert className="h-4 w-4" />
+              <AlertTriangle className="h-4 w-4" />
               Inventory Reports
             </span>
             <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
