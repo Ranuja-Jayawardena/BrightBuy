@@ -48,7 +48,7 @@ function ProductsContent() {
   const BRANDS = ["Samsung", "Apple", "Sony", "Nike", "Adidas", "LG"];
 
   const updateUrlParams = useCallback((key: string, value: string | null) => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
+    const current = new URLSearchParams(searchParams.toString());
     if (value === null || value === '' || value === 'All') {
       current.delete(key);
     } else {
