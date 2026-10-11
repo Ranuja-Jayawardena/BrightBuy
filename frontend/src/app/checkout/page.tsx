@@ -7,7 +7,7 @@ import { useCartStore } from '@/store/useCartStore';
 import { useAddressStore } from '@/store/useAddressStore';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { MapPin, Truck, Store, AlertCircle } from 'lucide-react';
+import { MapPin, Truck, Store, AlertCircle, CreditCard, Banknote } from 'lucide-react';
 import { apiFetch } from '@/services/api';
 
 export default function CheckoutPage() {
@@ -17,6 +17,7 @@ export default function CheckoutPage() {
 
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [deliveryMode, setDeliveryMode] = useState<'home_delivery' | 'store_pickup'>('home_delivery');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cod'>('card');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,6 +58,7 @@ export default function CheckoutPage() {
     setError(null);
 
     try {
+      // 1. Create the Order
       const res = await apiFetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -74,10 +76,33 @@ export default function CheckoutPage() {
 
       // Order placed successfully!
       useCartStore.getState().clearCart();
-      router.push(`/checkout/success/${data.order.order_id}`);
+      const orderId = data.order.order_id;
+
+      // 2. Create the Payment Session
+      const paymentRes = await apiFetch('/api/payments/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderId,
+          payment_method: paymentMethod
+        })
+      });
+      
+      const paymentData = await paymentRes.json();
+      
+      if (!paymentRes.ok) {
+        throw new Error(paymentData.error || 'Order placed but failed to initialize payment');
+      }
+
+      // 3. Handle Redirect based on payment mode
+      if (paymentMethod === 'card' && paymentData.checkout_url) {
+        window.location.href = paymentData.checkout_url;
+      } else {
+        router.push(`/checkout/success/${orderId}`);
+      }
+
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setIsPlacingOrder(false);
     }
   };
@@ -181,6 +206,37 @@ export default function CheckoutPage() {
                   ))}
                 </div>
               )}
+            </section>
+
+            {/* Payment Method Selection */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 flex items-center">
+                <CreditCard className="mr-2 w-5 h-5" /> Payment Method
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div 
+                  className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'hover:bg-muted'}`}
+                  onClick={() => setPaymentMethod('card')}
+                >
+                  <div className="flex items-center mb-2">
+                    <input type="radio" checked={paymentMethod === 'card'} readOnly className="mr-3" />
+                    <CreditCard className="w-5 h-5 mr-2 text-muted-foreground" />
+                    <span className="font-medium">Credit / Debit Card</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-8">Pay securely via Lemon Squeezy</p>
+                </div>
+                <div 
+                  className={`border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-primary bg-primary/5' : 'hover:bg-muted'}`}
+                  onClick={() => setPaymentMethod('cod')}
+                >
+                  <div className="flex items-center mb-2">
+                    <input type="radio" checked={paymentMethod === 'cod'} readOnly className="mr-3" />
+                    <Banknote className="w-5 h-5 mr-2 text-muted-foreground" />
+                    <span className="font-medium">Cash on Delivery</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-8">Pay when your order arrives</p>
+                </div>
+              </div>
             </section>
           </div>
 

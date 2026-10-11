@@ -11,6 +11,10 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
 }));
+
+// Webhook route needs raw body, mount before express.json()
+app.use('/api/webhooks', require('./routes/webhookRoutes'));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -44,6 +48,7 @@ const cartRoutes = require('./routes/cartRoutes');
 const cityRoutes = require('./routes/cityRoutes');
 const addressRoutes = require('./routes/addressRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -57,6 +62,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/cities', cityRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/payments', paymentRoutes);
 
 
 // 404 handler
