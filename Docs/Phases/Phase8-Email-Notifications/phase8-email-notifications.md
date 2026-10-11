@@ -1,6 +1,6 @@
-﻿# Phase 8: Email Notifications
+# Phase 8: Email Notifications
 
-> **Status:** Not Started (0 / 2 subphases complete)
+> **Status:** Complete (2 / 2 subphases complete)
 > **Members:** D (solo)
 > **Phase Dependencies:** Phase 5 (orders). 8.2 also needs 3.1, 6.3, and 7.3 for its triggers.
 > **DB Schema Reference:** [DB_Schema.md](../../Database/DB_Schema.md)
@@ -15,7 +15,8 @@ Transactional emails via Nodemailer. D sets up the email service, creates HTML t
 
 ## What's Done
 
-_Nothing yet._ Update this section as subphases are completed.
+- **8.1 Email Service & Templates:** Nodemailer transporter utility (`mailer.js`), styled HTML & plain-text templates (`emailTemplates.js`) for welcome, order confirmation, payment receipt, and delivery updates. Implemented `notificationService.js` with pure raw SQL queries.
+- **8.2 Email Triggers Integration:** Non-blocking, fault-tolerant email triggers integrated into `authController.js` (registration), `orderController.js` (order creation), `paymentService.js` (payment completion), and `adminOrderService.js` (`onDeliveryStatusChanged`). All triggers fire strictly after database transaction commits (`COMMIT`).
 
 ---
 
@@ -23,8 +24,8 @@ _Nothing yet._ Update this section as subphases are completed.
 
 | # | Subphase | Assigned | Depends On | Status |
 |---|----------|----------|------------|--------|
-| 8.1 | [Email Service & Templates](phase8.1-email-service-templates.md) | D | Phase 2 | Not Started |
-| 8.2 | [Email Triggers Integration](phase8.2-email-triggers-integration.md) | D | 8.1, 3.1, 5.3, 6.3, 7.3 | Not Started |
+| 8.1 | [Email Service & Templates](phase8.1-email-service-templates.md) | D | Phase 2 | Complete |
+| 8.2 | [Email Triggers Integration](phase8.2-email-triggers-integration.md) | D | 8.1, 3.1, 5.3, 6.3, 7.3 | Complete |
 
 ---
 

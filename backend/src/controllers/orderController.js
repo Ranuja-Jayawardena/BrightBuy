@@ -1,4 +1,5 @@
 const orderModel = require('../models/orderModel');
+const notificationService = require('../services/notificationService');
 
 const createOrder = async (req, res) => {
     try {
@@ -13,6 +14,11 @@ const createOrder = async (req, res) => {
         }
 
         const order = await orderModel.createOrder(customer_id, address_id, delivery_mode);
+
+        // Trigger Order Confirmation Email (Phase 8.2 - non-blocking after DB commit)
+        notificationService.sendOrderConfirmation(order.order_id).catch(err =>
+            console.error('[Order] Failed to send order confirmation email:', err)
+        );
         res.status(201).json({
             message: 'Order placed successfully',
             order
