@@ -83,7 +83,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
 - [ ] **Phase 9:** Reports & Analytics → [phase9-reports-analytics.md](Phases/Phase9-Reports-Analytics/phase9-reports-analytics.md)
   - [ ] 9.1 Sales Report APIs — **C** → [phase9.1-sales-report-apis.md](Phases/Phase9-Reports-Analytics/phase9.1-sales-report-apis.md)
   - [ ] 9.2 Inventory & Customer Report APIs + CSV Export — **C** → [phase9.2-inventory-customer-report-apis-csv-export.md](Phases/Phase9-Reports-Analytics/phase9.2-inventory-customer-report-apis-csv-export.md)
-  - [ ] 9.3 Report UI Foundations — **A** → [phase9.3-report-ui-foundations.md](Phases/Phase9-Reports-Analytics/phase9.3-report-ui-foundations.md)
+  - [x] 9.3 Report UI Foundations — **A** → [phase9.3-report-ui-foundations.md](Phases/Phase9-Reports-Analytics/phase9.3-report-ui-foundations.md)
   - [ ] 9.4 Report Pages — **A** → [phase9.4-report-pages.md](Phases/Phase9-Reports-Analytics/phase9.4-report-pages.md)
 - [ ] **Phase 10:** Polish, Testing & Deployment → [phase10-polish-testing-deployment.md](Phases/Phase10-Polish-Testing-Deployment/phase10-polish-testing-deployment.md)
   - [ ] 10.1 Storefront Polish — **A** → [phase10.1-storefront-polish.md](Phases/Phase10-Polish-Testing-Deployment/phase10.1-storefront-polish.md)
