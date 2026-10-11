@@ -1,6 +1,6 @@
 # Phase 9: Reports & Analytics
 
-> **Status:** In Progress (3 / 4 subphases complete)
+> **Status:** Complete (4 / 4 subphases complete)
 > **Members:** C (backend report queries/APIs), A (frontend charts/dashboard)
 > **Phase Dependencies:** 3.2 (admin guard) and 1.7 seed orders for the APIs; 7.5 (admin layout) for the UI
 > **DB Schema Reference:** [DB_Schema.md](../../Database/DB_Schema.md)
@@ -18,6 +18,7 @@ Business intelligence for admins. C writes SQL aggregation queries and exposes t
 - 9.1 Sales Report APIs — complete.
 - 9.2 Inventory & Customer Report APIs + CSV Export — complete.
 - **9.3 Report UI Foundations (A):** Reusable charts (`ReportLineChart`, `ReportBarChart`, `ReportDonutChart`), sortable and filterable `ReportDataTable`, `ReportDateRangePicker` with presets, `ReportExportButton` (CSV), and full routes under `/admin/reports/*`.
+- **9.4 Report Pages (A):** Complete sales dashboard (revenue, top products, order volume), inventory reports (low-stock alerts, category value), and customer insights (VIP spenders, geographic distribution), with date-range filters, loading skeletons, empty states, and CSV export.
 
 ---
 
@@ -28,7 +29,7 @@ Business intelligence for admins. C writes SQL aggregation queries and exposes t
 | 9.1 | [Sales Report APIs](phase9.1-sales-report-apis.md) | C | 3.2 | Complete |
 | 9.2 | [Inventory & Customer Report APIs + CSV Export](phase9.2-inventory-customer-report-apis-csv-export.md) | C | 3.2 | Complete |
 | 9.3 | [Report UI Foundations](phase9.3-report-ui-foundations.md) | A | 7.5 | Complete |
-| 9.4 | [Report Pages](phase9.4-report-pages.md) | A | 9.1, 9.2, 9.3 | In Progress |
+| 9.4 | [Report Pages](phase9.4-report-pages.md) | A | 9.1, 9.2, 9.3 | Complete |
 
 ---
 

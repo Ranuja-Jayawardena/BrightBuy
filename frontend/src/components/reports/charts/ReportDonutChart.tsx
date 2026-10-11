@@ -27,6 +27,7 @@ export interface ReportDonutChartProps {
   colors?: string[];
   formatValue?: (val: number) => string;
   emptyMessage?: string;
+  isLoading?: boolean;
 }
 
 const DEFAULT_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
@@ -41,6 +42,7 @@ export const ReportDonutChart: React.FC<ReportDonutChartProps> = ({
   colors = DEFAULT_COLORS,
   formatValue,
   emptyMessage = 'No breakdown data available.',
+  isLoading = false,
 }) => {
   const [mounted, setMounted] = useState(false);
 
@@ -48,13 +50,14 @@ export const ReportDonutChart: React.FC<ReportDonutChartProps> = ({
     setMounted(true);
   }, []);
 
-  if (!mounted) {
+  if (!mounted || isLoading) {
     return (
       <div className="bg-card border rounded-xl p-5 shadow-sm">
         {title && <h3 className="font-semibold text-lg">{title}</h3>}
         {description && <p className="text-sm text-muted-foreground mb-4">{description}</p>}
-        <div style={{ height }} className="flex items-center justify-center bg-muted/20 rounded-lg animate-pulse">
-          <span className="text-sm text-muted-foreground">Loading chart...</span>
+        <div style={{ height }} className="flex flex-col items-center justify-center bg-muted/20 rounded-lg border border-dashed border-border/60 animate-pulse">
+          <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin mb-2" />
+          <span className="text-xs text-muted-foreground font-medium">Loading breakdown data...</span>
         </div>
       </div>
     );

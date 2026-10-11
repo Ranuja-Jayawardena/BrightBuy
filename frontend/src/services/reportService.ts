@@ -2,6 +2,7 @@ import { apiFetch } from './api';
 import {
   RevenueDataPoint,
   TopProductDataPoint,
+  OrderStatusDataPoint,
   LowStockDataPoint,
   InventorySummaryDataPoint,
   TopCustomerDataPoint,
@@ -18,6 +19,23 @@ export const MOCK_REVENUE_DATA: RevenueDataPoint[] = [
   { period: '2026-08', revenue: 21600.75, order_count: 156 },
   { period: '2026-09', revenue: 25400.0, order_count: 182 },
   { period: '2026-10', revenue: 28950.25, order_count: 204 },
+];
+
+export const MOCK_ORDER_STATUS_DATA: OrderStatusDataPoint[] = [
+  { period: '2026-04', status: 'delivered', order_count: 75 },
+  { period: '2026-04', status: 'shipped', order_count: 10 },
+  { period: '2026-05', status: 'delivered', order_count: 98 },
+  { period: '2026-05', status: 'shipped', order_count: 14 },
+  { period: '2026-06', status: 'delivered', order_count: 120 },
+  { period: '2026-06', status: 'shipped', order_count: 14 },
+  { period: '2026-07', status: 'delivered', order_count: 85 },
+  { period: '2026-07', status: 'shipped', order_count: 13 },
+  { period: '2026-08', status: 'delivered', order_count: 140 },
+  { period: '2026-08', status: 'shipped', order_count: 16 },
+  { period: '2026-09', status: 'delivered', order_count: 165 },
+  { period: '2026-09', status: 'shipped', order_count: 17 },
+  { period: '2026-10', status: 'delivered', order_count: 180 },
+  { period: '2026-10', status: 'shipped', order_count: 24 },
 ];
 
 export const MOCK_TOP_PRODUCTS: TopProductDataPoint[] = [
@@ -192,10 +210,29 @@ export const reportService = {
     }
   },
 
-  // Top Customers
-  async getTopCustomers(limit: number = 10, sortBy: 'orders' | 'spend' = 'spend'): Promise<TopCustomerDataPoint[]> {
+  // Sales Orders Volume Report
+  async getOrders(params?: { period?: string; start_date?: string; end_date?: string }): Promise<OrderStatusDataPoint[]> {
     try {
-      const res = await apiFetch(`/api/reports/customers/top?limit=${limit}&sort_by=${sortBy}`);
+      const query = new URLSearchParams(params as any).toString();
+      const res = await apiFetch(`/api/reports/sales/orders${query ? `?${query}` : ''}`);
+      if (!res.ok) throw new Error('API request failed');
+      const json = await res.json();
+      return json.data || json;
+    } catch {
+      return MOCK_ORDER_STATUS_DATA;
+    }
+  },
+
+  // Top Customers
+  async getTopCustomers(params?: { limit?: number; sort_by?: 'orders' | 'spend'; start_date?: string; end_date?: string }): Promise<TopCustomerDataPoint[]> {
+    try {
+      const query = new URLSearchParams({
+        limit: String(params?.limit || 10),
+        sort_by: params?.sort_by || 'spend',
+        ...(params?.start_date ? { start_date: params.start_date } : {}),
+        ...(params?.end_date ? { end_date: params.end_date } : {}),
+      }).toString();
+      const res = await apiFetch(`/api/reports/customers/top?${query}`);
       if (!res.ok) throw new Error('API request failed');
       const json = await res.json();
       return json.data || json;
@@ -205,9 +242,10 @@ export const reportService = {
   },
 
   // Customer Geography
-  async getCustomerGeography(): Promise<CustomerGeographyDataPoint[]> {
+  async getCustomerGeography(params?: { start_date?: string; end_date?: string }): Promise<CustomerGeographyDataPoint[]> {
     try {
-      const res = await apiFetch('/api/reports/customers/geography');
+      const query = new URLSearchParams(params as any).toString();
+      const res = await apiFetch(`/api/reports/customers/geography${query ? `?${query}` : ''}`);
       if (!res.ok) throw new Error('API request failed');
       const json = await res.json();
       return json.data || json;
