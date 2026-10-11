@@ -1,6 +1,6 @@
 # Phase 7: Inventory & Admin Dashboard
 
-> **Status:** In Progress (4 / 6 subphases complete)
+> **Status:** Complete (6 / 6 subphases complete)
 > **Members:** C (backend admin APIs), B (frontend admin UI)
 > **Phase Dependencies:** Phase 3 (role guards) and Phase 4 (product APIs). 7.3 also needs Phase 5 (orders).
 > **DB Schema Reference:** [DB_Schema.md](../../Database/DB_Schema.md)
@@ -17,6 +17,10 @@ Management tools for employees and administrators. C builds admin-only APIs for 
 
 - **7.1 Product, Variant & Image Admin APIs:** Added admin-protected product CRUD, image upload/update/delete, and variant CRUD endpoints under `/api/admin`.
 - **7.2 Category Admin APIs:** Added admin-protected category tree CRUD with soft delete and circular hierarchy protection.
+- **7.3 Order & Delivery Admin APIs:** Added order filtering, status transition rules, and delivery courier update endpoints.
+- **7.4 Inventory & Employee Admin APIs:** Added stock level monitoring, audited stock adjustments with reason logging, and employee user account registration.
+- **7.5 Admin Layout & Catalog Management UI:** Created admin shell with sidebar navigation, category tree manager, product catalog table with search and soft delete, product creation form, and full product editor with media upload and variant matrix.
+- **7.6 Operations Admin UI (Orders, Inventory, Employees):** Created order management table with multi-filter and status controls, delivery updates, inventory dashboard with low-stock alerts and audited adjustment modal, and employee administration page.
 
 ---
 
@@ -29,7 +33,7 @@ Management tools for employees and administrators. C builds admin-only APIs for 
 | 7.3 | [Order & Delivery Admin APIs](phase7.3-order-delivery-admin-apis.md) | C | 3.2, 5.3 | Complete |
 | 7.4 | [Inventory & Employee Admin APIs](phase7.4-inventory-employee-admin-apis.md) | C | 3.2 | Complete |
 | 7.5 | [Admin Layout & Catalog Management UI](phase7.5-admin-layout-catalog-management-ui.md) | B | 3.4, 7.1, 7.2 | Complete |
-| 7.6 | [Operations Admin UI (Orders, Inventory, Employees)](phase7.6-operations-admin-ui.md) | B | 7.3, 7.4, 7.5 | Not Started |
+| 7.6 | [Operations Admin UI (Orders, Inventory, Employees)](phase7.6-operations-admin-ui.md) | B | 7.3, 7.4, 7.5 | Complete |
 
 ---
 

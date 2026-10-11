@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { catalogService } from '@/services/catalogService';
 import { Category, ProductSummary, PaginationMeta } from '@/types/catalog';
@@ -9,7 +9,7 @@ import { ProductCard } from '@/components/catalog/ProductCard';
 import { SearchFilterBar } from '@/components/catalog/SearchFilterBar';
 import { Pagination } from '@/components/catalog/Pagination';
 
-export default function ProductsPage() {
+function ProductsContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -161,5 +161,13 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="p-12 text-center text-muted-foreground">Loading products...</div>}>
+      <ProductsContent />
+    </Suspense>
   );
 }
