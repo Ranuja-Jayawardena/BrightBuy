@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const notificationService = require('./notificationService');
 
 /**
  * Handle successful payment
@@ -8,7 +9,7 @@ const db = require('../config/db');
  * @param {number} params.amount
  * @param {Object} params.raw_event
  */
-const handlePaymentSuccess = async ({ order_id, transaction_id, amount, raw_event }) => {
+const handlePaymentSuccess = async ({ order_id, transaction_id, amount, _raw_event }) => {
   console.log(`handlePaymentSuccess called for order ${order_id}, transaction ${transaction_id}`);
   
   const client = await db.connect();
@@ -42,6 +43,13 @@ const handlePaymentSuccess = async ({ order_id, transaction_id, amount, raw_even
     );
 
     await client.query('COMMIT');
+
+    // Trigger Payment Confirmation Email (Phase 8.2 - non-blocking after DB commit)
+    notificationService.sendPaymentConfirmation({
+      order_id,
+      transaction_id,
+      amount,
+    }).catch(err => console.error('[Payment] Failed to send payment confirmation email:', err));
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error handling payment success:', error);
@@ -59,7 +67,7 @@ const handlePaymentSuccess = async ({ order_id, transaction_id, amount, raw_even
  * @param {string} params.reason
  * @param {Object} params.raw_event
  */
-const handlePaymentFailure = async ({ order_id, transaction_id, reason, raw_event }) => {
+const handlePaymentFailure = async ({ order_id, transaction_id, reason, _raw_event }) => {
   console.log(`handlePaymentFailure called for order ${order_id}, transaction ${transaction_id}, reason: ${reason}`);
   
   try {

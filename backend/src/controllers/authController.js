@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const { hashPassword, comparePassword } = require('../utils/password');
 const { signAccessToken, signRefreshToken, verifyRefreshToken, verifyAccessToken } = require('../utils/jwt');
+const notificationService = require('../services/notificationService');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const cookieOptions = {
@@ -48,6 +49,13 @@ const register = async (req, res, next) => {
     );
 
     await client.query('COMMIT');
+
+    // Trigger Welcome Email (Phase 8.2 - non-blocking after DB commit)
+    notificationService.sendWelcome({
+      email: user.email,
+      firstName: first_name,
+      lastName: last_name,
+    }).catch(err => console.error('[Auth] Failed to send welcome email:', err));
 
     res.cookie('access_token', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
     res.cookie('refresh_token', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
