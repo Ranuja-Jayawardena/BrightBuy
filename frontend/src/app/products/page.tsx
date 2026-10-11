@@ -222,7 +222,7 @@ function ProductsContent() {
                 <div className="flex items-center justify-between mb-4 px-1">
                   <span className="text-sm text-slate-500 font-medium">
                     Showing {products.length} {products.length === 1 ? 'product' : 'products'}
-                    {pagination?.total_items ? ` of ${pagination.total_items}` : ''}
+                    {pagination?.total_count ? ` of ${pagination.total_count}` : ''}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
