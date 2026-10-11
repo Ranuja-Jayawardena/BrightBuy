@@ -28,7 +28,7 @@ Business intelligence for admins. C writes SQL aggregation queries and exposes t
 | 9.1 | [Sales Report APIs](phase9.1-sales-report-apis.md) | C | 3.2 | Complete |
 | 9.2 | [Inventory & Customer Report APIs + CSV Export](phase9.2-inventory-customer-report-apis-csv-export.md) | C | 3.2 | Complete |
 | 9.3 | [Report UI Foundations](phase9.3-report-ui-foundations.md) | A | 7.5 | Complete |
-| 9.4 | [Report Pages](phase9.4-report-pages.md) | A | 9.1, 9.2, 9.3 | Not Started |
+| 9.4 | [Report Pages](phase9.4-report-pages.md) | A | 9.1, 9.2, 9.3 | In Progress |
 
 ---
 
