@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { apiFetch } from '@/services/api';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { XCircle, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 
-export default function CheckoutCancelPage() {
+function CheckoutCancelContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order_id');
@@ -85,5 +85,13 @@ export default function CheckoutCancelPage() {
         </div>
       </div>
     </ProtectedRoute>
+  );
+}
+
+export default function CheckoutCancelPage() {
+  return (
+    <Suspense fallback={<div className="p-12 text-center text-muted-foreground">Loading...</div>}>
+      <CheckoutCancelContent />
+    </Suspense>
   );
 }
