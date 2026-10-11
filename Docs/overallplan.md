@@ -75,7 +75,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [ ] 7.2 Category Admin APIs — **C** → [phase7.2-category-admin-apis.md](Phases/Phase7-Inventory-Admin-Dashboard/phase7.2-category-admin-apis.md)
   - [ ] 7.3 Order & Delivery Admin APIs — **C** → [phase7.3-order-delivery-admin-apis.md](Phases/Phase7-Inventory-Admin-Dashboard/phase7.3-order-delivery-admin-apis.md)
   - [ ] 7.4 Inventory & Employee Admin APIs — **C** → [phase7.4-inventory-employee-admin-apis.md](Phases/Phase7-Inventory-Admin-Dashboard/phase7.4-inventory-employee-admin-apis.md)
-  - [ ] 7.5 Admin Layout & Catalog Management UI — **B** → [phase7.5-admin-layout-catalog-management-ui.md](Phases/Phase7-Inventory-Admin-Dashboard/phase7.5-admin-layout-catalog-management-ui.md)
+  - [x] 7.5 Admin Layout & Catalog Management UI — **B** → [phase7.5-admin-layout-catalog-management-ui.md](Phases/Phase7-Inventory-Admin-Dashboard/phase7.5-admin-layout-catalog-management-ui.md)
   - [ ] 7.6 Operations Admin UI — **B** → [phase7.6-operations-admin-ui.md](Phases/Phase7-Inventory-Admin-Dashboard/phase7.6-operations-admin-ui.md)
 - [ ] **Phase 8:** Email Notifications → [phase8-email-notifications.md](Phases/Phase8-Email-Notifications/phase8-email-notifications.md)
   - [ ] 8.1 Email Service & Templates — **D** → [phase8.1-email-service-templates.md](Phases/Phase8-Email-Notifications/phase8.1-email-service-templates.md)
