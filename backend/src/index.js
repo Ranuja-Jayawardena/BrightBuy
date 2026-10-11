@@ -101,15 +101,16 @@ app.use('/api/payments', paymentRoutes);
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    error: 'NotFound',
-    message: 'Endpoint not found',
-    statusCode: 404,
-  });
+  res.status(404).json({ error: 'not_found', message: 'Endpoint not found', statusCode: 404 });
 });
 
 // Error handling middleware
 app.use((err, req, res, _next) => {
+  console.error('Server error:', err);
+  const statusCode = Number.isInteger(err.status) ? err.status : err.code === '23505' ? 409 : err.code === '23503' ? 400 : 500;
+  res.status(statusCode).json({
+    error: err.publicCode || (statusCode === 409 ? 'conflict' : statusCode >= 500 ? 'internal_error' : 'invalid_request'),
+    message: statusCode >= 500 ? 'Internal Server Error' : err.code === '23503' ? 'A referenced resource does not exist' : err.message,
   if (process.env.NODE_ENV !== 'test') {
     console.error('Server error:', err);
   }

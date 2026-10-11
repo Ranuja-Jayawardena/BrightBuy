@@ -16,7 +16,7 @@ async function getProduct(req, res, next) {
   try {
     const result = await adminProductService.getProductDetail(parseId(req.params.id));
     if (!result) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
     }
     res.status(200).json(result);
   } catch (error) {
@@ -36,7 +36,7 @@ async function updateProduct(req, res, next) {
   try {
     const result = await adminProductService.updateProduct(parseId(req.params.id), req.body);
     if (!result) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
     }
     res.status(200).json(result);
   } catch (error) {
@@ -48,7 +48,7 @@ async function deleteProduct(req, res, next) {
   try {
     const result = await adminProductService.softDeleteProduct(parseId(req.params.id));
     if (!result) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
     }
     res.status(200).json(result);
   } catch (error) {
@@ -60,7 +60,7 @@ async function createImage(req, res, next) {
   try {
     const result = await adminProductService.createImage(parseId(req.params.id), req.file, req.body);
     if (!result) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
     }
     res.status(201).json(result);
   } catch (error) {
@@ -72,7 +72,7 @@ async function updateImage(req, res, next) {
   try {
     const result = await adminProductService.updateImage(parseId(req.params.id), req.body);
     if (!result) {
-      return res.status(404).json({ error: 'Image not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Image not found', statusCode: 404 });
     }
     res.status(200).json(result);
   } catch (error) {
@@ -84,7 +84,7 @@ async function deleteImage(req, res, next) {
   try {
     const result = await adminProductService.deleteImage(parseId(req.params.id));
     if (!result) {
-      return res.status(404).json({ error: 'Image not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Image not found', statusCode: 404 });
     }
     res.status(200).json(result);
   } catch (error) {
@@ -96,7 +96,7 @@ async function createVariant(req, res, next) {
   try {
     const result = await adminProductService.createVariant(parseId(req.params.id), req.body);
     if (!result) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
     }
     res.status(201).json(result);
   } catch (error) {
@@ -108,7 +108,7 @@ async function updateVariant(req, res, next) {
   try {
     const result = await adminProductService.updateVariant(parseId(req.params.id), req.body);
     if (!result) {
-      return res.status(404).json({ error: 'Variant not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Variant not found', statusCode: 404 });
     }
     res.status(200).json(result);
   } catch (error) {
@@ -120,7 +120,7 @@ async function deleteVariant(req, res, next) {
   try {
     const result = await adminProductService.softDeleteVariant(parseId(req.params.id));
     if (!result) {
-      return res.status(404).json({ error: 'Variant not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Variant not found', statusCode: 404 });
     }
     res.status(200).json(result);
   } catch (error) {

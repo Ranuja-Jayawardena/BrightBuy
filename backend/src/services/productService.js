@@ -7,18 +7,21 @@ const productModel = require('../models/productModel');
  * @returns {Promise<Object>}
  */
 async function getProductsList(queryParams) {
-  const page = Math.max(1, parseInt(queryParams.page, 10) || 1);
-  const limit = Math.min(100, Math.max(1, parseInt(queryParams.limit, 10) || 12));
-  const search = queryParams.search && queryParams.search.trim() ? queryParams.search.trim() : undefined;
-  const brand = queryParams.brand && queryParams.brand.trim() ? queryParams.brand.trim() : undefined;
-  const categoryId = queryParams.category_id ? parseInt(queryParams.category_id, 10) : undefined;
-  const sort = queryParams.sort;
+  const page = positiveQueryInteger(queryParams.page, 'page', 1, 1000000);
+  const limit = positiveQueryInteger(queryParams.limit, 'limit', 12, 100);
+  const search = optionalQueryString(queryParams.search, 'search', 100);
+  const brand = optionalQueryString(queryParams.brand, 'brand', 100);
+  const categoryId = queryParams.category_id === undefined ? undefined : positiveQueryInteger(queryParams.category_id, 'category_id', undefined, 1000000000);
+  const sort = queryParams.sort === undefined ? undefined : queryParams.sort;
+  if (sort !== undefined && !['name_asc', 'name_desc', 'price_asc', 'price_desc'].includes(sort)) {
+    const error = new Error('sort must be one of: name_asc, name_desc, price_asc, price_desc'); error.status = 400; throw error;
+  }
 
   const { rows, totalCount } = await productModel.findProducts({
     page,
     limit,
     search,
-    categoryId: Number.isInteger(categoryId) && categoryId > 0 ? categoryId : undefined,
+    categoryId,
     brand,
     sort,
   });
@@ -46,6 +49,22 @@ async function getProductsList(queryParams) {
       total_pages: totalPages,
     },
   };
+}
+
+function positiveQueryInteger(value, field, fallback, maximum) {
+  if (value === undefined || value === '') return fallback;
+  if (typeof value !== 'string' || !/^\d+$/.test(value)) { const error = new Error(`${field} must be a positive integer`); error.status = 400; throw error; }
+  const number = Number(value);
+  if (!Number.isSafeInteger(number) || number < 1 || number > maximum) { const error = new Error(`${field} must be between 1 and ${maximum}`); error.status = 400; throw error; }
+  return number;
+}
+
+function optionalQueryString(value, field, maximum) {
+  if (value === undefined || value === '') return undefined;
+  if (typeof value !== 'string') { const error = new Error(`${field} must be a string`); error.status = 400; throw error; }
+  const normalized = value.trim();
+  if (normalized.length > maximum) { const error = new Error(`${field} must be ${maximum} characters or fewer`); error.status = 400; throw error; }
+  return normalized || undefined;
 }
 
 /**
@@ -97,4 +116,6 @@ async function getProductDetails(productId) {
 module.exports = {
   getProductsList,
   getProductDetails,
+  positiveQueryInteger,
+  optionalQueryString,
 };

@@ -8,13 +8,13 @@ const imageService = require('../services/imageService');
 async function getImage(req, res, next) {
   try {
     const id = parseInt(req.params.id, 10);
-    if (isNaN(id) || id <= 0) {
-      return res.status(404).json({ error: 'Image not found' });
+    if (!/^\d+$/.test(req.params.id) || !Number.isSafeInteger(id) || id <= 0) {
+      return res.status(400).json({ error: 'invalid_request', message: 'id must be a positive integer', statusCode: 400 });
     }
 
     const image = await imageService.getImageById(id);
     if (!image) {
-      return res.status(404).json({ error: 'Image not found' });
+      return res.status(404).json({ error: 'not_found', message: 'Image not found', statusCode: 404 });
     }
 
     const { imageData, mimeType, etag } = image;
