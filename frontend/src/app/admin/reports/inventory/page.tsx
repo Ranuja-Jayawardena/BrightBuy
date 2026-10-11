@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PackageAlert, AlertTriangle, Layers, DollarSign, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, Layers, DollarSign, CheckCircle2 } from 'lucide-react';
 import {
   ReportNavTabs,
   ReportDateRangePicker,
@@ -106,7 +106,7 @@ export default function AdminReportsInventoryPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
-            <PackageAlert className="h-8 w-8 text-amber-500" />
+            <AlertTriangle className="h-8 w-8 text-amber-500" />
             Inventory Analytics & Stock Valuation
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
