@@ -10,6 +10,11 @@ function createHttpError(status, message) {
   return error;
 }
 
+function requireBody(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) throw createHttpError(400, 'JSON object body is required');
+  return body;
+}
+
 function parsePositiveInteger(value, fieldName) {
   if (typeof value !== 'number' && (typeof value !== 'string' || !/^\d+$/.test(value))) {
     throw createHttpError(400, `${fieldName} must be a positive integer`);
@@ -183,6 +188,7 @@ async function getProductDetail(productId) {
 }
 
 async function createProduct(body) {
+  requireBody(body);
   const payload = {
     product_name: normalizeString(body.product_name, 'product_name', { required: true, maxLength: 100 }),
     brand: normalizeString(body.brand, 'brand', { maxLength: 100 }),
@@ -194,6 +200,7 @@ async function createProduct(body) {
 }
 
 async function updateProduct(productId, body) {
+  requireBody(body);
   const payload = {
     product_name: normalizeString(body.product_name, 'product_name', { required: true, maxLength: 100 }),
     brand: normalizeString(body.brand, 'brand', { maxLength: 100 }),
@@ -244,6 +251,7 @@ async function createImage(productId, file, body) {
 }
 
 async function updateImage(imageId, body) {
+  requireBody(body);
   const image = await adminProductModel.updateImage(imageId, {
     sort_order: body.sort_order === undefined ? undefined : parseNonNegativeInteger(body.sort_order, 'sort_order'),
     is_primary: body.is_primary === undefined ? undefined : parseBoolean(body.is_primary, 'is_primary'),
@@ -257,6 +265,7 @@ async function deleteImage(imageId) {
 }
 
 async function createVariant(productId, body) {
+  requireBody(body);
   if (!await adminProductModel.productExists(productId)) {
     return null;
   }
@@ -266,6 +275,7 @@ async function createVariant(productId, body) {
 }
 
 async function updateVariant(variantId, body) {
+  requireBody(body);
   const payload = normalizeVariantPayload(body, false);
   const variant = await adminProductModel.updateVariant(variantId, payload);
   return variant ? { variant: mapVariant(variant, payload.attributes) } : null;

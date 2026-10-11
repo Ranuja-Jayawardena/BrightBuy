@@ -106,19 +106,14 @@ app.use((req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, _next) => {
-  console.error('Server error:', err);
-  const statusCode = Number.isInteger(err.status) ? err.status : err.code === '23505' ? 409 : err.code === '23503' ? 400 : 500;
-  res.status(statusCode).json({
-    error: err.publicCode || (statusCode === 409 ? 'conflict' : statusCode >= 500 ? 'internal_error' : 'invalid_request'),
-    message: statusCode >= 500 ? 'Internal Server Error' : err.code === '23503' ? 'A referenced resource does not exist' : err.message,
   if (process.env.NODE_ENV !== 'test') {
     console.error('Server error:', err);
   }
-  const statusCode = err.status || err.statusCode || 500;
-  const errorName = err.error || (statusCode >= 500 ? 'InternalServerError' : 'BadRequest');
+  const statusCode = Number.isInteger(err.status) ? err.status : Number.isInteger(err.statusCode) ? err.statusCode : err.code === '23505' ? 409 : err.code === '23503' ? 400 : 500;
+  const errorName = err.publicCode || err.error || (statusCode === 409 ? 'conflict' : statusCode >= 500 ? 'internal_error' : 'invalid_request');
   res.status(statusCode).json({
     error: errorName,
-    message: err.message || 'Internal Server Error',
+    message: statusCode >= 500 ? 'Internal Server Error' : err.code === '23503' ? 'A referenced resource does not exist' : err.message,
     statusCode,
   });
 });

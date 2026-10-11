@@ -10,7 +10,11 @@ function limit(value, fallback = 10) {
 
 function csv(rows, headers) {
   const fields = headers || Object.keys(rows[0] || {});
-  const escape = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
+  const escape = value => {
+    const cell = String(value ?? '');
+    const safe = /^[\s]*[=+@-]/.test(cell) ? `'${cell}` : cell;
+    return `"${safe.replace(/"/g, '""')}"`;
+  };
   return `\uFEFF${[fields.map(escape).join(','), ...rows.map(row => fields.map(header => escape(row[header])).join(','))].join('\r\n')}`;
 }
 

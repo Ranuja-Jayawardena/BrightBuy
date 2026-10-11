@@ -10,7 +10,7 @@ function httpError(status, message) {
 function positiveId(value, fieldName) {
   if (typeof value !== 'number' && (typeof value !== 'string' || !/^\d+$/.test(value))) throw httpError(400, `${fieldName} must be a positive integer`);
   const id = Number(value);
-  if (!Number.isInteger(id) || id <= 0) throw httpError(400, `${fieldName} must be a positive integer`);
+  if (!Number.isSafeInteger(id) || id <= 0) throw httpError(400, `${fieldName} must be a positive integer`);
   return id;
 }
 
@@ -65,6 +65,7 @@ async function ensureParentExists(parentCategoryId, categoryId) {
 }
 
 async function createCategory(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) throw httpError(400, 'JSON object body is required');
   const categoryName = name(body.category_name, true);
   const parentCategoryId = parentId(body.parent_category_id);
   await ensureParentExists(parentCategoryId);
@@ -77,6 +78,7 @@ async function createCategory(body) {
 }
 
 async function updateCategory(categoryId, body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) throw httpError(400, 'JSON object body is required');
   const current = await categoryModel.findCategoryById(categoryId);
   if (!current) return null;
   const fields = {};

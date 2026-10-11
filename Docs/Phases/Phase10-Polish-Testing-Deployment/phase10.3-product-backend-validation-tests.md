@@ -30,5 +30,6 @@
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
-- Added dependency-free Node test coverage for validation, category tree construction and circular-parent rejection, image retrieval helpers, and report query validation.
+- Added Jest service/controller tests for product CRUD validation, ancestor-cycle rejection, image upload and conditional retrieval, admin request validation, CSV safety, and report query validation. The existing Node tests cover additional pure helpers.
+- Verified on October 11, 2026: `npm ci` succeeds, `npm test` passes 35 Jest tests, `npm run test:product` passes 5 Node tests, and `npm run lint` reports no errors (8 existing warnings).
 

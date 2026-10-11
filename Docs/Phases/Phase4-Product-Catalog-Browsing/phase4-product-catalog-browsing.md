@@ -53,5 +53,5 @@ A can start 4.3 and 4.4 straight away against the contracts in [phase4.1-catalog
 ## Key Decisions & Notes
 
 - **Refined dependencies:** The public catalog endpoints (4.1, 4.2) don't need auth, so they only depend on Phase 2. Only 4.4 waits for Phase 3 (3.4) because of the guest "Add to Cart" redirect.
-- **Add to Cart wiring:** 4.4 builds the button (disabled at zero stock, guests redirected). The actual `POST /api/cart/items` call is wired by B in [5.4](../Phase5/phase5.4-cart-ui-add-to-cart-wiring.md).
+- **Add to Cart wiring:** 4.4 builds the button (disabled at zero stock, guests redirected). The actual `POST /api/cart/items` call is wired by B in [5.4](../Phase5-Shopping-Cart-Checkout/phase5.4-cart-ui-add-to-cart-wiring.md).
 

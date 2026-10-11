@@ -1,6 +1,6 @@
 # Phase 10: Polish, Testing & Deployment
 
-> **Status:** In Progress (2 / 6 subphases complete)
+> **Status:** In Progress (3 / 6 subphases complete)
 > **Lead:** E (deployment)
 > **Members:** A, B, C, D, E — each polishes and tests their own area
 > **Phase Dependencies:** All previous phases should be substantially complete
@@ -17,6 +17,7 @@ Final quality pass and go-live preparation. Each member polishes their own area:
 ## What's Done
 
 - **10.1 Storefront Polish (A):** Responsive audit across all storefront pages, custom modern landing page, mobile navigation and drawer, custom 404 page (`not-found.tsx`), card & detail skeleton loaders, error retry UI, Add-to-Cart micro-interaction with feedback, and SEO metadata.
+- **10.3 Product Backend Validation & Tests (C):** Added request validation and service/controller tests for product CRUD, category cycles, images, admin inputs, and reports; repaired the backend test scripts and lock file. Both test suites pass.
 - **10.5 Security Hardening (E):** Implemented Helmet.js HTTP security headers and CSP, configured restrictive CORS with frontend origin and credentials, added `express-rate-limit` to auth and API endpoints, performed SQL injection audit verifying parameterized queries across all endpoints, standardized 404 and global error handlers to `{ error, message, statusCode }`, and added a 21-test automated suite (`jest` + `supertest`) covering registration, login, refresh rotation, logout, `requireAuth`, and `requireRole`.
 
 ---

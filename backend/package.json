@@ -7,8 +7,11 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint src/",
-    "test": "node --test test"
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "test:product": "node --test test/product-validation.test.js"
+  },
+  "jest": {
+    "testMatch": ["**/tests/**/*.test.js"]
   },
   "keywords": [
     "brightbuy",
