@@ -42,6 +42,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const imageRoutes = require('./routes/imageRoutes');
 
 const adminRoutes = require('./routes/adminRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 const cartRoutes = require('./routes/cartRoutes');
 const cityRoutes = require('./routes/cityRoutes');
@@ -55,6 +56,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/images', imageRoutes);
 
 app.use('/api/admin', adminRoutes);
+app.use('/api/reports', reportRoutes);
 
 app.use('/api/cart', cartRoutes);
 app.use('/api/cities', cityRoutes);
