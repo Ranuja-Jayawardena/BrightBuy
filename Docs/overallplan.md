@@ -86,7 +86,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [x] 9.3 Report UI Foundations — **A** → [phase9.3-report-ui-foundations.md](Phases/Phase9-Reports-Analytics/phase9.3-report-ui-foundations.md)
   - [x] 9.4 Report Pages — **A** → [phase9.4-report-pages.md](Phases/Phase9-Reports-Analytics/phase9.4-report-pages.md)
 - [ ] **Phase 10:** Polish, Testing & Deployment → [phase10-polish-testing-deployment.md](Phases/Phase10-Polish-Testing-Deployment/phase10-polish-testing-deployment.md)
-  - [ ] 10.1 Storefront Polish — **A** → [phase10.1-storefront-polish.md](Phases/Phase10-Polish-Testing-Deployment/phase10.1-storefront-polish.md)
+  - [x] 10.1 Storefront Polish — **A** → [phase10.1-storefront-polish.md](Phases/Phase10-Polish-Testing-Deployment/phase10.1-storefront-polish.md)
   - [ ] 10.2 Admin, Cart & Checkout Polish — **B** → [phase10.2-admin-cart-checkout-polish.md](Phases/Phase10-Polish-Testing-Deployment/phase10.2-admin-cart-checkout-polish.md)
   - [ ] 10.3 Product Backend Validation & Tests — **C** → [phase10.3-product-backend-validation-tests.md](Phases/Phase10-Polish-Testing-Deployment/phase10.3-product-backend-validation-tests.md)
   - [ ] 10.4 Order Backend Validation & Tests — **D** → [phase10.4-order-backend-validation-tests.md](Phases/Phase10-Polish-Testing-Deployment/phase10.4-order-backend-validation-tests.md)
