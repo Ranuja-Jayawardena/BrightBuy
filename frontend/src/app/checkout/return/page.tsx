@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { apiFetch } from '@/services/api';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 
-export default function CheckoutReturnPage() {
+function CheckoutReturnContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order_id');
@@ -105,5 +105,13 @@ export default function CheckoutReturnPage() {
         )}
       </div>
     </ProtectedRoute>
+  );
+}
+
+export default function CheckoutReturnPage() {
+  return (
+    <Suspense fallback={<div className="p-12 text-center text-muted-foreground">Verifying session...</div>}>
+      <CheckoutReturnContent />
+    </Suspense>
   );
 }
