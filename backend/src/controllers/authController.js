@@ -129,7 +129,7 @@ const refresh = async (req, res, next) => {
     let payload;
     try {
       payload = verifyRefreshToken(refresh_token);
-    } catch (err) {
+    } catch (_err) {
       return res.status(401).json({ error: "Invalid or expired refresh token" });
     }
 
@@ -198,7 +198,8 @@ const logout = async (req, res, next) => {
             break;
           }
         }
-      } catch (err) {
+      } catch (_err) {
+        // Ignore invalid or expired token on logout; proceed to clear cookies
       }
     }
 
@@ -220,7 +221,7 @@ const me = async (req, res, next) => {
     let payload;
     try {
       payload = verifyAccessToken(access_token);
-    } catch (err) {
+    } catch (_err) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 

@@ -8,6 +8,7 @@ function httpError(status, message) {
 }
 
 function positiveId(value, fieldName) {
+  if (typeof value !== 'number' && (typeof value !== 'string' || !/^\d+$/.test(value))) throw httpError(400, `${fieldName} must be a positive integer`);
   const id = Number(value);
   if (!Number.isInteger(id) || id <= 0) throw httpError(400, `${fieldName} must be a positive integer`);
   return id;
@@ -18,7 +19,8 @@ function name(value, required = false) {
     if (required) throw httpError(400, 'category_name is required');
     return undefined;
   }
-  const normalized = String(value).trim();
+  if (typeof value !== 'string') throw httpError(400, 'category_name must be a string');
+  const normalized = value.trim();
   if (!normalized && required) throw httpError(400, 'category_name is required');
   if (normalized.length > 100) throw httpError(400, 'category_name must be 100 characters or fewer');
   return normalized;
@@ -98,4 +100,4 @@ async function deleteCategory(categoryId) {
   return result.rows[0] ? { category: result.rows[0] } : null;
 }
 
-module.exports = { listCategories, createCategory, updateCategory, deleteCategory, positiveId };
+module.exports = { listCategories, createCategory, updateCategory, deleteCategory, positiveId, buildTree, ensureParentExists };

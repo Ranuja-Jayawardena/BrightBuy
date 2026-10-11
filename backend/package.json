@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "test": "jest --runInBand"
   },
   "keywords": [
     "brightbuy",
@@ -22,6 +23,8 @@
     "cors": "^2.8.5",
     "dotenv": "^17.3.1",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^10.1.0",
     "pg": "^8.13.3"
@@ -29,6 +32,8 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "eslint": "^9.21.0",
-    "nodemon": "^3.1.9"
+    "jest": "^30.5.2",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.3.1"
   }
 }

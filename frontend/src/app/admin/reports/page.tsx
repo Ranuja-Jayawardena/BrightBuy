@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   TrendingUp,
-  PackageAlert,
+  AlertTriangle,
   Users,
   DollarSign,
   ShoppingCart,
@@ -195,7 +195,7 @@ export default function AdminReportsOverviewPage() {
           <div className="flex items-center justify-between text-muted-foreground text-xs uppercase font-medium">
             <span>Low Stock Items</span>
             <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
-              <PackageAlert className="h-4 w-4" />
+              <AlertTriangle className="h-4 w-4" />
             </div>
           </div>
           <div className="text-2xl font-bold text-amber-600">
@@ -295,7 +295,7 @@ export default function AdminReportsOverviewPage() {
         >
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
-              <PackageAlert className="h-4 w-4" />
+              <AlertTriangle className="h-4 w-4" />
               Inventory Reports
             </span>
             <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
