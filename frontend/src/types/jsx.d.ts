@@ -273,5 +273,29 @@ declare module 'next/image' {
 
 declare module 'lucide-react';
 declare module 'recharts';
-declare module 'zustand';
-declare module 'zustand/middleware';
+declare module 'zustand' {
+  export type StateCreator<T> = (
+    set: (partial: T | Partial<T> | ((state: T) => T | Partial<T>), replace?: boolean) => void,
+    get: () => T,
+    api?: any
+  ) => T;
+
+  export type UseBoundStore<T> = {
+    (): T;
+    <U>(selector: (state: T) => U): U;
+    getState: () => T;
+    setState: (partial: T | Partial<T> | ((state: T) => T | Partial<T>), replace?: boolean) => void;
+    subscribe: (listener: (state: T, prevState: T) => void) => () => void;
+  };
+
+  export function create<T>(initializer: StateCreator<T>): UseBoundStore<T>;
+  export function create<T>(): (initializer: StateCreator<T>) => UseBoundStore<T>;
+  export function create(initializer?: any): any;
+  export default create;
+}
+
+declare module 'zustand/middleware' {
+  export const persist: any;
+  export const devtools: any;
+}
+
