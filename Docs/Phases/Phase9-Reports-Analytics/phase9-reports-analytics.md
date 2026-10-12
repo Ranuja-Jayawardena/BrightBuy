@@ -1,4 +1,4 @@
-# Phase 9: Reports & Analytics
+﻿# Phase 9: Reports & Analytics
 
 > **Status:** Complete (4 / 4 subphases complete)
 > **Members:** C (backend report queries/APIs), A (frontend charts/dashboard)
