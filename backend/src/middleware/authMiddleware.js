@@ -25,8 +25,15 @@ const requireAuth = async (req, res, next) => {
         customer_id = customerResult.rows[0].customer_id;
       }
     } else {
-      const employeeResult = await db.query('SELECT employee_id, role FROM employees WHERE user_id = $1', [payload.user_id]);
+      const employeeResult = await db.query('SELECT employee_id, role, is_active FROM employees WHERE user_id = $1', [payload.user_id]);
       if (employeeResult.rows.length > 0) {
+        if (employeeResult.rows[0].is_active === false) {
+          return res.status(403).json({
+            error: 'Forbidden: Insufficient privileges',
+            message: 'Employee account has been deactivated. Contact Super Admin.',
+            statusCode: 403,
+          });
+        }
         employee_id = employeeResult.rows[0].employee_id;
         employee_role = employeeResult.rows[0].role;
       }
