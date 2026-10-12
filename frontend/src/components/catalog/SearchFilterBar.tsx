@@ -43,7 +43,7 @@ export function SearchFilterBar({
           type="text"
           placeholder="Search for products..."
           value={localSearch}
-          onChange={(e) => setLocalSearch(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
           className="w-full bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-900 transition-all outline-none"
         />
       </div>
@@ -53,7 +53,7 @@ export function SearchFilterBar({
         <div className="relative flex-1 md:flex-none">
           <select
             value={brandFilter}
-            onChange={(e) => onBrandChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onBrandChange(e.target.value)}
             className="w-full md:w-40 appearance-none bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl pl-4 pr-10 py-3 text-sm text-slate-700 transition-all outline-none font-medium cursor-pointer"
           >
             <option value="All">All Brands</option>
@@ -70,7 +70,7 @@ export function SearchFilterBar({
         <div className="relative flex-1 md:flex-none">
           <select
             value={sortBy}
-            onChange={(e) => onSortChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onSortChange(e.target.value)}
             className="w-full md:w-48 appearance-none bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-700 transition-all outline-none font-medium cursor-pointer"
           >
             <option value="">Recommended</option>

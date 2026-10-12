@@ -104,7 +104,7 @@ export const ReportLineChart: React.FC<ReportLineChartProps> = ({
                 }}
               />
               <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '13px' }} />
-              {lines.map((line) => (
+              {lines.map((line: LineConfig) => (
                 <Line
                   key={line.key}
                   type="monotone"

@@ -63,7 +63,7 @@ export const ReportDonutChart: React.FC<ReportDonutChartProps> = ({
     );
   }
 
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const total = data.reduce((sum: number, item: DonutDataItem) => sum + item.value, 0);
 
   return (
     <div className="bg-card border rounded-xl p-5 shadow-sm">
@@ -112,7 +112,7 @@ export const ReportDonutChart: React.FC<ReportDonutChartProps> = ({
                 outerRadius={outerRadius}
                 paddingAngle={4}
               >
-                {data.map((entry, index) => (
+                {data.map((entry: DonutDataItem, index: number) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={entry.color || colors[index % colors.length]}

@@ -133,7 +133,7 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
                 }}
               />
               <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '13px' }} />
-              {bars.map((bar) => (
+              {bars.map((bar: BarConfig) => (
                 <Bar
                   key={bar.key}
                   dataKey={bar.key}

@@ -8,7 +8,7 @@ export interface User {
   first_name?: string;
 }
 
-interface AuthState {
+export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;

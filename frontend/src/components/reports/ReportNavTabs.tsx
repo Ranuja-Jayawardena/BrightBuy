@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { TrendingUp, PackageCheck, Users, LayoutDashboard } from 'lucide-react';
 
-export const ReportNavTabs: React.FC = () => {
+export const ReportNavTabs = () => {
   const pathname = usePathname();
 
   const tabs = [

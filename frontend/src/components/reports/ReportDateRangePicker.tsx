@@ -139,14 +139,14 @@ export const ReportDateRangePicker: React.FC<ReportDateRangePickerProps> = ({
           <input
             type="date"
             value={value.startDate}
-            onChange={(e) => handleDateChange('startDate', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleDateChange('startDate', e.target.value)}
             className="border rounded-md px-2 py-1 bg-background text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <span className="text-muted-foreground">to</span>
           <input
             type="date"
             value={value.endDate}
-            onChange={(e) => handleDateChange('endDate', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleDateChange('endDate', e.target.value)}
             className="border rounded-md px-2 py-1 bg-background text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
