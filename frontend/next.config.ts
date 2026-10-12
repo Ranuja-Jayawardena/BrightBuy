@@ -19,10 +19,18 @@ const nextConfig: NextConfig = {
       }
     : {}),
   async rewrites() {
+    const rawTarget =
+      process.env.BACKEND_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      "http://localhost:5000";
+    const destination = rawTarget.endsWith("/api/:path*")
+      ? rawTarget
+      : `${rawTarget.replace(/\/+$/, "")}/api/:path*`;
+
     return [
       {
         source: "/api/:path*",
-        destination: process.env.BACKEND_URL || "http://localhost:5000/api/:path*",
+        destination,
       },
     ];
   },
