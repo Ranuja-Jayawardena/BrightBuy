@@ -1,7 +1,7 @@
 # Fix 1.4: Address Form Cancel Feedback Fix
 
 > **Parent Group:** [Fix 1: Customer Account & Storefront UX](fix1-customer-account-storefront.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member B (Frontend Addresses & Checkout UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -36,7 +36,7 @@ The `onClose` callback is called by both the Cancel button (`<Button onClick={on
 ## Tasks
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/addresses/page.tsx`:
+- [x] In `frontend/src/app/addresses/page.tsx`:
   - Separate `onSuccess` and `onCancel` callbacks (or pass `{ saved: boolean }` parameter to `onClose`).
   - Only call `setSuccessMessage` when saving actually completes with a successful HTTP response.
   - On cancel or `X` dismiss, simply close the form without triggering any success alert.
