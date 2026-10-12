@@ -34,3 +34,11 @@ Let customers manage addresses and place an order through a clear checkout flow.
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+---
+
+## Related Fixes & Patches
+
+- **[Fix 1.4: Address Form Cancel Action & UI Feedback](../../Fixes/Fix1-Customer-Account-Storefront/fix1.4-address-form-cancel-feedback.md):** Resolves cancel callback in address creation/editing modal during checkout, cleanly restoring previous state without side-effects.
+- **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Aligns delivery mode selector (Store Pickup vs Home Delivery) with required address inputs and shipping calculations.
+
+

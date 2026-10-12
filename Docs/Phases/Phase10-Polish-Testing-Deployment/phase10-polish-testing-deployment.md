@@ -69,3 +69,15 @@ All backend endpoints (C, D, E) must return errors in this shape:
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+---
+
+## Related Fixes & Patches Track
+
+User testing, end-to-end integration audits, and operational feedback revealed targeted refinements across the platform. These are formally planned and tracked in the dedicated **[Fixes & Patches Master Plan](../../Fixes/overallplan.md)**:
+- **[Fix 1: Customer Account & Storefront Polish](../../Fixes/Fix1-Customer-Account-Storefront/fix1-customer-account-storefront.md)** (Fixes 1.1 – 1.4: profile management, dynamic brands, complete apparel variant matrix, checkout address feedback).
+- **[Fix 2: Search & Filter Performance](../../Fixes/Fix2-Search-Filter-Performance/fix2-search-filter-performance.md)** (Fixes 2.1 – 2.2: price range dual-slider + V22 composite index, debounced search autocomplete + V23 trigram GIN index).
+- **[Fix 3: Admin Catalog & Media](../../Fixes/Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md)** (Fixes 3.1 – 3.4: sticky admin sidebar, product/category status switches & reactivation, multipart image upload & `/api/images/:id` route fix).
+- **[Fix 4: Role Permissions & Operations](../../Fixes/Fix4-Role-Permissions-Operations/fix4-role-permissions-operations.md)** (Fixes 4.1 – 4.3: staff cart purchase restriction, Super Admin employee deactivation & V24 migration, store pickup vs courier tracking codes).
+- **[Fix 5: Analytics & Reports Visuals](../../Fixes/Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)** (Fix 5.1: real product name labels and tooltips on top performing products chart).
+
+

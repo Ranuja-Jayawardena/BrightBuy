@@ -38,3 +38,10 @@ Assemble the admin report pages from the 9.3 building blocks and the real report
 - Added comprehensive loading skeletons (`isLoading`) and contextual empty state messaging across all chart and table building blocks.
 - Added `getOrders` and date filtering support to `reportService` connecting directly to Member C's `/api/reports/*` endpoints.
 
+---
+
+## Related Fixes & Patches
+
+- **[Fix 5.1: Top Performing Products Chart Data Display & Label Formatting](../../Fixes/Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md):** Updates the top performing products chart in `SalesReportPage.tsx` to display real product names instead of numeric indices on the chart axis.
+
+

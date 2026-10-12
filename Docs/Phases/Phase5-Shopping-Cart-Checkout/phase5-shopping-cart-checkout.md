@@ -66,3 +66,14 @@ B can start UI work against the contracts in each D subphase with mock data whil
 
 - **Added `GET /api/cities`** (5.2): the address form needs a city list to choose `city_id`. This endpoint was missing from the original plan.
 
+---
+
+## Related Fixes & Patches
+
+This cart and checkout flow is extended and refined by the following post-development fix items in [Docs/Fixes/overallplan.md](../../Fixes/overallplan.md):
+- **[Fix 1.4: Address Form Cancel Action & UI Feedback](../../Fixes/Fix1-Customer-Account-Storefront/fix1.4-address-form-cancel-feedback.md):** Fixes address creation/edit modal cancel button in checkout flow to cleanly restore previous state without unwanted side effects.
+- **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Ensures cart item thumbnails correctly resolve through `/api/images/:id`.
+- **[Fix 4.1: Staff Cart & Purchase Policy Enforcement](../../Fixes/Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md):** Enforces business rule prohibiting admin and employee accounts from placing orders; displays clear modal explaining policy and suppresses cart icon in navigation for staff.
+- **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Standardizes delivery modes (`pickup` vs `home_delivery`) during order creation and defines fulfillment rules.
+
+

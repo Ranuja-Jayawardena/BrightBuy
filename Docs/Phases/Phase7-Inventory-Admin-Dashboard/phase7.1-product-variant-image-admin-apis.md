@@ -1,4 +1,4 @@
-﻿# Phase 7.1: Product, Variant & Image Admin APIs
+# Phase 7.1: Product, Variant & Image Admin APIs
 
 > **Parent Phase:** [Phase 7: Inventory & Admin Dashboard](phase7-inventory-admin-dashboard.md)
 > **Status:** Complete
@@ -67,4 +67,12 @@ Response 409: { error: "Variant SKU already exists" }
 
 - Added admin list/detail (`GET`) and image update (`PUT`) endpoints. The admin UI needs them, but they were missing from the original plan.
 - Implemented under `/api/admin` with raw `pg` queries, transaction-wrapped product/category and variant/attribute writes, and route-local multipart parsing for image upload.
+
+---
+
+## Related Fixes & Patches
+
+- **[Fix 3.2: Product Status Switch & Reactivation Flow](../../Fixes/Fix3-Admin-Catalog-Media/fix3.2-product-status-toggle.md):** Adds `PATCH /api/admin/products/:id/status` allowing bidirectional activation toggling instead of one-way deletion.
+- **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Hardens multipart image upload processing, binary BYTEA storage, and public image URL consistency.
+
 

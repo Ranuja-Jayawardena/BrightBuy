@@ -37,3 +37,11 @@ Build the cart experience and connect the product page's Add to Cart button to t
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+---
+
+## Related Fixes & Patches
+
+- **[Fix 4.1: Staff Cart & Purchase Policy Enforcement](../../Fixes/Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md):** Suppresses the cart navbar icon for administrative and employee accounts, and pops up an informational policy modal when staff attempts to add items to cart.
+- **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Connects cart line item image thumbnails to `/api/images/:id` so product photos appear in the shopping bag.
+
+
