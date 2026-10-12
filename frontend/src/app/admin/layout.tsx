@@ -19,9 +19,30 @@ import {
   ChevronRight
 } from 'lucide-react';
 
+import { useAuthStore } from '@/store/useAuthStore';
+import { ShieldAlert } from 'lucide-react';
+
+const rolePermissions: Record<string, string[]> = {
+  super_admin: ['/admin', '/admin/products', '/admin/categories', '/admin/orders', '/admin/inventory', '/admin/employees', '/admin/reports'],
+  inventory_manager: ['/admin', '/admin/products', '/admin/inventory'],
+  order_dispatcher: ['/admin', '/admin/orders'],
+  catalog_manager: ['/admin', '/admin/products', '/admin/categories'],
+  analyst: ['/admin', '/admin/reports'],
+};
+
+const roleLabels: Record<string, string> = {
+  super_admin: 'Super Admin',
+  inventory_manager: 'Inventory Manager',
+  order_dispatcher: 'Order Dispatcher',
+  catalog_manager: 'Catalog Manager',
+  analyst: 'Business Analyst',
+};
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useAuthStore();
+  const staffRole = user?.employee_role || 'super_admin';
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -33,13 +54,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
   ];
 
+  const allowedPaths = rolePermissions[staffRole] || ['/admin'];
+  const visibleNavItems = navItems.filter((item) => allowedPaths.includes(item.href));
+
   const currentNav = navItems.find((item) => 
     item.exact ? pathname === item.href : pathname.startsWith(item.href)
   );
+
   // Skip the admin guard for the staff login page to prevent redirect loops
   if (pathname === '/admin/login') {
     return <>{children}</>;
   }
+
+  // Check if current route is authorized for this employee's role
+  const isAuthorizedRoute = allowedPaths.some((allowed) => 
+    allowed === '/admin' ? pathname === '/admin' : pathname.startsWith(allowed)
+  );
 
   return (
     <AdminRoute>
@@ -77,11 +107,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className="w-72 bg-card border-r h-full p-4 shadow-xl overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-3 mb-2">
-                Management Portal
+              <div className="flex items-center justify-between px-3 mb-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Management Portal
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                  {roleLabels[staffRole] || staffRole}
+                </span>
               </div>
               <nav className="space-y-1">
-                {navItems.map((item) => {
+                {visibleNavItems.map((item) => {
                   const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
                   const Icon = item.icon;
                   return (
@@ -117,11 +152,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Desktop Sidebar */}
         <aside className="hidden md:flex flex-col w-64 border-r bg-muted/20 shrink-0 p-4">
-          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-3 mb-3">
-            Admin Console
+          <div className="flex items-center justify-between px-3 mb-3">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Admin Console
+            </span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              {roleLabels[staffRole] || staffRole}
+            </span>
           </div>
           <nav className="space-y-1.5 flex-1">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
               const Icon = item.icon;
               return (
@@ -153,7 +193,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Main Content Area */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden min-w-0">
-          {children}
+          {isAuthorizedRoute ? (
+            children
+          ) : (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 border rounded-2xl bg-card shadow-xs">
+              <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-600 flex items-center justify-center mb-4">
+                <ShieldAlert className="w-6 h-6" />
+              </div>
+              <h2 className="text-xl font-bold tracking-tight">Access Restricted</h2>
+              <p className="text-sm text-muted-foreground max-w-md mt-1 mb-6">
+                Your staff account (<strong>{roleLabels[staffRole] || staffRole}</strong>) does not have permission to view or manage the <strong>{currentNav?.label || 'requested'}</strong> module.
+              </p>
+              <Link
+                href="/admin"
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs"
+              >
+                Return to Overview Dashboard
+              </Link>
+            </div>
+          )}
         </main>
       </div>
     </AdminRoute>

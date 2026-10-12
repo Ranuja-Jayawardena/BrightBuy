@@ -6,6 +6,9 @@ export interface User {
   email: string;
   role: string;
   first_name?: string;
+  last_name?: string;
+  employee_id?: number;
+  employee_role?: 'super_admin' | 'inventory_manager' | 'order_dispatcher' | 'catalog_manager' | 'analyst';
 }
 
 export interface AuthState {

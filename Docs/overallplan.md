@@ -92,6 +92,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [x] 10.4 Order Backend Validation & Tests — **D** → [phase10.4-order-backend-validation-tests.md](Phases/Phase10-Polish-Testing-Deployment/phase10.4-order-backend-validation-tests.md)
   - [x] 10.5 Security Hardening — **E** → [phase10.5-security-hardening.md](Phases/Phase10-Polish-Testing-Deployment/phase10.5-security-hardening.md)
   - [ ] 10.6 Production Deployment — **E** → [phase10.6-production-deployment.md](Phases/Phase10-Polish-Testing-Deployment/phase10.6-production-deployment.md)
+  - [x] 10.7 Staff Role-Based Access Control (RBAC) — **E** → [phase10.7-staff-rbac.md](Phases/Phase10-Polish-Testing-Deployment/phase10.7-staff-rbac.md)
 
 ---
 

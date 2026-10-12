@@ -25,7 +25,16 @@ interface EmployeeItem {
   first_name: string;
   last_name: string;
   phone: string | null;
+  role?: string;
 }
+
+const STAFF_ROLES = [
+  { value: 'super_admin', label: 'Super Administrator', badge: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300' },
+  { value: 'inventory_manager', label: 'Inventory Manager', badge: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300' },
+  { value: 'order_dispatcher', label: 'Order Dispatcher', badge: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' },
+  { value: 'catalog_manager', label: 'Catalog Manager', badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' },
+  { value: 'analyst', label: 'Business Analyst', badge: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300' },
+];
 
 export default function AdminEmployeesPage() {
   const [employees, setEmployees] = useState<EmployeeItem[]>([]);
@@ -40,7 +49,8 @@ export default function AdminEmployeesPage() {
     last_name: '',
     email: '',
     password: '',
-    phone: ''
+    phone: '',
+    role: 'inventory_manager',
   });
   const [formError, setFormError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,7 +83,8 @@ export default function AdminEmployeesPage() {
       last_name: '',
       email: '',
       password: '',
-      phone: ''
+      phone: '',
+      role: 'inventory_manager',
     });
     setFormError('');
     setIsModalOpen(true);
@@ -115,6 +126,7 @@ export default function AdminEmployeesPage() {
           last_name: formData.last_name.trim(),
           email: formData.email.trim().toLowerCase(),
           password: formData.password,
+          role: formData.role,
           phone: formData.phone.trim() || undefined
         })
       });
@@ -125,7 +137,7 @@ export default function AdminEmployeesPage() {
         throw new Error(data.error || 'Failed to register new employee');
       }
 
-      setSuccess(`Employee ${formData.first_name} ${formData.last_name} (${formData.email}) registered successfully.`);
+      setSuccess(`Employee ${formData.first_name} ${formData.last_name} (${formData.email}) registered as ${STAFF_ROLES.find(r => r.value === formData.role)?.label || formData.role} successfully.`);
       closeCreateModal();
       fetchEmployees();
     } catch (err: any) {
@@ -244,9 +256,14 @@ export default function AdminEmployeesPage() {
                       )}
                     </td>
                     <td className="p-4">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
-                        <ShieldCheck className="w-3.5 h-3.5" /> Admin
-                      </span>
+                      {(() => {
+                        const matched = STAFF_ROLES.find((r) => r.value === emp.role);
+                        return (
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${matched?.badge || 'bg-primary/10 text-primary'}`}>
+                            <ShieldCheck className="w-3.5 h-3.5" /> {matched?.label || emp.role || 'Admin'}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="p-4 text-right">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
@@ -364,6 +381,24 @@ export default function AdminEmployeesPage() {
                       className="pl-9 text-sm"
                     />
                   </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium">Assigned Operational Role</label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    {STAFF_ROLES.map((r) => (
+                      <option key={r.value} value={r.value} className="bg-popover text-popover-foreground">
+                        {r.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-muted-foreground">
+                    Controls which management modules and API endpoints this employee is permitted to access.
+                  </p>
                 </div>
               </div>
 

@@ -22,6 +22,7 @@ Table employees {
   first_name varchar(50) [not null]
   last_name varchar(50) [not null]
   phone varchar(20)
+  role varchar(30) [not null, default: 'super_admin', note: 'super_admin | inventory_manager | order_dispatcher | catalog_manager | analyst']
 }
 
 Table addresses {

@@ -106,12 +106,30 @@ const login = async (req, res, next) => {
     res.cookie('access_token', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
     res.cookie('refresh_token', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
 
+    let employee_role = undefined;
+    let employee_id = undefined;
+    let first_name = undefined;
+    let last_name = undefined;
+    if (user.role !== 'customer') {
+      const empRes = await db.query('SELECT employee_id, role, first_name, last_name FROM employees WHERE user_id = $1', [user.user_id]);
+      if (empRes.rows.length > 0) {
+        employee_role = empRes.rows[0].role;
+        employee_id = empRes.rows[0].employee_id;
+        first_name = empRes.rows[0].first_name;
+        last_name = empRes.rows[0].last_name;
+      }
+    }
+
     res.status(200).json({
       message: "Login successful",
       user: {
         user_id: user.user_id,
         email: user.email,
-        role: user.role
+        role: user.role,
+        ...(first_name && { first_name }),
+        ...(last_name && { last_name }),
+        ...(employee_id && { employee_id }),
+        ...(employee_role && { employee_role })
       }
     });
   } catch (error) {
@@ -237,11 +255,13 @@ const me = async (req, res, next) => {
     }
 
     const user = userResult.rows[0];
-    if (!user.first_name && user.role !== 'customer') {
-      const empResult = await db.query('SELECT first_name, last_name FROM employees WHERE user_id = $1', [payload.user_id]);
+    if (user.role !== 'customer') {
+      const empResult = await db.query('SELECT first_name, last_name, employee_id, role FROM employees WHERE user_id = $1', [payload.user_id]);
       if (empResult.rows.length > 0) {
         user.first_name = empResult.rows[0].first_name;
         user.last_name = empResult.rows[0].last_name;
+        user.employee_id = empResult.rows[0].employee_id;
+        user.employee_role = empResult.rows[0].role;
       }
     }
 

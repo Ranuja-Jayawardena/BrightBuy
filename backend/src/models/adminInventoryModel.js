@@ -24,19 +24,21 @@ async function adjustStock(variantId, employeeId, stockQuantity, reason) {
   } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
 }
 
-async function createEmployee({ email, passwordHash, firstName, lastName, phone }) {
+async function createEmployee({ email, passwordHash, firstName, lastName, phone, role }) {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
     const user = await client.query('INSERT INTO users (email,password_hash,role) VALUES ($1,$2,\'admin\') RETURNING user_id,email', [email, passwordHash]);
-    const employee = await client.query('INSERT INTO employees (user_id,first_name,last_name,phone) VALUES ($1,$2,$3,$4) RETURNING employee_id,user_id,first_name,last_name,phone', [user.rows[0].user_id, firstName, lastName, phone || null]);
+    const allowedRoles = ['super_admin', 'inventory_manager', 'order_dispatcher', 'catalog_manager', 'analyst'];
+    const staffRole = allowedRoles.includes(role) ? role : 'super_admin';
+    const employee = await client.query('INSERT INTO employees (user_id,first_name,last_name,phone,role) VALUES ($1,$2,$3,$4,$5) RETURNING employee_id,user_id,first_name,last_name,phone,role', [user.rows[0].user_id, firstName, lastName, phone || null, staffRole]);
     await client.query('COMMIT');
     return { ...employee.rows[0], email: user.rows[0].email };
   } catch (error) { await client.query('ROLLBACK'); if (error.code === '23505') { const e = new Error('Email already exists'); e.status = 409; throw e; } throw error; } finally { client.release(); }
 }
 
 async function listEmployees() {
-  const result = await db.query(`SELECT e.employee_id,e.user_id,u.email,e.first_name,e.last_name,e.phone FROM employees e JOIN users u ON u.user_id=e.user_id ORDER BY e.employee_id`);
+  const result = await db.query(`SELECT e.employee_id,e.user_id,u.email,e.first_name,e.last_name,e.phone,e.role FROM employees e JOIN users u ON u.user_id=e.user_id ORDER BY e.employee_id`);
   return result.rows;
 }
 
