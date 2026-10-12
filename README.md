@@ -22,6 +22,8 @@ BrightBuy is a full-stack retail and e-commerce platform designed to support cus
 - **Payments:** Lemon Squeezy integration
 - **Email:** Nodemailer with standard SMTP
 
+Transactional email is queued in PostgreSQL and retried by the backend worker up to five times. Apply migration V20 before starting the updated backend. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and a verified `EMAIL_FROM` in `backend/.env`; without credentials, jobs eventually fail and need manual requeue after SMTP is configured. Account verification and password reset links use `FRONTEND_URL` and expire after 24 hours and 1 hour respectively. Verification is currently informational and does not prevent login.
+
 ### Strict Architectural Guidelines
 1. **NO ORMs or Query Builders:** Pure, raw parameterized SQL with `pg` driver only.
 2. **NO Third-party Auth Services:** Custom JWT implementation with refresh token rotation.

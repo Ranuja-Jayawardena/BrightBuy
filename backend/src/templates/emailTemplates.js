@@ -206,7 +206,7 @@ function orderConfirmationEmail({
   estimatedDeliveryDays,
 }) {
   const displayName = name ? escapeHtml(name) : 'Valued Customer';
-  const title = `Order Confirmation #${orderId}`;
+  const title = `Order Received #${orderId}`;
   const previewText = `Thank you for your order #${orderId}. We have received your order and are preparing it.`;
   const formattedDate = orderDate ? new Date(orderDate).toLocaleDateString() : new Date().toLocaleDateString();
 
@@ -295,7 +295,7 @@ function orderConfirmationEmail({
   `;
 
   return {
-    subject: `Order Confirmation #${orderId} - BrightBuy`,
+    subject: `Order Received #${orderId} - BrightBuy`,
     html: baseLayout({ title, previewText, contentHtml }),
     text: `Thank you for your order #${orderId}!\n\nOrder Date: ${formattedDate}\n\nItems:\n${itemsRowsText}\nTotal: ${formatCurrency(totalAmount)}\n\nTrack your order at: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/orders/${orderId}\n\n- The BrightBuy Team`,
   };
