@@ -8,6 +8,9 @@ const { apiLimiter } = require('./middleware/rateLimiter');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust reverse proxy (Nginx) headers like X-Forwarded-For
+app.set('trust proxy', 1);
+
 // Security Headers via Helmet (XSS, HSTS, Sniffing, Frameguard)
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow frontend to load media/images
