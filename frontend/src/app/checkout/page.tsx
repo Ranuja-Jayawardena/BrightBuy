@@ -41,19 +41,19 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddressId) {
-      const defaultAddr = addresses.find(a => a.is_default) || addresses[0];
+      const defaultAddr = addresses.find((a: import('@/store/useAddressStore').Address) => a.is_default) || addresses[0];
       setSelectedAddressId(defaultAddr.address_id);
     }
   }, [addresses, selectedAddressId]);
 
   const selectedAddress = useMemo(() => {
-    return addresses.find(a => a.address_id === selectedAddressId);
+    return addresses.find((a: import('@/store/useAddressStore').Address) => a.address_id === selectedAddressId);
   }, [addresses, selectedAddressId]);
 
   const estimatedDeliveryDays = useMemo(() => {
     if (deliveryMode === 'store_pickup') return 2;
     if (!selectedAddress) return null;
-    const city = cities.find(c => c.city_id === selectedAddress.city_id);
+    const city = cities.find((c: import('@/store/useAddressStore').City) => c.city_id === selectedAddress.city_id);
     return city?.is_main_city ? 5 : 7;
   }, [deliveryMode, selectedAddress, cities]);
 
@@ -258,7 +258,7 @@ export default function CheckoutPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {addresses.map(addr => {
+                  {addresses.map((addr: import('@/store/useAddressStore').Address) => {
                     const isSelected = selectedAddressId === addr.address_id;
                     return (
                       <label 
@@ -358,7 +358,7 @@ export default function CheckoutPage() {
               <h2 className="text-lg font-bold tracking-tight border-b pb-3">Review & Total</h2>
               
               <div className="space-y-3 max-h-[35vh] overflow-y-auto pr-1 divide-y divide-muted">
-                {items.map(item => (
+                {items.map((item: import('@/store/useCartStore').CartItem) => (
                   <div key={item.cart_item_id} className="pt-2.5 first:pt-0 flex justify-between text-sm">
                     <div className="flex-1 pr-3">
                       <p className="font-medium text-foreground line-clamp-1">{item.product_name}</p>

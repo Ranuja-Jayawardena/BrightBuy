@@ -119,7 +119,7 @@ app.use((err, req, res, _next) => {
 });
 
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
+  app.listen(PORT, '127.0.0.1', () => {
     console.log(`Backend server running on http://localhost:${PORT}`);
   });
 }

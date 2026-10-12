@@ -117,7 +117,7 @@ function CartContent() {
         {/* Cart Item List */}
         <div className="lg:col-span-8 space-y-4">
           <div className="border rounded-xl bg-card overflow-hidden shadow-xs divide-y">
-            {items.map((item) => {
+            {items.map((item: import('@/store/useCartStore').CartItem) => {
               const isItemUpdating = updatingItemId === item.cart_item_id;
               const isItemRemoving = removingId === item.cart_item_id;
 
@@ -236,7 +236,7 @@ function CartContent() {
             
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-muted-foreground">
-                <span>Items Subtotal ({items.reduce((acc, i) => acc + i.quantity, 0)})</span>
+                <span>Items Subtotal ({items.reduce((acc: number, i: import('@/store/useCartStore').CartItem) => acc + i.quantity, 0)})</span>
                 <span className="font-medium text-foreground">${total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">

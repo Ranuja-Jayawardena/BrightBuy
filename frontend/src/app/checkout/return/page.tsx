@@ -13,7 +13,7 @@ function CheckoutReturnContent() {
   const [status, setStatus] = useState<'polling' | 'success' | 'error'>('polling');
   const [errorMsg, setErrorMsg] = useState('');
   const maxAttempts = 20; // 20 attempts * 2s = 40s wait time
-  const attemptsRef = useRef(0);
+  const attemptsRef = useRef<number>(0);
 
   useEffect(() => {
     if (!orderId) {
