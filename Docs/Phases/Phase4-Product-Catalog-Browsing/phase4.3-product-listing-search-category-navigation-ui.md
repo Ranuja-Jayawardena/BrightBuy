@@ -36,3 +36,13 @@ Build the storefront browsing experience: product grid, search, filters, and cat
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+---
+
+## Related Fixes & Patches
+
+- **[Fix 1.2: Seed Brands & Dynamic Catalog Filtering](../../Fixes/Fix1-Customer-Account-Storefront/fix1.2-brand-filtering-dynamic-catalog.md):** Replaces hardcoded brand filters with dynamic API fetching and multi-brand seed catalog.
+- **[Fix 2.1: Price Range Filter & Composite Index](../../Fixes/Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md):** Adds dual range slider price filtering synced to `min_price` and `max_price` URL params.
+- **[Fix 2.2: Search Autocomplete & GIN Trigram Indexing](../../Fixes/Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md):** Introduces interactive search suggestion dropdown.
+- **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Fixes 404 image serving bug so catalog product cards display product thumbnails reliably.
+
+

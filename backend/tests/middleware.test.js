@@ -2,7 +2,7 @@ process.env.NODE_ENV = 'test';
 process.env.JWT_ACCESS_SECRET = 'test_access_secret_1234567890_test';
 process.env.JWT_REFRESH_SECRET = 'test_refresh_secret_1234567890_test';
 
-const { requireAuth, requireRole } = require('../src/middleware/authMiddleware');
+const { requireAuth, requireRole, requireStaffRole } = require('../src/middleware/authMiddleware');
 const { signAccessToken } = require('../src/utils/jwt');
 const db = require('../src/config/db');
 
@@ -86,7 +86,7 @@ describe('Auth Middleware & Role Guards', () => {
       req.cookies.access_token = token;
 
       db.query.mockResolvedValueOnce({
-        rows: [{ employee_id: 7 }],
+        rows: [{ employee_id: 7, role: 'inventory_manager' }],
       });
 
       await requireAuth(req, res, next);
@@ -95,6 +95,7 @@ describe('Auth Middleware & Role Guards', () => {
         user_id: 12,
         role: 'admin',
         employee_id: 7,
+        employee_role: 'inventory_manager',
       });
       expect(next).toHaveBeenCalled();
     });
@@ -121,6 +122,70 @@ describe('Auth Middleware & Role Guards', () => {
     it('should call next() when user role is in allowed roles', () => {
       req.user = { user_id: 2, role: 'admin' };
       const guard = requireRole('admin', 'inventory_manager');
+
+      guard(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('requireStaffRole', () => {
+    it('should reject non-admin users with 403', () => {
+      req.user = { user_id: 5, role: 'customer' };
+      const guard = requireStaffRole('inventory_manager');
+
+      guard(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: 'Forbidden: Insufficient privileges',
+          message: 'Administrative staff privileges required',
+        })
+      );
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should allow super_admin regardless of specific allowed roles', () => {
+      req.user = { user_id: 1, role: 'admin', employee_role: 'super_admin' };
+      const guard = requireStaffRole('order_dispatcher');
+
+      guard(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+    });
+
+    it('should allow user if employee_role matches allowed roles', () => {
+      req.user = { user_id: 2, role: 'admin', employee_role: 'inventory_manager' };
+      const guard = requireStaffRole('inventory_manager', 'catalog_manager');
+
+      guard(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+    });
+
+    it('should reject user if employee_role does not match allowed roles', () => {
+      req.user = { user_id: 3, role: 'admin', employee_role: 'order_dispatcher' };
+      const guard = requireStaffRole('inventory_manager');
+
+      guard(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: 'Forbidden: Insufficient privileges',
+          message: 'Your staff role (order_dispatcher) does not have permission for this resource',
+        })
+      );
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should fallback to super_admin if employee_role is not defined', () => {
+      req.user = { user_id: 4, role: 'admin' };
+      const guard = requireStaffRole('inventory_manager');
 
       guard(req, res, next);
 

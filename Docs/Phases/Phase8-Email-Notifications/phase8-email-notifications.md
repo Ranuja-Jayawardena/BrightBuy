@@ -48,3 +48,11 @@ graph LR
 
 - **Cross-owner code:** 8.2 adds email calls inside endpoints owned by E (`/api/auth/register`) and C (`/api/admin/deliveries/:id/status`). D adds a single non-blocking `notificationService` call at the hook point the owner leaves, and the owner reviews the change.
 
+---
+
+## Related Fixes & Patches
+
+Transactional notifications are extended by the following post-development fix item in [Docs/Fixes/overallplan.md](../../Fixes/overallplan.md):
+- **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** D updates delivery status notification email templates to conditionally render courier tracking numbers and links for courier deliveries, while displaying storefront pickup instructions for store pickup orders.
+
+

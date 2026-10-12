@@ -61,3 +61,12 @@ E can stub these functions until 6.3 is done.
 
 - **Added 6.4 Payment UI (B):** The original plan had no frontend work for payments (choosing a method, redirecting to Lemon Squeezy, success/failure return pages). It's assigned to B, who owns the checkout UI.
 
+---
+
+## Related Fixes & Patches
+
+Payment flows are guarded and clarified by the following post-development fix items in [Docs/Fixes/overallplan.md](../../Fixes/overallplan.md):
+- **[Fix 4.1: Staff Cart & Purchase Policy Enforcement](../../Fixes/Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md):** Rejects payment session initialization attempts initiated by administrator or employee accounts.
+- **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Aligns cash on delivery (COD) vs prepaid payment flows with chosen delivery method (Store Pickup vs Courier Delivery).
+
+

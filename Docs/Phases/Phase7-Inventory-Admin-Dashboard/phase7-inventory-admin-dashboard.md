@@ -56,3 +56,16 @@ B can start the admin layout and forms in 7.5 with mock data while C builds the 
 
 - 7.1 uses a route-local multipart parser for image uploads so no new dependency is required in the current environment. Uploaded image bytes are validated by magic bytes before inserting into `product_images.image_data`.
 
+---
+
+## Related Fixes & Patches
+
+Admin operations and inventory workflows are enhanced and resolved by the following post-development fix items in [Docs/Fixes/overallplan.md](../../Fixes/overallplan.md):
+- **[Fix 3.1: Admin Sidebar Sticky Layout & Viewport Containment](../../Fixes/Fix3-Admin-Catalog-Media/fix3.1-admin-sidebar-sticky-layout.md):** Converts admin shell sidebar to sticky layout to prevent disappearing on tall catalog tables.
+- **[Fix 3.2: Product Status Switch & Reactivation Flow](../../Fixes/Fix3-Admin-Catalog-Media/fix3.2-product-status-toggle.md):** Replaces destructive delete button with an interactive active/inactive toggle switch and adds `PATCH /api/admin/products/:id/status`.
+- **[Fix 3.3: Category Status Switch & Hierarchical Propagation](../../Fixes/Fix3-Admin-Catalog-Media/fix3.3-category-status-toggle.md):** Replaces one-way category deletion with a status switch toggle and cascading child deactivation safeguards.
+- **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Fixes admin multipart file upload binary storage, instant preview rendering, and fixes the `/api/images/:id` routing bug.
+- **[Fix 4.2: Employee Lifecycle & Role Management](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Expands employee management to allow Super Admin deactivation/reactivation, role updates, and migration `V24`.
+- **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Distinguishes Store Pickup from Courier Home Delivery in admin order fulfillment, enforcing tracking numbers only when dispatching couriers.
+
+

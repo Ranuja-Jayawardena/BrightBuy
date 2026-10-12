@@ -1,0 +1,107 @@
+# Fix 3.4: Product Image Upload & Route Serving Fix
+
+> **Parent Group:** [Fix 3: Admin Catalog & Media Management](fix3-admin-catalog-media.md)
+> **Status:** Not Started
+> **Assigned To:** Member C (Backend Middleware & Image Routes) & Member B (Admin Products UI)
+> **Depends On:** —
+> **Blocks:** —
+> **Priority:** High
+> **DB Schema Reference:** [DB_Schema.md](../../Database/DB_Schema.md) (table: `product_images`)
+
+---
+
+## Problem Description
+
+1. Uploading product images from the admin product edit page (`/admin/products/[id]`) fails or does not display the uploaded image.
+2. Even when an image is saved in the database, the admin preview renders a broken image box.
+3. During product creation (`/admin/products/new`), there is no image upload field available.
+
+---
+
+## Root Cause
+
+1. **Incorrect Image URL Path:**
+   - In `frontend/src/app/admin/products/[id]/page.tsx` line 402, the image tag points to:
+     `<img src={'/api/products/images/${img.image_id}'} />`
+   - In `backend/src/index.js` line 90, the image serving router is mounted at:
+     `app.use('/api/images', imageRoutes);`
+   - Requesting `/api/products/images/:id` results in an immediate **404 Not Found**, making all uploaded images appear broken.
+2. **Custom Multipart Parser Edge Cases:**
+   - `backend/src/middleware/multipartImageUpload.js` extracts boundaries with `contentType.match(/boundary=([^;]+)/i)` without stripping optional quotes (`boundary="..."`).
+   - Using string conversions (`latin1`) and `part.replace(/\r\n$/, '')` can corrupt binary image files ending with CRLF sequences.
+3. **Missing Product Creation Media Upload:**
+   - `frontend/src/app/admin/products/new/page.tsx` contains no image upload UI; images can only be attached after product creation.
+
+---
+
+## Tasks
+
+### Backend — Member C
+- [ ] In `backend/src/middleware/multipartImageUpload.js`:
+  - Sanitize boundary extraction: `const boundary = boundaryMatch[1].replace(/^["']|["']$/g, '');`.
+  - Fix multipart binary buffer slicing to preserve exact binary bytes without string trimming corruption.
+  - Test upload of PNG, JPEG, and WebP binary files.
+- [ ] In `backend/src/routes/productRoutes.js`:
+  - Add route alias `GET /images/:id` (redirecting or forwarding to `imageController.getImage`) so both `/api/images/:id` and `/api/products/images/:id` resolve cleanly.
+
+### Frontend — Member B
+- [ ] In `frontend/src/app/admin/products/[id]/page.tsx`:
+  - Update image src to standard path: `/api/images/${img.image_id}`.
+  - Show proper loading spinner during image upload.
+  - Add primary image badge, sort order inputs, and deletion confirmation modal.
+- [ ] In `frontend/src/app/cart/page.tsx`:
+  - Update cart item image src from `/api/products/images/...` to `/api/images/...`.
+- [ ] (Optional Enhancement) In `frontend/src/app/admin/products/new/page.tsx`:
+  - Add informational notice explaining that product media galleries are configured after initial product creation, or allow primary image attachment on create.
+
+---
+
+## API Contracts
+
+### `POST /api/admin/products/:id/images`
+```http
+POST /api/admin/products/5/images
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryXyZ
+Cookie: access_token=...
+
+------WebKitFormBoundaryXyZ
+Content-Disposition: form-data; name="image"; filename="phone-front.png"
+Content-Type: image/png
+
+<binary bytes>
+------WebKitFormBoundaryXyZ
+Content-Disposition: form-data; name="is_primary"
+
+true
+------WebKitFormBoundaryXyZ--
+```
+**Response 201:**
+```json
+{
+  "image": {
+    "image_id": 42,
+    "product_id": 5,
+    "sort_order": 0,
+    "is_primary": true,
+    "created_at": "2026-10-12T13:10:00.000Z"
+  }
+}
+```
+
+---
+
+## Affected Files
+
+- `backend/src/middleware/multipartImageUpload.js`
+- `backend/src/routes/productRoutes.js`
+- `frontend/src/app/admin/products/[id]/page.tsx`
+- `frontend/src/app/cart/page.tsx`
+- `frontend/src/app/admin/products/new/page.tsx`
+
+---
+
+## Definition of Done
+
+1. Uploading PNG, JPEG, and WebP images succeeds without corruption or 400 errors.
+2. Uploaded images display immediately in the product gallery and storefront.
+3. Setting an image as primary or deleting an image works reliably.

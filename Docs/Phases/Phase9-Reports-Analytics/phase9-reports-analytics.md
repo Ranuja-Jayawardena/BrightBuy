@@ -49,3 +49,11 @@ graph LR
 
 - **Refined dependencies:** Report APIs only need the admin guard (3.2) and seeded orders (1.7), so C can build them in parallel with Phase 7. Only A's UI waits for the admin layout (7.5).
 
+---
+
+## Related Fixes & Patches
+
+Analytics and report visualizations are refined by the following post-development fix item in [Docs/Fixes/overallplan.md](../../Fixes/overallplan.md):
+- **[Fix 5.1: Top Performing Products Chart Data Display & Label Formatting](../../Fixes/Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md):** Updates the top performing products chart in `SalesReportPage.tsx` and backend aggregation query to prominently display real product names with tooltips instead of numeric indices.
+
+

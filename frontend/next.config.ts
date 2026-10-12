@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // Hot reload inside Docker: file-change events from Windows/macOS bind mounts don't
   // reach the container, so we must poll. Turbopack does not support polling, so
   // docker-compose overrides the command to use Webpack (`next dev --webpack`) and

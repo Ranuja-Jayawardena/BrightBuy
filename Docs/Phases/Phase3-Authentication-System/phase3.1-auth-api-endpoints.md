@@ -79,3 +79,11 @@ Response 401: { error: "Not authenticated" }
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+---
+
+## Related Fixes & Patches
+
+- **[Fix 1.1: Customer Profile Management & Navigation](../../Fixes/Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md):** Adds customer profile update endpoint (`PUT /api/auth/profile`) and password change endpoint (`PUT /api/auth/password`).
+- **[Fix 4.2: Employee Lifecycle & Role Management](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Adds employee deactivation check during login (`is_active` validation in `POST /api/auth/login`).
+
+

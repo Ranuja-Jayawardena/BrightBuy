@@ -38,7 +38,7 @@ function ProductsContent() {
     } else if (brand !== 'All') {
       title = `${brand} Products | BrightBuy`;
     } else if (categoryId && categories.length > 0) {
-      const activeCat = categories.flatMap(c => [c, ...(c.children || [])]).find(c => c.category_id === categoryId);
+      const activeCat = categories.flatMap((c: Category) => [c, ...(c.children || [])]).find((c: Category) => c.category_id === categoryId);
       if (activeCat) title = `${activeCat.category_name} | BrightBuy`;
     }
     document.title = title;
@@ -104,7 +104,7 @@ function ProductsContent() {
 
   const hasActiveFilters = Boolean(search || (brand && brand !== 'All') || categoryId);
   const activeCategory = categoryId 
-    ? categories.flatMap(c => [c, ...(c.children || [])]).find(c => c.category_id === categoryId)
+    ? categories.flatMap((c: Category) => [c, ...(c.children || [])]).find((c: Category) => c.category_id === categoryId)
     : null;
 
   return (
@@ -133,17 +133,17 @@ function ProductsContent() {
           <CategorySidebar 
             categories={categories} 
             selectedCategoryId={categoryId} 
-            onSelectCategory={(id) => updateUrlParams('category_id', id ? id.toString() : null)} 
+            onSelectCategory={(id: number | null) => updateUrlParams('category_id', id ? id.toString() : null)} 
           />
 
           <div className="flex-1">
             <SearchFilterBar 
               searchQuery={search}
-              onSearchChange={(q) => updateUrlParams('search', q)}
+              onSearchChange={(q: string) => updateUrlParams('search', q)}
               brandFilter={brand}
-              onBrandChange={(b) => updateUrlParams('brand', b)}
+              onBrandChange={(b: string) => updateUrlParams('brand', b)}
               sortBy={sort}
-              onSortChange={(s) => updateUrlParams('sort', s)}
+              onSortChange={(s: string) => updateUrlParams('sort', s)}
               brands={BRANDS}
             />
 
@@ -199,7 +199,7 @@ function ProductsContent() {
               </div>
             ) : loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
+                {Array.from({ length: 6 }).map((_: unknown, i: number) => (
                   <div key={i} className="flex flex-col bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm animate-pulse">
                     <div className="aspect-square bg-slate-200/80 w-full" />
                     <div className="p-5 flex flex-col flex-grow space-y-3">
@@ -226,14 +226,14 @@ function ProductsContent() {
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {products.map(product => (
+                  {products.map((product: ProductSummary) => (
                     <ProductCard key={product.product_id} product={product} />
                   ))}
                 </div>
                 {pagination && (
                   <Pagination 
                     meta={pagination} 
-                    onPageChange={(p) => updateUrlParams('page', p.toString())} 
+                    onPageChange={(p: number) => updateUrlParams('page', p.toString())} 
                   />
                 )}
               </>

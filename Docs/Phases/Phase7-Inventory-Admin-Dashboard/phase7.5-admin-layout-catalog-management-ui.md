@@ -36,3 +36,13 @@ Build the admin shell and the screens for managing products, variants, images, a
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+---
+
+## Related Fixes & Patches
+
+- **[Fix 3.1: Admin Sidebar Sticky Layout & Viewport Containment](../../Fixes/Fix3-Admin-Catalog-Media/fix3.1-admin-sidebar-sticky-layout.md):** Converts sidebar into a sticky fixed-height navigation bar so it does not scroll out of view when scrolling long product tables.
+- **[Fix 3.2: Product Status Switch & Reactivation Flow](../../Fixes/Fix3-Admin-Catalog-Media/fix3.2-product-status-toggle.md):** Replaces one-way delete button with an interactive active/inactive toggle switch.
+- **[Fix 3.3: Category Status Switch & Hierarchical Propagation](../../Fixes/Fix3-Admin-Catalog-Media/fix3.3-category-status-toggle.md):** Replaces category delete button with active/inactive toggle switch and warning modal.
+- **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Fixes product image upload, displays instant local preview, and ensures uploaded images display correctly.
+
+

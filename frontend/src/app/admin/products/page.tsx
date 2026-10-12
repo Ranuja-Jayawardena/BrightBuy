@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '@/services/api';
 import { Button } from '@/components/ui/button';
@@ -130,7 +130,7 @@ export default function AdminProductsPage() {
           <Input
             placeholder="Search by name, brand, SKU..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
             className="pl-9 text-sm"
           />
         </div>

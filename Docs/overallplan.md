@@ -92,6 +92,9 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [x] 10.4 Order Backend Validation & Tests — **D** → [phase10.4-order-backend-validation-tests.md](Phases/Phase10-Polish-Testing-Deployment/phase10.4-order-backend-validation-tests.md)
   - [x] 10.5 Security Hardening — **E** → [phase10.5-security-hardening.md](Phases/Phase10-Polish-Testing-Deployment/phase10.5-security-hardening.md)
   - [ ] 10.6 Production Deployment — **E** → [phase10.6-production-deployment.md](Phases/Phase10-Polish-Testing-Deployment/phase10.6-production-deployment.md)
+  - [x] 10.7 Staff Role-Based Access Control (RBAC) — **E** → [phase10.7-staff-rbac.md](Phases/Phase10-Polish-Testing-Deployment/phase10.7-staff-rbac.md)
+
+- [ ] **Fixes & Patches Track:** Post-testing bug fixes & refinements (Fix 1 to Fix 5) → [overallplan.md](Fixes/overallplan.md)
 
 ---
 
@@ -183,6 +186,11 @@ BrightBuy/
 ├── Docs/                   # Project documentation
 │   ├── Database/
 │   │   └── DB_Schema.md    # Single source of truth for DB schema
+│   ├── Fixes/              # Post-development fixes & patches
+│   │   ├── overallplan.md  # Fix tracker — master navigation hub for all fixes
+│   │   └── FGX-Name/       # Fix Group folders (like Phase folders)
+│   │       ├── fgX-name.md             # Fix Group overview
+│   │       └── fgX.Y-name.md           # Individual Fix Item docs
 │   ├── Phases/
 │   │   ├── Phase1-Project-Foundation/
 │   │   │   ├── phase1-project-foundation.md       # Phase overview: status, members, subphase links

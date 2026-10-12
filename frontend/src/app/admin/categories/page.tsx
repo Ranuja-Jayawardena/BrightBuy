@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { apiFetch } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -274,7 +274,7 @@ export default function AdminCategoriesPage() {
                 required
                 placeholder="e.g. Laptops & Computers"
                 value={formData.category_name}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFormData({ ...formData, category_name: e.target.value });
                   if (fieldErrors.category_name) setFieldErrors({});
                 }}
@@ -289,7 +289,7 @@ export default function AdminCategoriesPage() {
               <select
                 className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 value={formData.parent_category_id}
-                onChange={(e) => setFormData({ ...formData, parent_category_id: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, parent_category_id: e.target.value })}
               >
                 <option value="">None (Top Level Root Category)</option>
                 {flattened

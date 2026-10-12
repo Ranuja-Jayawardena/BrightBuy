@@ -1,9 +1,9 @@
 const express = require('express');
 const controller = require('../controllers/salesReportController');
 const analyticsController = require('../controllers/analyticsReportController');
-const { requireAuth, requireRole } = require('../middleware/authMiddleware');
+const { requireAuth, requireRole, requireStaffRole } = require('../middleware/authMiddleware');
 const router = express.Router();
-router.use(requireAuth, requireRole('admin'));
+router.use(requireAuth, requireRole('admin'), requireStaffRole('analyst'));
 router.get('/sales/revenue', controller.revenue);
 router.get('/sales/top-products', controller.topProducts);
 router.get('/sales/orders', controller.orders);

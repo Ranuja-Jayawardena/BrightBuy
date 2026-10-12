@@ -38,5 +38,13 @@ Build the product detail page with an image gallery and variant selection.
 - Used Zustand's `useAuthStore` to check authentication on "Add to Cart" click.
 - Variants are resolved dynamically based on selected attributes.
 - Image gallery defaults to `is_primary` and allows toggling through thumbnails via `/api/images/:id`.
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+
+---
+
+## Related Fixes & Patches
+
+- **[Fix 1.3: Apparel Variant Matrix & Combinations](../../Fixes/Fix1-Customer-Account-Storefront/fix1.3-apparel-variant-matrix.md):** Guarantees complete attribute combinations (Size × Color) so users never hit dead-ends with missing variant combinations.
+- **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Fixes `/api/images/:id` 404 response so detail page gallery thumbnails and primary photos load without broken icons.
+- **[Fix 4.1: Staff Cart & Purchase Policy Enforcement](../../Fixes/Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md):** Displays informational modal when an admin or employee attempts to click "Add to Cart".
+
 
