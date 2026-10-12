@@ -12,11 +12,11 @@ INSERT INTO cities (city_name, state, is_main_city) VALUES
 ('Corpus Christi', 'Texas', false);
 
 -- Users (password: password123)
--- bcrypt hash for password123: $2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC
+-- bcrypt hash for password123: $2b$10$0RoEeNxLLnwX0xi3nweLTez2.0sHVb.xR3GKM1TbpUKWpuSmgpx1.
 INSERT INTO users (email, password_hash, role) VALUES
-('admin@brightbuy.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC', 'admin'),
-('employee1@brightbuy.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC', 'admin'),
-('employee2@brightbuy.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC', 'admin');
+('admin@brightbuy.com', '$2b$10$0RoEeNxLLnwX0xi3nweLTez2.0sHVb.xR3GKM1TbpUKWpuSmgpx1.', 'admin'),
+('employee1@brightbuy.com', '$2b$10$0RoEeNxLLnwX0xi3nweLTez2.0sHVb.xR3GKM1TbpUKWpuSmgpx1.', 'admin'),
+('employee2@brightbuy.com', '$2b$10$0RoEeNxLLnwX0xi3nweLTez2.0sHVb.xR3GKM1TbpUKWpuSmgpx1.', 'admin');
 
 -- Employees (linked by email)
 INSERT INTO employees (user_id, first_name, last_name, phone) VALUES
