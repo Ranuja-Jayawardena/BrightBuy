@@ -45,3 +45,4 @@ Thumbs.db
 # Temporary and cache
 *.tsbuildinfo
 .eslintcache
+scratch/
