@@ -3,9 +3,11 @@ services:
     image: postgres:15-alpine
     container_name: brightbuy-postgres
     restart: always
+    env_file:
+      - .env.prod
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-BrightBuy2026SecurePass!}
       POSTGRES_DB: ${DB_NAME:-brightbuy_prod}
     ports:
       - "5432:5432"
