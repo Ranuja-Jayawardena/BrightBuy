@@ -87,7 +87,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
             <div className="flex items-center gap-1.5 text-sm font-semibold">
-              <span className="text-muted-foreground">Admin</span>
+              <span className="text-muted-foreground">{roleLabels[staffRole] || 'Admin'}</span>
               <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
               <span>{currentNav?.label || 'Console'}</span>
             </div>

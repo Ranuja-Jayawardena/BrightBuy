@@ -7,6 +7,14 @@ import { useCartStore } from '@/store/useCartStore';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, ShoppingBag, Menu, X, LayoutDashboard } from 'lucide-react';
 
+const staffRoleLabels: Record<string, string> = {
+  super_admin: 'Super Admin',
+  inventory_manager: 'Inventory Manager',
+  order_dispatcher: 'Order Dispatcher',
+  catalog_manager: 'Catalog Manager',
+  analyst: 'Business Analyst',
+};
+
 export function Navbar() {
   const { user, isAuthenticated, isLoading, logout } = useAuthStore();
   const { itemCount, fetchCart, clearCart } = useCartStore();
@@ -78,7 +86,7 @@ export function Navbar() {
                     <Link href="/admin">
                       <Button variant="outline" size="sm" className="gap-1.5 border-slate-300 dark:border-zinc-700">
                         <LayoutDashboard className="h-3.5 w-3.5" />
-                        Admin
+                        {user?.employee_role ? (staffRoleLabels[user.employee_role] || user.employee_role) : 'Admin'}
                       </Button>
                     </Link>
                   )}
@@ -152,7 +160,7 @@ export function Navbar() {
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-base font-medium text-slate-800 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-900"
                 >
                   <LayoutDashboard className="h-4 w-4" />
-                  Admin Dashboard
+                  {user?.employee_role ? `${staffRoleLabels[user.employee_role] || user.employee_role} Dashboard` : 'Admin Dashboard'}
                 </Link>
               )}
               <Button
