@@ -30,8 +30,8 @@
 - **Inbound Rules:**
   - `22` (SSH) — `0.0.0.0/0` (`sgr-06808f3f8f612c9d5`)
   - `5432` (PostgreSQL) — `0.0.0.0/0` (`sgr-039900afe488787b4`)
-  - `80` (HTTP) — Public (Stage 2)
-  - `443` (HTTPS) — Public (Stage 2)
+  - `80` (HTTP) — `0.0.0.0/0` (`sgr-0ab65955dc0734315`)
+  - `443` (HTTPS) — `0.0.0.0/0` (`sgr-048b2bcc4c0f6ca6c`)
 
 ### Storage (EBS)
 - **Root Volume Size:** 20 GB (gp3)
@@ -57,6 +57,8 @@
 | 2026-10-12 | `flyway migrate` (x2) | `V1`–`V20` applied | Migrated `brightbuy_dev` and `brightbuy_prod` schemas |
 | 2026-10-12 | `psql < seed/*.sql` (x2) | Seeds `01`–`07` applied | Seeded `brightbuy_dev` and `brightbuy_prod` (21 tables, 8 users each) |
 | 2026-10-12 | `npm test` (local) | 6/6 test suites passed (69/69) | Verified local backend test suite against AWS `brightbuy_dev` |
+| 2026-10-12 | `aws ec2 authorize-security-group-ingress --group-id sg-0ea637458096f125b --protocol tcp --port 80 --cidr 0.0.0.0/0` | `sgr-0ab65955dc0734315` | Authorized public HTTP (port 80) for Nginx ingress |
+| 2026-10-12 | `aws ec2 authorize-security-group-ingress --group-id sg-0ea637458096f125b --protocol tcp --port 443 --cidr 0.0.0.0/0` | `sgr-048b2bcc4c0f6ca6c` | Authorized public HTTPS (port 443) for SSL ingress |
 
 ---
 
