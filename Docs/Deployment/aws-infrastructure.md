@@ -58,3 +58,39 @@
 | 2026-10-12 | `psql < seed/*.sql` (x2) | Seeds `01`–`07` applied | Seeded `brightbuy_dev` and `brightbuy_prod` (21 tables, 8 users each) |
 | 2026-10-12 | `npm test` (local) | 6/6 test suites passed (69/69) | Verified local backend test suite against AWS `brightbuy_dev` |
 
+---
+
+## 4. Secrets Management & CI/CD Credentials
+
+The project employs a **Hybrid Separation of Secrets** strategy to prevent credential leakage and keep application secrets isolated inside AWS.
+
+### 4.1 Deployment Secrets (GitHub Actions Repository Secrets)
+
+Used exclusively by GitHub Actions to establish an SSH connection to EC2 to pull updates and rebuild containers:
+
+| Secret Name | Value / Source | Scope | Description |
+|-------------|----------------|-------|-------------|
+| `EC2_HOST` | `18.208.53.186` | Actions Secret | Public Elastic IP associated with instance `i-0a19078299834fba2` |
+| `EC2_USER` | `ubuntu` | Actions Secret | Default SSH user for Ubuntu 22.04 LTS AMI |
+| `EC2_SSH_KEY` | Content of `~/.ssh/brightbuy-key.pem` | Actions Secret | RSA Private Key for instance SSH authentication |
+
+### 4.2 Application Runtime Secrets (EC2 Host `.env.prod`)
+
+All production application secrets reside exclusively on the EC2 host at `/home/ubuntu/BrightBuy/.env.prod` (`chmod 600`) and are consumed by `docker-compose.prod.yml` via `env_file: .env.prod`.
+
+| Variable | Target Service | Purpose |
+|----------|----------------|---------|
+| `DB_HOST` | Backend | Points to internal `db` container |
+| `DB_PORT` | Backend | Internal port `5432` |
+| `DB_USER` | Backend | `postgres` |
+| `DB_PASSWORD` | Backend / DB | Production DB password (`BrightBuy2026SecurePass!`) |
+| `DB_NAME` | Backend | `brightbuy_prod` |
+| `JWT_ACCESS_SECRET` | Backend | HMAC secret for short-lived access tokens |
+| `JWT_REFRESH_SECRET` | Backend | HMAC secret for rotating refresh tokens |
+| `LEMON_SQUEEZY_API_KEY` | Backend | Live API key for checkout sessions |
+| `LEMON_SQUEEZY_STORE_ID` | Backend | Store identifier |
+| `LEMON_SQUEEZY_WEBHOOK_SECRET` | Backend | Secret for validating webhook signatures |
+| `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` | Backend | Nodemailer transactional email delivery credentials |
+
+> **Security Note:** Because `.env*` is committed to `.gitignore`, `/home/ubuntu/BrightBuy/.env.prod` is completely ignored by Git. Automated `git pull origin main` during CI/CD will never overwrite, erase, or expose these production credentials.
+

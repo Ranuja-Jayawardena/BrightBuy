@@ -67,7 +67,7 @@ All backend endpoints (C, D, E) must return errors in this shape:
 
 ## Key Decisions & Notes
 
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+- **Automated CI/CD Pipeline (Phase 10.6):** Implemented GitHub Actions CI/CD pipeline for the project. CI runs automated linting, backend tests (with a live PostgreSQL container), and Next.js frontend builds on every pull request. CD automatically deploys passing `main` branch code to the AWS EC2 production instance via SSH and Docker Compose.
 
 ---
 

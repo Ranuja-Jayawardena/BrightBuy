@@ -66,26 +66,42 @@ All AWS infrastructure provisioning (EC2 instances, security groups, key pairs, 
 - [x] Team members update their local `backend/.env` to point `DB_HOST` at the Elastic IP (`18.208.53.186`), targeting `brightbuy_dev`
 - [x] Verify all team members can connect and query from their local machines (all 6 backend test suites, 69/69 tests passed against AWS `brightbuy_dev`)
 
-### Stage 2: Deploy the Full Application Stack (Live Website)
+### Stage 2: Containerize the Production Stack
 
 - [ ] Create a production `docker-compose.prod.yml` (production builds, no hot-reload volumes, no source mounts)
 - [ ] Create production Dockerfiles for backend and frontend (multi-stage builds, `npm run build`, `npm start`)
 - [ ] Set up the Nginx container with reverse proxy configuration and Certbot for automatic SSL
-- [ ] Configure production environment variables on the server (JWT secrets, SMTP credentials, Lemon Squeezy keys, `DATABASE_URL` pointing to `brightbuy_prod`)
+- [ ] Configure production runtime environment variables on the EC2 host: create `/home/ubuntu/BrightBuy/.env.prod` (`chmod 600`) containing live secrets (`DB_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `LEMON_SQUEEZY_*`, `SMTP_*`, pointing to `brightbuy_prod`)
 - [ ] Update EC2 Security Group via AWS CLI: add inbound rules for ports 80 and 443 (public); keep port 5432 restricted to team IPs
-- [ ] Deploy the full stack and verify the live site is accessible over HTTPS
-- [ ] Point the Lemon Squeezy webhook URL at the production HTTPS endpoint
+- [ ] Deploy the initial full stack manually to verify baseline connectivity over HTTPS
+
+### Stage 3: Automated CI/CD Pipeline (GitHub Actions)
+
+- [ ] Create GitHub Actions CI workflow (`.github/workflows/ci.yml`):
+  - [ ] Trigger on push and pull request to `main`
+  - [ ] Backend Job: Run Postgres service container, execute Flyway migrations & seeds, run `npm run lint` and `npm test` (all 6 test suites) + `npm run test:product`
+  - [ ] Frontend Job: Run `npm run lint` and Next.js production build check (`npm run build`)
+  - [ ] Docker Job: Verify backend and frontend production Docker images build successfully without errors
+- [ ] Create GitHub Actions CD workflow (`.github/workflows/deploy.yml`):
+  - [ ] Trigger on push to `main` (conditioned on passing CI checks)
+  - [ ] SSH into AWS EC2 instance (`18.208.53.186`) using GitHub Secrets (`EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`)
+  - [ ] Execute automated pull: `git pull origin main`
+  - [ ] Rebuild and deploy containers: `docker compose -f docker-compose.prod.yml up -d --build --remove-orphans`
+  - [ ] Run health check verification against the live container stack
+- [ ] Configure GitHub Repository Secrets (Deployment access only: `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`)
+
+### Stage 4: Live Verification, Webhooks & Documentation
+
+- [ ] Point the Lemon Squeezy webhook URL at the production HTTPS endpoint (`https://<domain>/api/payments/webhook`)
 - [ ] Run the end-to-end smoke test on the live site: browse → register → cart → checkout → pay → admin → reports
-
-### Stage 3: Documentation & Handoff
-
+- [ ] Test the CI/CD pipeline end-to-end with a sample test commit
 - [ ] Update `README.md` with:
   - Live site URL
   - Deployment architecture diagram
-  - How to deploy updates (git pull → docker compose up --build)
-  - How team members connect locally to the dev database
+  - CI/CD workflow explanation (GitHub Actions CI/CD trigger rules and secrets)
+  - How team members connect locally to the dev database (`brightbuy_dev`)
   - Environment variable reference
-- [ ] Document the update workflow: local edit → git push → SSH into server → git pull → rebuild containers
+- [ ] Document the automated update workflow: local edit → git push to branch → PR with CI tests passing → merge to `main` → automated CD deploy to EC2
 
 ---
 
@@ -96,7 +112,9 @@ All AWS infrastructure provisioning (EC2 instances, security groups, key pairs, 
 - The full application stack (db + backend + frontend + nginx) is running and accessible over HTTPS.
 - The Lemon Squeezy webhook is pointed at the production URL and payment flow works end-to-end.
 - The full customer and admin flow works on the live URL: browse → register → cart → checkout → pay → admin → reports.
-- `README.md` documents the deployment architecture, live URL, and update workflow.
+- GitHub Actions CI pipeline automatically runs linters, backend integration tests with Postgres, and frontend Next.js builds on all PRs/pushes.
+- GitHub Actions CD pipeline automatically deploys passing `main` builds to the EC2 server with zero manual intervention.
+- `README.md` documents the deployment architecture, live URL, CI/CD pipeline, and update workflow.
 
 ---
 
@@ -105,6 +123,9 @@ All AWS infrastructure provisioning (EC2 instances, security groups, key pairs, 
 - **Rejected Vercel / Railway / Render:** Team chose a fully self-hosted AWS EC2 + Docker approach to demonstrate DevOps proficiency and maintain full control over the infrastructure.
 - **Single Server, Two Databases:** Instead of separate dev and prod servers (which would double costs), a single PostgreSQL container hosts both `brightbuy_dev` and `brightbuy_prod` databases. This is zero extra cost and provides full environment isolation.
 - **Nginx over direct port exposure:** Backend and frontend containers are never exposed to the public internet directly. Nginx handles all incoming traffic, provides SSL, and routes requests internally. This follows the industry-standard reverse proxy pattern.
-- **No CI/CD pipeline:** Updates are deployed manually via SSH (git pull + docker compose rebuild). This is appropriate for a university project with a small team and infrequent deployments.
+- **Automated CI/CD Pipeline (GitHub Actions):** Shifted from manual SSH deployments to an automated GitHub Actions CI/CD pipeline. CI validates code quality (linters, full backend automated tests against a live Postgres container, Next.js build verification, Dockerfile builds) on all PRs. CD securely connects to the EC2 instance via SSH keys and automatically pulls and rebuilds the production stack upon merging to `main`.
+- **Secrets Management Strategy (Hybrid Separation):**
+  - **Deployment Secrets (GitHub Actions Secrets):** Stored strictly for SSH automation (`EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`). No application, database, or payment secrets are stored in GitHub.
+  - **Application Runtime Secrets (EC2 Host `.env.prod`):** Stored directly on the EC2 host at `/home/ubuntu/BrightBuy/.env.prod` with `chmod 600`. Because `.env*` is in `.gitignore`, production credentials never leave the AWS boundary, never enter GitHub actions/logs, and are never overwritten during automated `git pull` updates.
 - **AWS CLI-first provisioning:** All AWS infrastructure (EC2, security groups, key pairs, Elastic IPs) is created and managed via the AWS CLI, not the web console. This makes the setup fully scriptable, reproducible, and agent-executable.
 
