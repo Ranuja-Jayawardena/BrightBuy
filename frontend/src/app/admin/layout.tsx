@@ -36,6 +36,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const currentNav = navItems.find((item) => 
     item.exact ? pathname === item.href : pathname.startsWith(item.href)
   );
+  // Skip the admin guard for the staff login page to prevent redirect loops
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
 
   return (
     <AdminRoute>

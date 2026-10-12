@@ -12,7 +12,7 @@ export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: Record<string, string>) => Promise<void>;
+  login: (credentials: Record<string, string>) => Promise<User>;
   register: (data: Record<string, string>) => Promise<void>;
   logout: () => Promise<void>;
   fetchMe: () => Promise<void>;
@@ -39,6 +39,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       const data = await res.json();
       set({ user: data.user, isAuthenticated: true, isLoading: false });
+      return data.user;
     } catch (error) {
       set({ isLoading: false });
       throw error;

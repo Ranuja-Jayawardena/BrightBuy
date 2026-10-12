@@ -33,5 +33,6 @@ Build the login and register pages and the client-side auth state.
 
 ## Key Decisions & Notes
 
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+1. **Hybrid Authentication Flow (Post-Phase 10 Polish):** The `/login` page was enhanced with smart role-based redirect logic. After successful authentication, if the user's role is `admin`, they are automatically forwarded to `/admin` instead of the customer homepage (`/`). Additionally, the `?redirect=` query parameter (set by route guards like `AdminRoute` and `ProtectedRoute`) is now honored, so users land on the page they originally tried to visit. This eliminates the confusing experience where admin staff logged in via `/login` and were dumped on the customer storefront with no obvious path to the admin dashboard.
+2. **Staff Can Still Use `/login`:** The customer login portal does not block admin accounts. It simply detects them post-login and redirects intelligently. This ensures staff are never locked out if they navigate to the wrong login page by habit.
 

@@ -34,5 +34,7 @@ Keep users logged in without them noticing, and guard pages that require authent
 
 ## Key Decisions & Notes
 
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+1. **Dedicated Staff Login Portal (`/admin/login`) (Post-Phase 10 Polish):** A separate back-office login page was introduced at `/admin/login` with staff-specific branding ("BrightBuy Operations & Staff Sign In"). This page uses the same backend `POST /api/auth/login` endpoint but adds a frontend role check after authentication: if a customer account tries to log in here, they are shown a clear rejection message ("Access restricted to authorized staff & administrators") instead of being silently redirected. Staff who log in here land directly on `/admin`.
+2. **AdminRoute Guard Updated:** The `AdminRoute` wrapper component now redirects unauthenticated users to `/admin/login?redirect=...` instead of the customer-facing `/login?redirect=...`. This ensures staff see the dedicated back-office portal when their session expires or when they first visit any `/admin/*` route.
+3. **Dual-Portal Access:** Staff are not restricted to `/admin/login`. They can also log in via the standard customer `/login` page, which detects admin roles post-login and automatically redirects them to `/admin` (see phase3.3 Key Decisions).
 

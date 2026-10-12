@@ -31,4 +31,5 @@
 3. **Form Validation Feedback:** Implemented inline field-level errors (format checks, password visibility toggle, required fields) across `/login`, `/register`, and `/addresses`.
 4. **Data Table Skeletons & Empty States:** Added skeleton loading rows and rich empty states across customer orders, saved addresses, admin products, categories, employees, and inventory tables.
 5. **TypeScript & Build Resolution:** Removed invalid global ambient module declarations that masked React types, ensuring full zero-error `next build` and strict type safety across all frontend routes.
+6. **Hybrid Admin Login Portal (UX Enhancement):** Introduced a dedicated staff login page at `/admin/login` to separate the admin back-office experience from the customer storefront login. The customer `/login` page was also enhanced with role-based auto-redirect (admins → `/admin`) and `?redirect=` query parameter support. This addressed a UX issue where admin staff were dropped onto the customer homepage after signing in with no obvious path to their management tools. See phase3.3 and phase3.4 Key Decisions for full details.
 

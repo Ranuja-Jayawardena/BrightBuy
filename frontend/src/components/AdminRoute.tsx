@@ -11,7 +11,7 @@ export function AdminRoute({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+        router.push(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
       } else if (user?.role !== 'admin') {
         router.push('/');
       }
