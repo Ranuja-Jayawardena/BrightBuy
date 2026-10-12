@@ -73,7 +73,7 @@ All AWS infrastructure provisioning (EC2 instances, security groups, key pairs, 
 - [x] Set up the Nginx container with reverse proxy configuration and Certbot for automatic SSL
 - [x] Configure production runtime environment variables on the EC2 host: create `/home/ubuntu/BrightBuy/.env.prod` (`chmod 600`) containing live secrets (`DB_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `LEMON_SQUEEZY_*`, `SMTP_*`, pointing to `brightbuy_prod`)
 - [x] Update EC2 Security Group via AWS CLI: add inbound rules for ports 80 and 443 (public); keep port 5432 restricted to team IPs
-- [ ] Deploy the initial full stack manually to verify baseline connectivity over HTTPS
+- [x] Deploy the initial full stack manually to verify baseline connectivity over HTTPS
 
 ### Stage 3: Automated CI/CD Pipeline (GitHub Actions)
 
