@@ -17,6 +17,8 @@ router.put('/inventory/:variantId', requireStaffRole('inventory_manager'), admin
 // Employee administration (Strictly super_admin)
 router.post('/employees', requireStaffRole('super_admin'), adminInventoryController.createEmployee);
 router.get('/employees', requireStaffRole('super_admin'), adminInventoryController.listEmployees);
+router.put('/employees/:id', requireStaffRole('super_admin'), adminInventoryController.updateEmployee);
+router.patch('/employees/:id/status', requireStaffRole('super_admin'), adminInventoryController.setEmployeeStatus);
 
 // Order & delivery dispatching
 router.get('/orders', requireStaffRole('order_dispatcher'), adminOrderController.list);

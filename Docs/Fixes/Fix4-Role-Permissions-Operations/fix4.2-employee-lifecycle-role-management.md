@@ -1,7 +1,7 @@
 # Fix 4.2: Super Admin Employee Management & Deactivation
 
 > **Parent Group:** [Fix 4: Role Permissions & Operations](fix4-role-permissions-operations.md)
-> **Status:** Not Started
+> **Status:** In Progress
 > **Assigned To:** Member E (DevOps/Architecture & Auth Backend) & Member B (Admin Employees UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -64,12 +64,12 @@
 ## Tasks
 
 ### Backend & DB — Member E
-- [ ] Create Flyway migration `backend/db/migrations/V24__add_employee_active_status.sql`.
-- [ ] Update `backend/src/controllers/authController.js` login handler to check `employee.is_active` and block deactivated staff.
-- [ ] Implement `updateEmployee(id, body)` in `backend/src/models/adminInventoryModel.js` (or `adminEmployeeModel.js`).
-- [ ] Implement `setEmployeeStatus(id, isActive)` with self-deactivation protection.
-- [ ] Expose `PUT /api/admin/employees/:id` and `PATCH /api/admin/employees/:id/status` in `backend/src/routes/adminRoutes.js` guarded by `requireStaffRole('super_admin')`.
-- [ ] Update `Docs/Database/DB_Schema.md`.
+- [x] Create Flyway migration `backend/db/migrations/V24__add_employee_active_status.sql`.
+- [x] Update `backend/src/controllers/authController.js` login handler to check `employee.is_active` and block deactivated staff.
+- [x] Implement `updateEmployee(id, body)` in `backend/src/models/adminInventoryModel.js` (or `adminEmployeeModel.js`).
+- [x] Implement `setEmployeeStatus(id, isActive)` with self-deactivation protection.
+- [x] Expose `PUT /api/admin/employees/:id` and `PATCH /api/admin/employees/:id/status` in `backend/src/routes/adminRoutes.js` guarded by `requireStaffRole('super_admin')`.
+- [x] Update `Docs/Database/DB_Schema.md`.
 
 ### Frontend — Member B
 - [ ] In `frontend/src/app/admin/employees/page.tsx`:
