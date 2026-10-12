@@ -1,7 +1,7 @@
-﻿# Phase 6.3: Payment Event Handlers & Order Status
+# Phase 6.3: Payment Event Handlers & Order Status
 
 > **Parent Phase:** [Phase 6: Payment Integration](phase6-payment-integration.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** D
 > **Depends On:** 6.1, 6.2
 > **Blocks:** 8.2
@@ -16,10 +16,10 @@ Update payments and orders when Lemon Squeezy reports a successful or failed pay
 
 ## Tasks
 
-- [ ] Implement `handlePaymentSuccess` in `paymentService.js` — save `transaction_id`, set `payment_status = 'completed'`, move the order from `pending` → `paid` (one transaction)
-- [ ] Implement `handlePaymentFailure` — set `payment_status = 'failed'`; leave the order `pending` so the customer can retry
-- [ ] Ignore events for orders that are already paid (safe to receive twice)
-- [ ] Follow the exact function signatures in the [interface contract](phase6-payment-integration.md#shared-contract-webhook--payment-handler-interface)
+- [x] Implement `handlePaymentSuccess` in `paymentService.js` — save `transaction_id`, set `payment_status = 'completed'`, move the order from `pending` → `paid` (one transaction)
+- [x] Implement `handlePaymentFailure` — set `payment_status = 'failed'`; leave the order `pending` so the customer can retry
+- [x] Ignore events for orders that are already paid (safe to receive twice)
+- [x] Follow the exact function signatures in the [interface contract](phase6-payment-integration.md#shared-contract-webhook--payment-handler-interface)
 
 ---
 

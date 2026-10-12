@@ -10,8 +10,16 @@ function createHttpError(status, message) {
   return error;
 }
 
+function requireBody(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) throw createHttpError(400, 'JSON object body is required');
+  return body;
+}
+
 function parsePositiveInteger(value, fieldName) {
-  const parsed = parseInt(value, 10);
+  if (typeof value !== 'number' && (typeof value !== 'string' || !/^\d+$/.test(value))) {
+    throw createHttpError(400, `${fieldName} must be a positive integer`);
+  }
+  const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed <= 0) {
     throw createHttpError(400, `${fieldName} must be a positive integer`);
   }
@@ -22,7 +30,10 @@ function parseNonNegativeInteger(value, fieldName, defaultValue = 0) {
   if (value === undefined || value === null || value === '') {
     return defaultValue;
   }
-  const parsed = parseInt(value, 10);
+  if (typeof value !== 'number' && (typeof value !== 'string' || !/^\d+$/.test(value))) {
+    throw createHttpError(400, `${fieldName} must be a non-negative integer`);
+  }
+  const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed < 0) {
     throw createHttpError(400, `${fieldName} must be a non-negative integer`);
   }
@@ -52,7 +63,10 @@ function normalizeString(value, fieldName, { required = false, maxLength } = {})
     }
     return null;
   }
-  const normalized = String(value).trim();
+  if (typeof value !== 'string') {
+    throw createHttpError(400, `${fieldName} must be a string`);
+  }
+  const normalized = value.trim();
   if (!normalized) {
     if (required) {
       throw createHttpError(400, `${fieldName} is required`);
@@ -79,10 +93,15 @@ function normalizeAttributes(value) {
   if (!Array.isArray(value)) {
     throw createHttpError(400, 'attributes must be an array');
   }
-  return value.map((attribute) => ({
+  return value.map((attribute) => {
+    if (!attribute || typeof attribute !== 'object' || Array.isArray(attribute)) {
+      throw createHttpError(400, 'each attribute must be an object');
+    }
+    return ({
     attribute_name: normalizeString(attribute.attribute_name, 'attribute_name', { required: true, maxLength: 50 }),
     attribute_value: normalizeString(attribute.attribute_value, 'attribute_value', { required: true, maxLength: 100 }),
-  }));
+    });
+  });
 }
 
 function mapProduct(row) {
@@ -112,9 +131,10 @@ function mapVariant(row, attributes = []) {
 }
 
 async function listProducts(queryParams) {
-  const page = Math.max(1, parseInt(queryParams.page, 10) || 1);
-  const limit = Math.min(100, Math.max(1, parseInt(queryParams.limit, 10) || 20));
-  const search = queryParams.search && queryParams.search.trim() ? queryParams.search.trim() : undefined;
+  const page = parsePositiveInteger(queryParams.page === undefined ? 1 : queryParams.page, 'page');
+  const limit = parsePositiveInteger(queryParams.limit === undefined ? 20 : queryParams.limit, 'limit');
+  if (limit > 100) throw createHttpError(400, 'limit must be 100 or fewer');
+  const search = queryParams.search === undefined ? undefined : normalizeString(queryParams.search, 'search', { maxLength: 100 }) || undefined;
   const { rows, totalCount } = await adminProductModel.findProducts({ page, limit, search });
 
   return {
@@ -168,6 +188,7 @@ async function getProductDetail(productId) {
 }
 
 async function createProduct(body) {
+  requireBody(body);
   const payload = {
     product_name: normalizeString(body.product_name, 'product_name', { required: true, maxLength: 100 }),
     brand: normalizeString(body.brand, 'brand', { maxLength: 100 }),
@@ -179,6 +200,7 @@ async function createProduct(body) {
 }
 
 async function updateProduct(productId, body) {
+  requireBody(body);
   const payload = {
     product_name: normalizeString(body.product_name, 'product_name', { required: true, maxLength: 100 }),
     brand: normalizeString(body.brand, 'brand', { maxLength: 100 }),
@@ -229,6 +251,7 @@ async function createImage(productId, file, body) {
 }
 
 async function updateImage(imageId, body) {
+  requireBody(body);
   const image = await adminProductModel.updateImage(imageId, {
     sort_order: body.sort_order === undefined ? undefined : parseNonNegativeInteger(body.sort_order, 'sort_order'),
     is_primary: body.is_primary === undefined ? undefined : parseBoolean(body.is_primary, 'is_primary'),
@@ -242,6 +265,7 @@ async function deleteImage(imageId) {
 }
 
 async function createVariant(productId, body) {
+  requireBody(body);
   if (!await adminProductModel.productExists(productId)) {
     return null;
   }
@@ -251,6 +275,7 @@ async function createVariant(productId, body) {
 }
 
 async function updateVariant(variantId, body) {
+  requireBody(body);
   const payload = normalizeVariantPayload(body, false);
   const variant = await adminProductModel.updateVariant(variantId, payload);
   return variant ? { variant: mapVariant(variant, payload.attributes) } : null;

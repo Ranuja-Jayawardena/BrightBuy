@@ -1,7 +1,7 @@
-﻿# Phase 6.2: Payment Sessions & Cash on Delivery
+# Phase 6.2: Payment Sessions & Cash on Delivery
 
 > **Parent Phase:** [Phase 6: Payment Integration](phase6-payment-integration.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** D
 > **Depends On:** 5.3
 > **Blocks:** 6.3, 6.4
@@ -16,11 +16,11 @@ Start a payment for an order, either through Lemon Squeezy (card) or as Cash on 
 
 ## Tasks
 
-- [ ] `POST /api/payments/create-session` — check that the order belongs to the customer and is unpaid
-- [ ] Card: create a Lemon Squeezy checkout session (pass `order_id` as custom data) and return the checkout URL
-- [ ] Card: create a `payments` row with `payment_status = 'pending'`
-- [ ] COD: skip Lemon Squeezy and create a `payments` row with `payment_status = 'cod_pending'`
-- [ ] Reject payments for orders that are already paid or cancelled
+- [x] `POST /api/payments/create-session` — check that the order belongs to the customer and is unpaid
+- [x] Card: create a Lemon Squeezy checkout session (pass `order_id` as custom data) and return the checkout URL
+- [x] Card: create a `payments` row with `payment_status = 'pending'`
+- [x] COD: skip Lemon Squeezy and create a `payments` row with `payment_status = 'cod_pending'`
+- [x] Reject payments for orders that are already paid or cancelled
 
 ---
 

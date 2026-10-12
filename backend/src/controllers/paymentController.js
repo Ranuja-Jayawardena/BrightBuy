@@ -1,0 +1,123 @@
+const db = require('../config/db');
+
+function isPositiveInt(value) {
+    if (value === undefined || value === null) return false;
+    const str = String(value).trim();
+    if (!/^\d+$/.test(str)) return false;
+    const num = Number(str);
+    return Number.isSafeInteger(num) && num > 0;
+}
+
+const createSession = async (req, res) => {
+    try {
+        const customer_id = req.user ? req.user.customer_id : null;
+        if (!customer_id) {
+            return res.status(403).json({ error: 'forbidden', message: 'Only customers can create payment sessions', statusCode: 403 });
+        }
+
+        const { order_id, payment_method } = req.body || {};
+
+        if (!isPositiveInt(order_id)) {
+            return res.status(400).json({ error: 'invalid_request', message: 'order_id must be a positive integer', statusCode: 400 });
+        }
+        if (!payment_method || !['card', 'cod'].includes(payment_method)) {
+            return res.status(400).json({ error: 'invalid_request', message: 'Invalid payment_method. Must be card or cod', statusCode: 400 });
+        }
+
+        const oid = Number(order_id);
+
+        // Check if order exists and belongs to the customer
+        const orderResult = await db.query(
+            'SELECT order_id, status, total_amount FROM orders WHERE order_id = $1 AND customer_id = $2',
+            [oid, customer_id]
+        );
+
+        if (orderResult.rows.length === 0) {
+            return res.status(404).json({ error: 'not_found', message: 'Order not found', statusCode: 404 });
+        }
+
+        const order = orderResult.rows[0];
+
+        if (order.status !== 'pending') {
+            return res.status(400).json({ error: 'invalid_order_status', message: 'Order is not pending payment', statusCode: 400 });
+        }
+
+        if (payment_method === 'cod') {
+            const insertResult = await db.query(
+                `INSERT INTO payments (order_id, payment_method, payment_status, amount)
+                 VALUES ($1, $2, $3, $4) RETURNING payment_id`,
+                [oid, 'cod', 'cod_pending', order.total_amount]
+            );
+
+            return res.status(200).json({
+                message: 'COD order confirmed',
+                payment_id: insertResult.rows[0].payment_id
+            });
+        } else if (payment_method === 'card') {
+            let checkout_url = 'https://checkout.lemonsqueezy.com/test-url'; // Fallback for testing without env vars
+
+            if (process.env.LEMON_SQUEEZY_API_KEY && process.env.LEMON_SQUEEZY_STORE_ID && process.env.LEMON_SQUEEZY_VARIANT_ID) {
+                const lsResponse = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/vnd.api+json',
+                        'Content-Type': 'application/vnd.api+json',
+                        'Authorization': `Bearer ${process.env.LEMON_SQUEEZY_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        data: {
+                            type: "checkouts",
+                            attributes: {
+                                checkout_data: {
+                                    custom: {
+                                        order_id: oid.toString()
+                                    }
+                                }
+                            },
+                            relationships: {
+                                store: {
+                                    data: {
+                                        type: "stores",
+                                        id: process.env.LEMON_SQUEEZY_STORE_ID
+                                    }
+                                },
+                                variant: {
+                                    data: {
+                                        type: "variants",
+                                        id: process.env.LEMON_SQUEEZY_VARIANT_ID
+                                    }
+                                }
+                            }
+                        }
+                    })
+                });
+
+                const lsResult = await lsResponse.json();
+                if (lsResponse.ok && lsResult.data && lsResult.data.attributes) {
+                    checkout_url = lsResult.data.attributes.url;
+                } else {
+                    console.error('Lemon Squeezy API Error:', lsResult);
+                    return res.status(502).json({ error: 'bad_gateway', message: 'Failed to create payment session with Lemon Squeezy', statusCode: 502 });
+                }
+            }
+
+            const insertResult = await db.query(
+                `INSERT INTO payments (order_id, payment_method, payment_status, amount)
+                 VALUES ($1, $2, $3, $4) RETURNING payment_id`,
+                [oid, 'card', 'pending', order.total_amount]
+            );
+
+            return res.status(200).json({
+                checkout_url,
+                payment_id: insertResult.rows[0].payment_id
+            });
+        }
+    } catch (error) {
+        console.error('Error creating payment session:', error);
+        res.status(500).json({ error: 'internal_error', message: 'Internal Server Error', statusCode: 500 });
+    }
+};
+
+module.exports = {
+    createSession
+};

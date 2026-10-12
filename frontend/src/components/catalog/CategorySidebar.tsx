@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Category } from '@/types/catalog';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface CategorySidebarProps {
   categories: Category[];
@@ -9,22 +9,43 @@ interface CategorySidebarProps {
 }
 
 export function CategorySidebar({ categories, selectedCategoryId, onSelectCategory }: CategorySidebarProps) {
+  const [mobileExpanded, setMobileExpanded] = useState(false);
+
   return (
     <div className="w-full lg:w-64 flex-shrink-0">
-      <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm sticky top-24">
-        <h2 className="text-lg font-bold text-slate-900 mb-6">Categories</h2>
-        
-        <div className="space-y-1">
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-sm sticky top-24 transition-all">
+        {/* Header with mobile toggle */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Filter size={18} className="text-blue-600" />
+            <h2 className="text-base sm:text-lg font-bold text-slate-900">Categories</h2>
+          </div>
           <button
-            onClick={() => onSelectCategory(null)}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            type="button"
+            onClick={() => setMobileExpanded(!mobileExpanded)}
+            className="lg:hidden flex items-center gap-1 text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1.5 rounded-lg"
+          >
+            {mobileExpanded ? 'Hide' : 'Filter'}
+            {mobileExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+        </div>
+
+        {/* Categories list (collapsible on mobile, always visible on lg+) */}
+        <div className={`mt-4 space-y-1 ${mobileExpanded ? 'block' : 'hidden lg:block'}`}>
+          <button
+            onClick={() => {
+              onSelectCategory(null);
+              setMobileExpanded(false);
+            }}
+            className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               selectedCategoryId === null 
-                ? 'bg-blue-50 text-blue-700' 
+                ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' 
                 : 'text-slate-600 hover:bg-slate-50'
             }`}
           >
             All Products
           </button>
+
           
           {categories.map((category) => (
             <div key={category.category_id} className="pt-2">

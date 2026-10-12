@@ -1,7 +1,7 @@
-﻿# Phase 10.4: Order Backend Validation & Tests
+# Phase 10.4: Order Backend Validation & Tests
 
 > **Parent Phase:** [Phase 10: Polish, Testing & Deployment](phase10-polish-testing-deployment.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** D
 > **Depends On:** Phase 5, 6, and 8 APIs
 > **Blocks:** 10.6
@@ -10,12 +10,12 @@
 
 ## Tasks
 
-- [ ] Input validation on all cart, address, order, and payment endpoints
-- [ ] Use the shared [error response format](phase10-polish-testing-deployment.md#shared-contract-error-response-format)
-- [ ] Unit tests for stock deduction logic (atomic transactions, concurrent orders)
-- [ ] Unit tests for order placement (happy path + edge cases)
-- [ ] Integration tests for the cart → order → payment flow (card and COD)
-- [ ] Integration tests for email triggers on order events
+- [x] Input validation on all cart, address, order, and payment endpoints
+- [x] Use the shared [error response format](phase10-polish-testing-deployment.md#shared-contract-error-response-format)
+- [x] Unit tests for stock deduction logic (atomic transactions, concurrent orders)
+- [x] Unit tests for order placement (happy path + edge cases)
+- [x] Integration tests for the cart → order → payment flow (card and COD)
+- [x] Integration tests for email triggers on order events
 
 ---
 
@@ -27,5 +27,10 @@
 
 ## Key Decisions & Notes
 
-_Record any implementation decisions, trade-offs, or deviations from the plan here._
+- **Input validation & error formatting:** Standardized error responses to `{ error, message, statusCode }` across cart, address, order, payment, and delivery endpoints. Added strict positive-integer validation for IDs and quantities, string trimming and max length boundaries for address fields, and guarded against inactive variants and insufficient stock.
+- **Stock deduction & concurrency protection:** Verified that `orderModel.createOrder` sorts `variant_id`s in ascending order before acquiring `FOR UPDATE` row locks to prevent deadlocks under concurrent order placement. Ensured atomic rollback leaves stock and cart items untouched if any item in the order has insufficient stock or if the address does not belong to the customer.
+- **Automated test suites:** Added 34 new automated tests across two suites:
+  - `tests/orderStockAtomic.test.js` (11 tests): Unit tests verifying atomic transactions, stock deductions, main city (5 days) vs. non-main city (7 days) delivery ETA calculation, deadlock prevention lock ordering, and rollback edge cases.
+  - `tests/orderFlowIntegration.test.js` (23 tests): Integration tests covering complete COD and Card checkout flows, input validation error shapes, Lemon Squeezy webhook signature verification and processing, and non-blocking email notification triggers on order events.
+- **Node 25 test environment:** Updated `package.json` test script with `--localstorage-file=:memory:` to ensure seamless Jest execution on modern Node environments. All 6 Jest test suites (69 tests) and Node product tests pass with 0 ESLint errors.
 

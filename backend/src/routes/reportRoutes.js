@@ -1,0 +1,15 @@
+const express = require('express');
+const controller = require('../controllers/salesReportController');
+const analyticsController = require('../controllers/analyticsReportController');
+const { requireAuth, requireRole } = require('../middleware/authMiddleware');
+const router = express.Router();
+router.use(requireAuth, requireRole('admin'));
+router.get('/sales/revenue', controller.revenue);
+router.get('/sales/top-products', controller.topProducts);
+router.get('/sales/orders', controller.orders);
+router.get('/inventory/low-stock', analyticsController.lowStock);
+router.get('/inventory/summary', analyticsController.inventorySummary);
+router.get('/customers/top', analyticsController.topCustomers);
+router.get('/customers/geography', analyticsController.customerGeography);
+router.get('/export/:type', analyticsController.exportReport);
+module.exports = router;

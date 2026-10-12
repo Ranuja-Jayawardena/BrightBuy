@@ -1,7 +1,7 @@
 ﻿# Phase 9.1: Sales Report APIs
 
 > **Parent Phase:** [Phase 9: Reports & Analytics](phase9-reports-analytics.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** C
 > **Depends On:** 3.2
 > **Blocks:** 9.4
@@ -17,11 +17,11 @@ Expose sales analytics using raw SQL aggregation queries.
 
 ## Tasks
 
-- [ ] `GET /api/reports/sales/revenue` — total revenue by period (daily, weekly, monthly, quarterly) using `date_trunc`
-- [ ] `GET /api/reports/sales/top-products` — top-selling products/variants by quantity or revenue
-- [ ] `GET /api/reports/sales/orders` — order volume by period and status
-- [ ] Count only revenue-bearing orders (exclude `pending` and `cancelled`)
-- [ ] Protect all routes with `requireAuth` + `requireRole('admin')`
+- [x] `GET /api/reports/sales/revenue` — total revenue by period (daily, weekly, monthly, quarterly) using `date_trunc`
+- [x] `GET /api/reports/sales/top-products` — top-selling products/variants by quantity or revenue
+- [x] `GET /api/reports/sales/orders` — order volume by period and status
+- [x] Count only revenue-bearing orders (exclude `pending` and `cancelled`)
+- [x] Protect all routes with `requireAuth` + `requireRole('admin')`
 
 ---
 
@@ -66,4 +66,7 @@ Response 200: { data: [{ period, status, order_count }] }
 ## Key Decisions & Notes
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
+
+- Revenue-bearing statuses are `paid`, `shipped`, and `delivered`; `end_date` is inclusive through the full day.
+- Query values are parameterized; period and sort SQL fragments are selected only from whitelists.
 

@@ -1,7 +1,7 @@
 ﻿# Phase 9.2: Inventory & Customer Report APIs + CSV Export
 
 > **Parent Phase:** [Phase 9: Reports & Analytics](phase9-reports-analytics.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** C
 > **Depends On:** 3.2
 > **Blocks:** 9.4
@@ -18,17 +18,17 @@ Expose inventory and customer analytics, plus CSV export for all reports.
 ## Tasks
 
 **Inventory Reports**
-- [ ] `GET /api/reports/inventory/low-stock` — variants below a configurable stock threshold
-- [ ] `GET /api/reports/inventory/summary` — total stock value by category
+- [x] `GET /api/reports/inventory/low-stock` — variants below a configurable stock threshold
+- [x] `GET /api/reports/inventory/summary` — total stock value by category
 
 **Customer Reports**
-- [ ] `GET /api/reports/customers/top` — most active customers by order count or spend
-- [ ] `GET /api/reports/customers/geography` — order distribution by city/region (main vs regional)
+- [x] `GET /api/reports/customers/top` — most active customers by order count or spend
+- [x] `GET /api/reports/customers/geography` — order distribution by city/region (main vs regional)
 
 **Data Export**
-- [ ] `GET /api/reports/export/:type` — CSV export for sales, inventory, or customer data
+- [x] `GET /api/reports/export/:type` — CSV export for sales, inventory, or customer data
 
-- [ ] Protect all routes with `requireAuth` + `requireRole('admin')`
+- [x] Protect all routes with `requireAuth` + `requireRole('admin')`
 
 ---
 
@@ -84,4 +84,7 @@ Response 200: CSV file download
 ## Key Decisions & Notes
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
+
+- Customer spend, geographic revenue, and exported sales use revenue-bearing orders only: `paid`, `shipped`, and `delivered`.
+- Exports are spreadsheet-safe UTF-8 CSV downloads. Sales exports use monthly revenue, inventory exports use stock summary by category, and customer exports use the top 100 customers by spend.
 

@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const { hashPassword, comparePassword } = require('../utils/password');
 const { signAccessToken, signRefreshToken, verifyRefreshToken, verifyAccessToken } = require('../utils/jwt');
+const notificationService = require('../services/notificationService');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const cookieOptions = {
@@ -48,6 +49,13 @@ const register = async (req, res, next) => {
     );
 
     await client.query('COMMIT');
+
+    // Trigger Welcome Email (Phase 8.2 - non-blocking after DB commit)
+    notificationService.sendWelcome({
+      email: user.email,
+      firstName: first_name,
+      lastName: last_name,
+    }).catch(err => console.error('[Auth] Failed to send welcome email:', err));
 
     res.cookie('access_token', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
     res.cookie('refresh_token', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
@@ -121,7 +129,7 @@ const refresh = async (req, res, next) => {
     let payload;
     try {
       payload = verifyRefreshToken(refresh_token);
-    } catch (err) {
+    } catch (_err) {
       return res.status(401).json({ error: "Invalid or expired refresh token" });
     }
 
@@ -190,7 +198,8 @@ const logout = async (req, res, next) => {
             break;
           }
         }
-      } catch (err) {
+      } catch (_err) {
+        // Ignore invalid or expired token on logout; proceed to clear cookies
       }
     }
 
@@ -212,7 +221,7 @@ const me = async (req, res, next) => {
     let payload;
     try {
       payload = verifyAccessToken(access_token);
-    } catch (err) {
+    } catch (_err) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
