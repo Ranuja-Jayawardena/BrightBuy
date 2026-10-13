@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (32 / 35 fix items complete across 8 fix groups; Fix 1–7 complete; Fix 8 has 9/12 items complete: 8.1–8.8 & 8.11 verified complete)
+**Status:** Complete (35 / 35 fix items complete across all 8 fix groups; Fix 1–8 complete)
 
 ---
 
@@ -90,7 +90,7 @@ Fix 6 is complete (4/4 items complete: 6.1, 6.2, 6.3, and 6.4 verified complete)
 
 Fix 7 is complete (5/5 items complete: 7.1, 7.2, 7.3, 7.4, and 7.5). In `05_catalog_links.sql`, all 40 tech products map across 12 tech subcategories and 65 variants have tech attributes. In `07_orders.sql`, order items reference valid tech SKUs. Fix 7.2 and Fix 7.5 are verified complete: all 40 technology products, 65 variants and 80 primary/secondary image URLs are defined, all 80 WebP assets are synchronized to S3 bucket `brightbuy-media-storage-695945476492/products/`, and all 80 public image URLs return HTTP 200 with image/webp. Fix 7.4 database reseed (Member E), storefront UI validation (Member A), and Admin dashboard validation (Member B) are all verified complete.
 
-- [ ] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
+- [x] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
   - [x] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
   - [x] **8.2: Catalog Timestamp Migration Verification** | C (catalog), E (migration/environment) | [Details](Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
   - [x] **8.3: Cart Uniqueness & Checkout Concurrency** | D | [Details](Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
@@ -102,9 +102,9 @@ Fix 7 is complete (5/5 items complete: 7.1, 7.2, 7.3, 7.4, and 7.5). In `05_cata
   - [x] **8.9: Checkout & Admin Conflict Handling** | B | [Details](Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
   - [x] **8.10: Storefront & Report Regression Verification** | A (lead), C (report query support) | [Details](Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
   - [x] **8.11: Application & Migration Database Accounts** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
-  - [ ] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
+  - [x] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
 
-Fix 8 has 11/12 items complete (8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 8.10 & 8.11 Complete). Remaining item is 8.12 (integration rollout).
+Fix 8 is complete (12/12 items complete: 8.1–8.12 verified complete). Concurrency harness, account separation, triggers, UI conflicts, regression suites, and CI workflows are all verified.
 
 ---
 

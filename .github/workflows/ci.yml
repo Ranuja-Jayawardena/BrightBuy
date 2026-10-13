@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - dev
   pull_request:
     branches:
       - main
+      - dev
 
 jobs:
   backend-ci:
@@ -63,6 +65,22 @@ jobs:
       - name: Run Product Validation Tests
         working-directory: ./backend
         run: npm run test:product
+
+      - name: Run Database Account Separation Tests (Fix 8.11)
+        working-directory: ./backend
+        run: npm run test:db-accounts
+
+      - name: Run PostgreSQL Concurrency Integration Tests (Fix 8.12)
+        working-directory: ./backend
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: BrightBuy2026SecurePass!
+          DB_NAME: brightbuy_test
+          FIX8_REQUIRE_LIVE_DB: '1'
+        run: npm run test:concurrency
 
   frontend-ci:
     name: Frontend Lint & Production Build

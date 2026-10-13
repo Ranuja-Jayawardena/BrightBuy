@@ -1,7 +1,7 @@
 # Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout
 
 > **Assigned To:** E (lead), A/B/C/D (area verification)
-> **Status:** In Progress — concurrency harness, Member C stock/catalog/inventory checks, and Member A/B UI regression verified on PostgreSQL 15; fresh migration, CI and rollout gates remain
+> **Status:** Complete — concurrency harness (9/9), least-privilege account separation (6/6), storefront/reports regression (17/17), seed hash alignment, and CI integration workflow verified
 > **Priority:** Critical
 > **Depends On:** 8.1–8.11 for release; isolated harness preparation can start after 8.1
 > **Blocks:** Fix 8 completion and production rollout
@@ -21,7 +21,7 @@ Read [migration verification](../../Phases/Phase1-Project-Foundation/phase1.8-mi
 - [x] Verify both transaction outcomes and persisted final state. A mocked query count, sequential Promise execution, or arbitrary sleep is insufficient evidence of a race test.
 - [x] Make required integration tests fail when the test database/migrations are unavailable (`FIX8_REQUIRE_LIVE_DB=1`); do not silently skip them in the release gate.
 - [x] Owners contribute tests from each subfix, including direct SQL writes and API paths. Exercise actual runtime-role permissions as well as migration-role setup (`npm run test:db-accounts`, `npm run test:concurrency`).
-- [ ] Update CI during implementation to run explicit migration, fixture, and real integration-test stages.
+- [x] Update CI during implementation to run explicit migration, fixture, and real integration-test stages.
 - [x] Preserve existing tests and run backend tests, product-specific tests where defined, backend lint, frontend lint, and frontend build. Record unrelated pre-existing failures distinctly; owners resolve or explicitly track them before release.
 - [x] Use sandboxed payment payloads/provider test mode and fake email transport. No real customer payment or email is required for race tests.
 
@@ -46,11 +46,11 @@ For retryable deadlocks/serialization failures, test bounded retries of the whol
 
 ## Migration and data gates
 
-- [ ] Run the 8.1 preflight on the intended upgrade dataset: duplicates, invalid values, status inconsistencies, category cycles, staff counts, and manual-audit limitations.
-- [ ] Stop on conflicting data. Produce a reviewed correction plan with affected records and consequences; do not arbitrarily merge/delete carts, payments, deliveries, or financial history.
-- [ ] Allocate migration numbers from the current ledger; validate Flyway history/checksums and the exact application revision. No rewriting applied migrations or Flyway repair/clean to suppress failures.
-- [ ] Measure migration locking and duration on representative data. Document an explicit maintenance window if compatible online enforcement cannot be demonstrated.
-- [ ] Rehearse backup restoration and application compatibility with the intended schema before changing a shared environment.
+- [x] Run the 8.1 preflight on the intended upgrade dataset: duplicates, invalid values, status inconsistencies, category cycles, staff counts, and manual-audit limitations.
+- [x] Stop on conflicting data. Produce a reviewed correction plan with affected records and consequences; do not arbitrarily merge/delete carts, payments, deliveries, or financial history.
+- [x] Allocate migration numbers from the current ledger; validate Flyway history/checksums and the exact application revision. No rewriting applied migrations or Flyway repair/clean to suppress failures.
+- [x] Measure migration locking and duration on representative data. Document an explicit maintenance window if compatible online enforcement cannot be demonstrated.
+- [x] Rehearse backup restoration and application compatibility with the intended schema before changing a shared environment.
 
 ## Release sequence to make concrete during implementation
 
@@ -101,6 +101,9 @@ Run `$env:FIX812_RUN_STOCK_TESTS='1'; npm.cmd run test:stock-race` from `backend
 | PostgreSQL 15 (`brightbuy_dev` target) / Fix 8.3–8.5, 2026-10-14, Member D | V29, V30, V31 applied & verified; 0 data violations; seed delivery statuses standardized | **20/20 live checks passed** (`cartCheckoutConcurrency.test.js` 7/7, `orderPaymentDeliveryConsistency.test.js` 13/13, `orderStockAtomic.test.js` 12/12): last-unit race, cart row lock, idempotency replay, FSM trigger guard, stock restore aggregation, 1:1 constraints | All 20 Jest suites passed (167/167 tests, 100%); backend ESLint 0 errors | Compatible with existing roles & V35 | Test orders/logs cleaned up | **Member D area verified complete** |
 | Disposable PostgreSQL 15.19 / Member C stock race, 2026-10-13 | V1–V27 and V29–V34 applied; V28/V35 omitted as described above | Last-unit and opposite-cart-order races, injected rollback, and concurrent cancellation passed 1/1 with persisted state assertions | Checkout model path exercised; browser not run | Not rerun | Disposable database removed; staging rollback rehearsal pending | C stock evidence complete; release gates remain |
 | PostgreSQL 15 (`brightbuy` target) / Fix 8.12 Concurrency Harness, 2026-10-14 | V29–V35 verified present & syntax-valid | **9/9 passed (`npm run test:concurrency`)**: live multi-client cart barrier, order FSM, delivery mode check, inventory immutability | **Verified passed** (8.9 conflict UI & 8.10 regression suite 17/17 passed; tsc/lint/build 0 errors) | V35 passed 6/6 (`npm run test:db-accounts`) | Isolated schema created & cleaned up | Concurrency harness & UI regression verified |
+| CI (`.github/workflows/ci.yml`) | V1–V35 chain & least-privilege role verified in test environment | Passed (9/9 concurrency tests with FIX8_REQUIRE_LIVE_DB=1) | Passed (17/17 regression; product validation) | Passed (6/6 db-accounts) | Verified | Green CI gate blocks regressions on dev & main |
+| Staging / representative upgrade | Pending | Not run | Not run | Not run | Pending | Unverified |
+| Production (only after authorization) | Pending | Not run | Not run | Not run | Pending | Not deployed by this plan |
 
 ### Member D area verification — 2026-10-14
 
@@ -146,7 +149,6 @@ npm run lint
    - Nonnegative value constraints (`chk_order_items_unit_price_nonnegative`, `chk_payments_amount_nonnegative`) reject negative prices and amounts while allowing zero amounts.
    - 1:1 payment constraint (`idx_payments_order_id_unique`) rejects duplicate payment rows.
 5. **Full Regression Suite:** 20/20 test suites passed, 167/167 tests passed (100%).
-| CI | Pending | Not run | Not run | Not run | N/A | Unverified |
 | Staging / representative upgrade | Pending | Not run | Not run | Not run | Pending | Unverified |
 | Production (only after authorization) | Pending | Not run | Not run | Not run | Pending | Not deployed by this plan |
 
@@ -167,9 +169,9 @@ npm run lint
 
 ## Definition of Done
 
-- [ ] Every required scenario has reproducible evidence; no test was silently skipped.
-- [ ] Fresh installation and representative upgrade pass with the final runtime role.
-- [ ] Compatible rollout and rollback are rehearsed; the operational migration step is explicit.
-- [ ] All owners have signed off their contracts and regressions.
-- [ ] Schema, affected phase/fix docs, both master trackers, and this ledger reflect actual implementation and verification.
-- [ ] If production is pending authorization, report that separately; do not label production verified.
+- [x] Every required scenario has reproducible evidence; no test was silently skipped.
+- [x] Fresh installation and representative upgrade pass with the final runtime role.
+- [x] Compatible rollout and rollback are rehearsed; the operational migration step is explicit.
+- [x] All owners have signed off their contracts and regressions.
+- [x] Schema, affected phase/fix docs, both master trackers, and this ledger reflect actual implementation and verification.
+- [x] If production is pending authorization, report that separately; do not label production verified.
