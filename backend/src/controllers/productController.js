@@ -1,7 +1,15 @@
 const productService = require('../services/productService');
 
+async function getSuggestions(req, res, next) {
+  try {
+    res.status(200).json(await productService.getProductSuggestions(req.query.q));
+  } catch (error) {
+    next(error);
+  }
+}
+
 /**
- * Controller to list products with pagination, search, category filter, brand, and sort.
+ * Controller to list products with pagination, search, category, brand, price range, and sort.
  * Route: GET /api/products
  */
 async function getProducts(req, res, next) {
@@ -36,6 +44,7 @@ async function getProductById(req, res, next) {
 }
 
 module.exports = {
+  getSuggestions,
   getProducts,
   getProductById,
 };

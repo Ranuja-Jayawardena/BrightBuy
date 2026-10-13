@@ -1,5 +1,25 @@
 const db = require('../config/db');
 
+/** Return up to six active catalog matches for a literal search phrase. */
+async function getSuggestions(query) {
+  const pattern = `%${query.replace(/[\\%_]/g, '\\$&')}%`;
+  const result = await db.query(`
+    SELECT p.product_id, p.product_name, p.brand,
+      (SELECT c.category_name
+       FROM product_categories pc
+       JOIN categories c ON c.category_id = pc.category_id
+       WHERE pc.product_id = p.product_id AND c.is_active = true
+       ORDER BY c.category_name ASC LIMIT 1) AS category_name
+    FROM products p
+    WHERE p.is_active = true
+      AND (p.product_name ILIKE $1 ESCAPE '\\' OR p.brand ILIKE $1 ESCAPE '\\')
+    ORDER BY GREATEST(similarity(p.product_name, $2), similarity(COALESCE(p.brand, ''), $2)) DESC,
+      p.product_name ASC, p.product_id ASC
+    LIMIT 6
+  `, [pattern, query]);
+  return result.rows;
+}
+
 /**
  * Query products with pagination, keyword search, category filter (including child categories),
  * brand filter, and sorting. Excludes inactive products, variants, and categories.
@@ -10,10 +30,12 @@ const db = require('../config/db');
  * @param {string} [options.search]
  * @param {number} [options.categoryId]
  * @param {string} [options.brand]
+ * @param {number} [options.minPrice]
+ * @param {number} [options.maxPrice]
  * @param {string} [options.sort]
  * @returns {Promise<{ rows: Array<Object>, totalCount: number }>}
  */
-async function findProducts({ page = 1, limit = 12, search, categoryId, brand, sort }) {
+async function findProducts({ page = 1, limit = 12, search, categoryId, brand, minPrice, maxPrice, sort }) {
   const values = [];
   const countValues = [];
   let paramIndex = 1;
@@ -66,6 +88,8 @@ async function findProducts({ page = 1, limit = 12, search, categoryId, brand, s
 
   const whereConditions = ['p.is_active = true'];
   const countWhereConditions = ['p.is_active = true'];
+  const priceConditions = [];
+  const countPriceConditions = [];
 
   if (brand) {
     whereConditions.push(`LOWER(p.brand) = LOWER($${paramIndex})`);
@@ -86,6 +110,27 @@ async function findProducts({ page = 1, limit = 12, search, categoryId, brand, s
     countWhereConditions.push(`(p.product_name ILIKE $${countParamIndex} OR p.brand ILIKE $${countParamIndex} OR p.description ILIKE $${countParamIndex})`);
     countValues.push(searchPattern);
     countParamIndex++;
+  }
+
+  if (minPrice !== undefined) {
+    priceConditions.push(`pv.price >= $${paramIndex}`);
+    values.push(minPrice);
+    paramIndex++;
+    countPriceConditions.push(`pv.price >= $${countParamIndex}`);
+    countValues.push(minPrice);
+    countParamIndex++;
+  }
+  if (maxPrice !== undefined) {
+    priceConditions.push(`pv.price <= $${paramIndex}`);
+    values.push(maxPrice);
+    paramIndex++;
+    countPriceConditions.push(`pv.price <= $${countParamIndex}`);
+    countValues.push(maxPrice);
+    countParamIndex++;
+  }
+  if (priceConditions.length) {
+    whereConditions.push(`EXISTS (SELECT 1 FROM product_variants pv WHERE pv.product_id = p.product_id AND pv.is_active = true AND ${priceConditions.join(' AND ')})`);
+    countWhereConditions.push(`EXISTS (SELECT 1 FROM product_variants pv WHERE pv.product_id = p.product_id AND pv.is_active = true AND ${countPriceConditions.join(' AND ')})`);
   }
 
   const whereClause = `WHERE ${whereConditions.join(' AND ')} ${categoryFilterClause}`;
@@ -153,7 +198,7 @@ async function findProducts({ page = 1, limit = 12, search, categoryId, brand, s
         MAX(pv.price) AS max_price,
         COUNT(pv.variant_id)::int AS variant_count
       FROM product_variants pv
-      WHERE pv.product_id = p.product_id AND pv.is_active = true
+      WHERE pv.product_id = p.product_id AND pv.is_active = true${priceConditions.length ? ` AND ${priceConditions.join(' AND ')}` : ''}
     ) v ON true
     ${whereClause}
     ${orderByClause}
@@ -268,6 +313,7 @@ async function findProductCategories(productId) {
 }
 
 module.exports = {
+  getSuggestions,
   findProducts,
   findProductById,
   findProductImages,
