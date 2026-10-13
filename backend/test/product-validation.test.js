@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const productService = require('../src/services/productService');
 const adminProduct = require('../src/services/adminProductService');
 const categories = require('../src/services/adminCategoryService');
-const { detectMimeType, generateETag } = require('../src/services/imageService');
+const { keyFromPublicUrl } = require('../src/services/s3Service');
 const { dateRange, integer } = require('../src/utils/reportValidation');
 
 function expectsBadRequest(callback) {
@@ -35,11 +35,19 @@ test('category tree construction nests categories and preserves roots', async ()
   await assert.rejects(categories.ensureParentExists(1, 1), (error) => error.status === 400);
 });
 
-test('image retrieval identifies accepted image bytes and generates a stable ETag', () => {
-  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
-  assert.equal(detectMimeType(png), 'image/png');
-  assert.match(generateETag(png), /^"[a-f0-9]{32}"$/);
-  assert.equal(detectMimeType(Buffer.from('not an image')), 'application/octet-stream');
+test('image URL parser accepts only canonical product-owned S3 keys', () => {
+  const previousBucket = process.env.AWS_S3_BUCKET_NAME;
+  process.env.AWS_S3_BUCKET_NAME = 'brightbuy-test-media';
+  try {
+    const url = 'https://brightbuy-test-media.s3.us-east-1.amazonaws.com/products/42/primary.webp';
+    assert.equal(keyFromPublicUrl(url, 42), 'products/42/primary.webp');
+    assert.equal(keyFromPublicUrl(url, 43), null);
+    assert.equal(keyFromPublicUrl('https://other.example/products/42/primary.webp', 42), null);
+    assert.equal(keyFromPublicUrl(`${url}?redirect=evil`, 42), null);
+  } finally {
+    if (previousBucket === undefined) delete process.env.AWS_S3_BUCKET_NAME;
+    else process.env.AWS_S3_BUCKET_NAME = previousBucket;
+  }
 });
 
 test('report queries validate dates, date ranges, and integer limits', () => {

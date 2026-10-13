@@ -15,10 +15,10 @@
 - [x] Product/admin models and services select/return URL fields; the image endpoint redirects to the stored URL; multipart middleware is removed.
 - [x] Existing Jest media tests were changed to URL mocks; the preceding review passed 139 Jest tests overall.
 - [ ] Durable issued-upload identity, authoritative content/size verification, immutable finalization and idempotent confirm implemented.
-- [ ] Safe durable deletion/orphan cleanup and product-level image locking implemented.
-- [ ] Real S3/PostgreSQL failure/concurrency tests passed; obsolete standalone product test corrected.
+- [ ] Safe durable deletion/orphan cleanup and product-level image locking implemented. Product row locking is now present for create/update/delete; durable cleanup remains open.
+- [ ] Real S3/PostgreSQL failure/concurrency tests passed; obsolete standalone product test corrected. The standalone test is corrected, but real integration evidence remains open.
 
-**Needs correction:** URL-prefix validation and HEAD existence alone permit reattaching an existing object and do not prove an issued upload or valid bytes. Repeated confirmation can insert another row. Deletion commits the DB removal before S3 deletion, losing a durable retry source on failure. Concurrent image mutations do not share a product lock. Keep the useful canonical URL validation, role guards and partial unique index while correcting these gaps.
+**Needs correction:** URL-prefix validation and HEAD existence alone permit reattaching an existing object and do not prove an issued upload or valid bytes. Repeated confirmation can insert another row. Deletion commits the DB removal before S3 deletion, losing a durable retry source on failure. Image create/update/delete now take a product row lock in a transaction, but this has not been verified with concurrent PostgreSQL clients. Keep the useful canonical URL validation, role guards and partial unique index while correcting the remaining gaps.
 
 ## Files to inspect before editing
 
@@ -125,7 +125,7 @@ A representative proposed conflict body is `{ "error": "upload_conflict", "messa
 - [ ] D adds cart `primary_image_url: string | null`, preserving item IDs, quantities, prices and purchase rules. No checkout-concurrency rewrite belongs in this handoff.
 - [ ] Preserve `GET /api/images/:id` and `/api/products/images/:id` with 302 and canonical stored URL; invalid ID 400 and missing/deleted row 404. Validate new writes/migrated URLs so redirects cannot point to arbitrary attacker-selected hosts.
 - [ ] Define caching for immutable final objects and avoid permanently caching mutable legacy ID redirects. If CDN support is chosen later, update canonical key extraction/deletion together; do not accept arbitrary URL hosts.
-- [ ] Replace stale `test/product-validation.test.js` BYTEA helper tests with URL/redirect/service assertions. Do not reintroduce deleted helpers just to satisfy the old test.
+- [x] Replace stale `test/product-validation.test.js` BYTEA helper tests with URL/redirect/service assertions. The test now verifies canonical product-owned S3 URL parsing; redirect behavior remains covered by `tests/imageRouteAlias.test.js`.
 - [ ] Keep mocked validation tests, then add real DB races/failure injection and isolated S3 tests from the companion. Existing mocked test counts are not sufficient evidence.
 
 ## Acceptance and handoff

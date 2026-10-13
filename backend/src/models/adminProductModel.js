@@ -275,6 +275,7 @@ async function createImage({ product_id, image_url, sort_order, is_primary }) {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
+    await client.query('SELECT product_id FROM products WHERE product_id = $1 FOR UPDATE', [product_id]);
     if (is_primary) {
       await client.query('UPDATE product_images SET is_primary = false WHERE product_id = $1', [product_id]);
     }
@@ -297,6 +298,12 @@ async function updateImage(imageId, { sort_order, is_primary }) {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
+    const owner = await client.query('SELECT product_id FROM product_images WHERE image_id = $1', [imageId]);
+    if (owner.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+    await client.query('SELECT product_id FROM products WHERE product_id = $1 FOR UPDATE', [owner.rows[0].product_id]);
     const existing = await client.query('SELECT image_id, product_id, image_url, sort_order, is_primary FROM product_images WHERE image_id = $1', [imageId]);
     if (existing.rowCount === 0) {
       await client.query('ROLLBACK');
@@ -324,12 +331,28 @@ async function updateImage(imageId, { sort_order, is_primary }) {
 }
 
 async function deleteImage(imageId) {
-  const result = await db.query(`
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+    const owner = await client.query('SELECT product_id FROM product_images WHERE image_id = $1', [imageId]);
+    if (owner.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+    await client.query('SELECT product_id FROM products WHERE product_id = $1 FOR UPDATE', [owner.rows[0].product_id]);
+    const result = await client.query(`
     DELETE FROM product_images
     WHERE image_id = $1
     RETURNING image_id, product_id, image_url, sort_order, is_primary
   `, [imageId]);
-  return result.rows[0] || null;
+    await client.query('COMMIT');
+    return result.rows[0] || null;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 async function createVariant(productId, { variant_sku, variant_name, price, stock_quantity, attributes }) {
