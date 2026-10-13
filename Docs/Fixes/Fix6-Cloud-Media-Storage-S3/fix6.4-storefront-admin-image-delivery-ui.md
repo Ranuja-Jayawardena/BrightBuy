@@ -31,7 +31,7 @@ Confirm actual file locations before edits. B coordinates shared cart types/stor
 
 - [ ] Obtain resolved M2/M3/M5/M8 and actual examples: method/body, upload identity, required headers, size/type limits, expiry, confirm responses/replay/errors, processing behavior if any, delete/retry semantics and authorization.
 - [ ] Identify permanent URL fields precisely: list/card `primary_image_url`, detail/gallery `images[].image_url`, cart `primary_image_url`. Keep existing ID fields.
-- [ ] C demonstrates the migrated isolated backend; D supplies an actual cart response with the additive nullable URL. Do not guess that the current cart response already contains it.
+- [x] C demonstrates the migrated isolated backend; D supplies an actual cart response with the additive nullable URL (`primary_image_url` verified live with S3 URL and null fallback).
 - [ ] Record stale-tab/release behavior. Mock work can start after the contract is frozen; integrated completion waits for the working backend/storage.
 
 **Stop condition:** the server still accepts URL-only confirmation, the contract is unresolved or storage/CORS is unverified. Report the named dependency; continue independent UI/type preparation against approved mocks.

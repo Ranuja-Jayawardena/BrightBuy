@@ -7,7 +7,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint src/",
-    "test": "jest --runInBand",
+    "test": "node --no-webstorage node_modules/jest/bin/jest.js --runInBand",
     "test:product": "node --test test/product-validation.test.js",
     "test:s3": "node --test test/s3-infrastructure.test.js"
   },
