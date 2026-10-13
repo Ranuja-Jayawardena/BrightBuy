@@ -1,6 +1,5 @@
-import React from 'react';
-import { SlidersHorizontal, ChevronDown } from 'lucide-react';
-import { SearchAutocomplete } from './SearchAutocomplete';
+import React, { useState, useEffect } from 'react';
+import { Search, SlidersHorizontal, ChevronDown, X } from 'lucide-react';
 
 interface SearchFilterBarProps {
   searchQuery: string;
@@ -21,18 +20,59 @@ export function SearchFilterBar({
   onSortChange,
   brands
 }: SearchFilterBarProps) {
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== searchQuery) {
+        onSearchChange(localSearch);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [localSearch, searchQuery, onSearchChange]);
+
+  const handleClear = () => {
+    setLocalSearch('');
+    onSearchChange('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onSearchChange(localSearch);
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
       
-      {/* Search Bar with Autocomplete Suggestions */}
-      <div className="w-full md:max-w-md">
-        <SearchAutocomplete
-          value={searchQuery}
-          onSearchSubmit={(q: string) => onSearchChange(q)}
-          onQueryChange={(q: string) => onSearchChange(q)}
-          placeholder="Search products by name or brand..."
-          variant="catalog"
+      {/* Search Bar without floating suggestions box */}
+      <div className="relative w-full md:max-w-md group">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
+          <Search size={18} />
+        </div>
+        <input
+          type="text"
+          placeholder="Search for products..."
+          value={localSearch}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="w-full bg-slate-50 border border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl pl-11 pr-10 py-3 text-sm text-slate-900 transition-all outline-none"
         />
+        {localSearch && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+            aria-label="Clear search"
+          >
+            <X size={15} />
+          </button>
+        )}
       </div>
 
       <div className="flex w-full md:w-auto items-center gap-3">
