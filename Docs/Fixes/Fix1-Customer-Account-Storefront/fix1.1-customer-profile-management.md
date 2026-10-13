@@ -1,7 +1,7 @@
 # Fix 1.1: Customer Profile Management & Navigation
 
 > **Parent Group:** [Fix 1: Customer Account & Storefront UX](fix1-customer-account-storefront.md)
-> **Status:** Not Started
+> **Status:** In Progress
 > **Assigned To:** Member E (Backend Auth & Profile API) & Member A (Storefront Profile UI & Navbar)
 > **Depends On:** —
 > **Blocks:** —
@@ -28,16 +28,16 @@
 ## Tasks
 
 ### Backend — Member E
-- [ ] Implement `PUT /api/auth/profile` in `backend/src/controllers/authController.js`:
+- [x] Implement `PUT /api/auth/profile` in `backend/src/controllers/authController.js`:
   - Validate request body: `first_name` (string, 1-50 chars), `last_name` (string, 1-50 chars), `phone` (optional string, max 20 chars).
   - Update `customers` table for `req.user.user_id` where `role = 'customer'`.
   - Return updated user object `{ user: { user_id, email, role, first_name, last_name, phone } }`.
-- [ ] Implement `PUT /api/auth/password` in `backend/src/controllers/authController.js`:
+- [x] Implement `PUT /api/auth/password` in `backend/src/controllers/authController.js`:
   - Accept `{ current_password, new_password }`.
   - Verify `current_password` with bcrypt against `users.password_hash`.
   - Validate `new_password` meets minimum security rules (e.g., minimum 8 characters).
   - Hash and update password in `users` table.
-- [ ] Wire routes into `backend/src/routes/authRoutes.js` protected with `requireAuth`.
+- [x] Wire routes into `backend/src/routes/authRoutes.js` protected with `requireAuth`.
 
 ### Frontend — Member A
 - [ ] Create `/profile` page in `frontend/src/app/profile/page.tsx`:

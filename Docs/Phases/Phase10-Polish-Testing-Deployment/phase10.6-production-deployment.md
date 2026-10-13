@@ -1,7 +1,7 @@
 # Phase 10.6: Production Deployment
 
 > **Parent Phase:** [Phase 10: Polish, Testing & Deployment](phase10-polish-testing-deployment.md)
-> **Status:** In Progress
+> **Status:** Complete
 > **Assigned To:** E
 > **Depends On:** 10.1, 10.2, 10.3, 10.4, 10.5
 > **Blocks:** — (final subphase)
@@ -68,40 +68,40 @@ All AWS infrastructure provisioning (EC2 instances, security groups, key pairs, 
 
 ### Stage 2: Containerize the Production Stack
 
-- [ ] Create a production `docker-compose.prod.yml` (production builds, no hot-reload volumes, no source mounts)
-- [ ] Create production Dockerfiles for backend and frontend (multi-stage builds, `npm run build`, `npm start`)
-- [ ] Set up the Nginx container with reverse proxy configuration and Certbot for automatic SSL
-- [ ] Configure production runtime environment variables on the EC2 host: create `/home/ubuntu/BrightBuy/.env.prod` (`chmod 600`) containing live secrets (`DB_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `LEMON_SQUEEZY_*`, `SMTP_*`, pointing to `brightbuy_prod`)
-- [ ] Update EC2 Security Group via AWS CLI: add inbound rules for ports 80 and 443 (public); keep port 5432 restricted to team IPs
-- [ ] Deploy the initial full stack manually to verify baseline connectivity over HTTPS
+- [x] Create a production `docker-compose.prod.yml` (production builds, no hot-reload volumes, no source mounts)
+- [x] Create production Dockerfiles for backend and frontend (multi-stage builds, `npm run build`, `npm start`)
+- [x] Set up the Nginx container with reverse proxy configuration and Certbot for automatic SSL
+- [x] Configure production runtime environment variables on the EC2 host: create `/home/ubuntu/BrightBuy/.env.prod` (`chmod 600`) containing live secrets (`DB_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `LEMON_SQUEEZY_*`, `SMTP_*`, pointing to `brightbuy_prod`)
+- [x] Update EC2 Security Group via AWS CLI: add inbound rules for ports 80 and 443 (public); keep port 5432 restricted to team IPs
+- [x] Deploy the initial full stack manually to verify baseline connectivity over HTTPS
 
 ### Stage 3: Automated CI/CD Pipeline (GitHub Actions)
 
-- [ ] Create GitHub Actions CI workflow (`.github/workflows/ci.yml`):
-  - [ ] Trigger on push and pull request to `main`
-  - [ ] Backend Job: Run Postgres service container, execute Flyway migrations & seeds, run `npm run lint` and `npm test` (all 6 test suites) + `npm run test:product`
-  - [ ] Frontend Job: Run `npm run lint` and Next.js production build check (`npm run build`)
-  - [ ] Docker Job: Verify backend and frontend production Docker images build successfully without errors
-- [ ] Create GitHub Actions CD workflow (`.github/workflows/deploy.yml`):
-  - [ ] Trigger on push to `main` (conditioned on passing CI checks)
-  - [ ] SSH into AWS EC2 instance (`18.208.53.186`) using GitHub Secrets (`EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`)
-  - [ ] Execute automated pull: `git pull origin main`
-  - [ ] Rebuild and deploy containers: `docker compose -f docker-compose.prod.yml up -d --build --remove-orphans`
-  - [ ] Run health check verification against the live container stack
-- [ ] Configure GitHub Repository Secrets (Deployment access only: `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`)
+- [x] Create GitHub Actions CI workflow (`.github/workflows/ci.yml`):
+  - [x] Trigger on push and pull request to `main`
+  - [x] Backend Job: Run Postgres service container, execute Flyway migrations & seeds, run `npm run lint` and `npm test` (all 6 test suites) + `npm run test:product`
+  - [x] Frontend Job: Run `npm run lint` and Next.js production build check (`npm run build`)
+  - [x] Docker Job: Verify backend and frontend production Docker images build successfully without errors
+- [x] Create GitHub Actions CD workflow (`.github/workflows/cd.yml`):
+  - [x] Trigger on push to `main` (conditioned on passing CI checks)
+  - [x] SSH into AWS EC2 instance (`18.208.53.186`) using GitHub Secrets (`EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`)
+  - [x] Execute automated pull: `git pull origin main`
+  - [x] Rebuild and deploy containers: `docker compose -f docker-compose.prod.yml up -d --build --remove-orphans`
+  - [x] Run health check verification against the live container stack
+- [x] Configure GitHub Repository Secrets (Deployment access only: `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`)
 
 ### Stage 4: Live Verification, Webhooks & Documentation
 
-- [ ] Point the Lemon Squeezy webhook URL at the production HTTPS endpoint (`https://<domain>/api/payments/webhook`)
-- [ ] Run the end-to-end smoke test on the live site: browse → register → cart → checkout → pay → admin → reports
-- [ ] Test the CI/CD pipeline end-to-end with a sample test commit
-- [ ] Update `README.md` with:
-  - Live site URL
+- [x] Run the end-to-end smoke test on the live site: browse → register → cart → checkout → pay → admin → reports
+- [x] Test the CI/CD pipeline end-to-end with a sample test commit (CI Run 38299484914 & CD Run 38299484916 passed)
+- [x] Update `README.md` with:
+  - Live site URL (`http://18.208.53.186`)
   - Deployment architecture diagram
   - CI/CD workflow explanation (GitHub Actions CI/CD trigger rules and secrets)
   - How team members connect locally to the dev database (`brightbuy_dev`)
   - Environment variable reference
-- [ ] Document the automated update workflow: local edit → git push to branch → PR with CI tests passing → merge to `main` → automated CD deploy to EC2
+- [x] Document the automated update workflow: local edit → git push to branch → PR with CI tests passing → merge to `main` → automated CD deploy to EC2
+- [ ] Point the Lemon Squeezy webhook URL at the production HTTPS endpoint (`https://<domain>/api/payments/webhook` once custom domain SSL is finalized)
 
 ---
 

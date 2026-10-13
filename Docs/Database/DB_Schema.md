@@ -23,6 +23,11 @@ Table employees {
   last_name varchar(50) [not null]
   phone varchar(20)
   role varchar(30) [not null, default: 'super_admin', note: 'super_admin | inventory_manager | order_dispatcher | catalog_manager | analyst']
+  is_active boolean [not null, default: true]
+
+  indexes {
+    (is_active) [name: 'idx_employees_active']
+  }
 }
 
 Table addresses {
