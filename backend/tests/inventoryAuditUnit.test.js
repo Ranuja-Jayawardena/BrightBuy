@@ -1,8 +1,11 @@
+/* global jest, afterEach, test, expect */
 jest.mock('../src/config/db', () => ({ connect: jest.fn() }));
 
 const db = require('../src/config/db');
 const products = require('../src/models/adminProductModel');
 const inventory = require('../src/models/adminInventoryModel');
+const productService = require('../src/services/adminProductService');
+const inventoryService = require('../src/services/adminInventoryService');
 
 function clientFor(initial, { failAudit = false } = {}) {
   const client = { release: jest.fn(), query: jest.fn() };
@@ -31,6 +34,26 @@ test('variant stock edit locks the row and writes one employee audit in its tran
   expect(statements.filter(sql => sql.includes('INSERT INTO inventory_adjustments'))).toHaveLength(1);
   expect(client.query.mock.calls.find(([sql]) => sql.includes('INSERT INTO inventory_adjustments'))[1]).toEqual([4, 12, 5, 8, 'Restock']);
   expect(statements.at(-1)).toBe('COMMIT');
+});
+
+test('variant stock edit without reason throws 400', async () => {
+  clientFor(5);
+  await expect(products.updateVariant(4, { stock_quantity: 8 }, 12))
+    .rejects.toMatchObject({ message: 'reason is required when stock_quantity changes', status: 400 });
+});
+
+test('product service requires valid employee id when updating stock', async () => {
+  await expect(productService.updateVariant(4, { stock_quantity: 8, reason: 'Restock' }, null))
+    .rejects.toMatchObject({ message: 'Employee identity is required', status: 403 });
+  await expect(productService.updateVariant(4, { stock_quantity: 8, reason: 'Restock' }, 0))
+    .rejects.toMatchObject({ message: 'Employee identity is required', status: 403 });
+});
+
+test('inventory service requires non-negative stock_quantity and reason', async () => {
+  await expect(inventoryService.adjust(4, { stock_quantity: -1, reason: 'Manual' }, 1))
+    .rejects.toMatchObject({ message: 'stock_quantity must be a non-negative integer', status: 400 });
+  await expect(inventoryService.adjust(4, { stock_quantity: 10, reason: '   ' }, 1))
+    .rejects.toMatchObject({ message: 'reason is required and must be 255 characters or fewer', status: 400 });
 });
 
 test('failed audit insertion rolls the stock edit back', async () => {
