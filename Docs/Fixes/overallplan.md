@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (10 / 14 fix items complete across 5 fix groups)
+**Status:** In Progress (11 / 14 fix items complete across 5 fix groups)
 
 ---
 
@@ -70,8 +70,8 @@ This document is the **master tracker** for all post-development fixes, patches,
   - [x] **4.2** Super Admin Employee Management & Deactivation — **E (DB/API), B (UI)** → [fix4.2-employee-lifecycle-role-management.md](Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md)
   - [x] **4.3** Order Fulfillment: Courier Tracking vs. Store Pickup — **D (API), B (UI)** → [fix4.3-order-delivery-mode-fulfillment.md](Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md)
 
-- [ ] **Fix 5: Analytics & Reports Visuals** → [fix5-analytics-reports-visuals.md](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
-  - [ ] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
+- [x] **Fix 5: Analytics & Reports Visuals** → [fix5-analytics-reports-visuals.md](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
+  - [x] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
 
 ---
 

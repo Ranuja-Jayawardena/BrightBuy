@@ -251,12 +251,14 @@ export default function AdminReportsSalesPage() {
         <ReportBarChart
           data={topProducts}
           xKey="product_name"
+          layout="vertical"
           bars={[
             { key: 'total_revenue', name: 'Revenue ($)', fill: '#10b981' },
           ]}
           title="Top Products by Revenue"
           description="Leading revenue generators across catalog"
           formatYAxis={(val) => `$${(val / 1000).toFixed(0)}k`}
+          formatTooltip={(val) => [`$${Number(val).toLocaleString()}`, 'Revenue']}
           emptyMessage="No product sales recorded in this period."
           isLoading={loading}
         />
