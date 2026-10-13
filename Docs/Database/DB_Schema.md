@@ -105,6 +105,8 @@ Table product_variants {
 
   indexes {
     product_id
+    (product_id, price) [note: 'partial index WHERE is_active = true']
+    price [note: 'partial index WHERE is_active = true']
   }
 }
 

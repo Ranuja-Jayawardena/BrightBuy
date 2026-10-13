@@ -1,6 +1,6 @@
 # Fix 2: Search & Filter Performance
 
-> **Status:** Not Started (0 / 2 fix items complete)
+> **Status:** In Progress (0 / 2 fix items complete)
 > **Members:** C (Backend Products & DB), A (Storefront Search & Catalog UI)
 > **Priority:** High
 > **Related Phases:** Phase 1.3 (Product Schema), Phase 4 (Catalog Browsing)
@@ -16,7 +16,7 @@ Fix 2 addresses the product catalog search and filtering engine. It introduces d
 
 ## What's Done
 
-- (nothing yet)
+- **2.1 Backend (C):** Added active variant price indexes, validated price range query parameters, and matched filtered product counts to returned product cards. Member A's storefront controls remain open.
 
 ---
 
@@ -24,7 +24,7 @@ Fix 2 addresses the product catalog search and filtering engine. It introduces d
 
 | # | Fix Item | Assigned | Depends On | Priority | Status |
 |---|----------|----------|------------|----------|--------|
-| 2.1 | [Price Range Filtering & Composite Indexing](fix2.1-price-range-filter-indexing.md) | C (Backend/DB), A (UI) | — | High | Not Started |
+| 2.1 | [Price Range Filtering & Composite Indexing](fix2.1-price-range-filter-indexing.md) | C (Backend/DB), A (UI) | — | High | In Progress (C Complete) |
 | 2.2 | [Search Autocomplete & pg_trgm GIN Indexing](fix2.2-search-autocomplete-suggestions.md) | C (Backend/DB), A (UI) | — | High | Not Started |
 
 ---

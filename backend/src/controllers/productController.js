@@ -1,7 +1,7 @@
 const productService = require('../services/productService');
 
 /**
- * Controller to list products with pagination, search, category filter, brand, and sort.
+ * Controller to list products with pagination, search, category, brand, price range, and sort.
  * Route: GET /api/products
  */
 async function getProducts(req, res, next) {
