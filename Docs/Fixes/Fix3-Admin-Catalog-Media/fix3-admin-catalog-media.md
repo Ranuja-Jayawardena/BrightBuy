@@ -1,6 +1,6 @@
 # Fix 3: Admin Catalog & Media Management
 
-> **Status:** Not Started (0 / 4 fix items complete)
+> **Status:** In Progress (1 / 4 fix items complete)
 > **Members:** B (Frontend Admin UI), C (Backend Catalog & Image APIs)
 > **Priority:** High
 > **Related Phases:** Phase 7 (Admin Dashboard & Inventory), Phase 1.3 (Images & Categories)
@@ -16,7 +16,7 @@ Fix 3 focuses on the admin management console. It resolves layout usability issu
 
 ## What's Done
 
-- (nothing yet)
+- **3.1 Admin Sticky Sidebar Layout (B):** Updated desktop `<aside>` classes in `frontend/src/app/admin/layout.tsx` with `sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto` so the admin navigation remains fixed and independently scrollable while main dashboard content scrolls.
 
 ---
 
@@ -24,7 +24,7 @@ Fix 3 focuses on the admin management console. It resolves layout usability issu
 
 | # | Fix Item | Assigned | Depends On | Priority | Status |
 |---|----------|----------|------------|----------|--------|
-| 3.1 | [Admin Sticky Sidebar Layout](fix3.1-admin-sidebar-sticky-layout.md) | B (Frontend) | — | Medium | Not Started |
+| 3.1 | [Admin Sticky Sidebar Layout](fix3.1-admin-sidebar-sticky-layout.md) | B (Frontend) | — | Medium | Complete |
 | 3.2 | [Product Active/Inactive Switch & Reactivation API](fix3.2-product-status-toggle.md) | C (Backend), B (Frontend) | — | High | Not Started |
 | 3.3 | [Category Active/Inactive Switch](fix3.3-category-status-toggle.md) | B (Frontend) | — | Medium | Not Started |
 | 3.4 | [Product Image Upload & Route Serving Fix](fix3.4-product-image-upload-serving.md) | C (Backend), B (Frontend) | — | High | Not Started |
