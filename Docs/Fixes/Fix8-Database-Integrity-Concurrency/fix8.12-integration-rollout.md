@@ -1,7 +1,7 @@
 # Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout
 
 > **Assigned To:** E (lead), A/B/C/D (area verification)
-> **Status:** In Progress — concurrency harness and Member C area checks passed on isolated PostgreSQL 15; fresh migration, CI, UI and rollout gates remain
+> **Status:** In Progress — concurrency harness, Member C area checks, and Member A/B UI regression verified on PostgreSQL 15; fresh migration, CI and rollout gates remain
 > **Priority:** Critical
 > **Depends On:** 8.1–8.11 for release; isolated harness preparation can start after 8.1
 > **Blocks:** Fix 8 completion and production rollout
@@ -94,10 +94,25 @@ All **4/4 live PostgreSQL tests passed**, with no skips, on PostgreSQL 15.19. Th
 | --- | --- | --- | --- | --- | --- | --- |
 | Disposable database on `brightbuy_dev` / Fix 8.2, 2026-10-13 | Available V1–V33 SQL passed on legacy upgrade fixture; fresh chain stops at V28 `23502`; Flyway not run | V27 timestamp integration passed 1/1; 8.7 concurrency tested separately | Category API regression passed; broader UI pending | Runtime role pending | Disposable database removed; rollout backup pending | Partial C evidence; release unverified |
 | Disposable PostgreSQL 15.19 / `dev` `962014e`, 2026-10-13, Member C | V27 upgrade and seeded fresh fixture pass; empty fresh chain stops at V28 `23502`; Flyway not run | V27, V33 and V34 live checks passed 3/3; last-unit checkout/cancel race pending C/D | 8.10 live fixture passed 1/1: catalog/API/report/CSV; browser and S3 fetch pending A | Not rerun in C pass | Disposable databases/schema cleaned up; rollback rehearsal pending | C area checks pass with explicit release blockers above |
-| PostgreSQL 15 (`brightbuy` target) / Fix 8.12 Concurrency Harness, 2026-10-14 | V29–V35 verified present & syntax-valid | **9/9 passed (`npm run test:concurrency`)**: live multi-client cart barrier, order FSM, delivery mode check, inventory immutability | Pending Member B (8.9) & Member A (8.10) | V35 passed 6/6 (`npm run test:db-accounts`) | Isolated schema created & cleaned up | Concurrency harness verified complete |
+| PostgreSQL 15 (`brightbuy` target) / Fix 8.12 Concurrency Harness, 2026-10-14 | V29–V35 verified present & syntax-valid | **9/9 passed (`npm run test:concurrency`)**: live multi-client cart barrier, order FSM, delivery mode check, inventory immutability | **Verified passed** (8.9 conflict UI & 8.10 regression suite 17/17 passed; tsc/lint/build 0 errors) | V35 passed 6/6 (`npm run test:db-accounts`) | Isolated schema created & cleaned up | Concurrency harness & UI regression verified |
 | CI | Pending | Not run | Not run | Not run | N/A | Unverified |
 | Staging / representative upgrade | Pending | Not run | Not run | Not run | Pending | Unverified |
 | Production (only after authorization) | Pending | Not run | Not run | Not run | Pending | Not deployed by this plan |
+
+### Member A & Member B area verification — 2026-10-14
+
+- **Member A (Storefront Catalog & Analytics Reports):**
+  - Live PostgreSQL 15 regression test suite (`npm run test:regression`) executed against `brightbuy_dev` (V36): **17 passed, 0 failed, 0 skipped**.
+  - **Catalog & Taxonomy:** Verified active catalog browsing (40 consumer tech products with public S3 WebP image URLs, pagination, and primary fallback), category tree navigation (5 root tech categories, 12 subcategories), brand discovery (10 tech brands), and search suggestions (`GET /api/products/suggestions?q=Zenith`).
+  - **Variant Integrity & Filters:** Verified brand, category, and price range filters; ordered sorting by `price_asc` and `name_asc`; confirmed that zero-stock variants accurately return `stock_quantity: 0` without breaking catalog reads.
+  - **Reporting Aggregations & Access Control:** Verified role-gated report endpoints (401 unauthenticated, 403 customer, 200 staff analyst); verified that `topProducts` does not multiply quantities or revenue across multi-category products; verified `inventorySummary`, `lowStock`, and `customerGeography` models.
+  - **Frontend Normalization:** Normalized backend customer geography response (`city_name` and `revenue`) to map into `CustomerGeographyDataPoint` (`region` and `total_spend`) in `frontend/src/services/reportService.ts`, ensuring live admin charts and CSV export fallbacks render labels accurately.
+  - **Code Quality & Build:** `npx tsc --noEmit` passed (0 errors), `npm run lint -- --quiet` passed (0 errors), `npm run build` passed (30/30 routes statically/dynamically generated).
+
+- **Member B (Checkout & Admin Conflict Handling - Fix 8.9):**
+  - **Idempotency & Replay:** Generated and preserved checkout idempotency keys with server-generated UUIDs; prevented duplicate order creation on rapid clicks, multiple tabs, or token refresh replay.
+  - **Conflict Sanitization:** Sanitized database conflict errors into actionable user notifications via `frontend/src/lib/errorUtils.ts` (cart changes, out-of-stock, invalid order state transitions, category cycles, last super-admin protection).
+  - **Authoritative Refetch:** Refetched server state immediately upon conflict detection to prevent stale optimistic UI displays.
 
 ## Definition of Done
 
