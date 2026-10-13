@@ -1,4 +1,4 @@
-import { GetCategoriesResponse, GetProductsResponse, GetProductByIdResponse } from "../types/catalog";
+import { GetCategoriesResponse, GetProductsResponse, GetProductByIdResponse, GetSuggestionsResponse } from "../types/catalog";
 import { apiFetch } from "./api";
 
 export const catalogService = {
@@ -11,6 +11,18 @@ export const catalogService = {
     const res = await apiFetch('/api/categories');
     if (!res.ok) {
       throw new Error('Failed to fetch categories');
+    }
+    return res.json();
+  },
+
+  async getSuggestions(query: string): Promise<GetSuggestionsResponse> {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      return { suggestions: [] };
+    }
+    const res = await apiFetch(`/api/products/suggestions?q=${encodeURIComponent(trimmed)}`);
+    if (!res.ok) {
+      return { suggestions: [] };
     }
     return res.json();
   },

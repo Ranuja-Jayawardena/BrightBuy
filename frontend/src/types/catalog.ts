@@ -68,3 +68,14 @@ export interface GetProductByIdResponse {
   product: ProductDetail;
 }
 
+export interface ProductSuggestion {
+  product_id: number;
+  product_name: string;
+  brand: string;
+  category_name?: string | null;
+}
+
+export interface GetSuggestionsResponse {
+  suggestions: ProductSuggestion[];
+}
+
