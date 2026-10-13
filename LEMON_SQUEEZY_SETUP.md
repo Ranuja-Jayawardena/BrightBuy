@@ -207,3 +207,15 @@ LEMON_SQUEEZY_API_KEY=eyJ0eXAi...
      docker exec -it brightbuy-postgres psql -U postgres -d brightbuy_prod -c "SELECT order_id, status FROM orders ORDER BY order_id DESC LIMIT 3;"
      ```
    - Status must transition from `pending` to `paid`.
+
+---
+
+## 8. Live Verification Results & Fixes Applied
+
+- **Multi-Origin Redirect URL Fix:** Updated paymentController.js to dynamically match the client origin against configured FRONTEND_URL origins, preventing comma-separated strings (localhost:3000,18.208.53.186) from causing 422 errors with the Lemon Squeezy Checkouts API.
+- **Idempotent Payment Upsert:** Ensured payment attempts update existing payments rows rather than inserting duplicate records on retry.
+- **Safe Webhook Order ID Parsing:** Updated webhookController.js to parse numeric order IDs cleanly, avoiding PostgreSQL integer conversion errors when processing webhooks.
+- **Live EC2 Deployment Verified:**
+  - Active environment variables loaded into brightbuy-backend-1.
+  - Live checkout session created: returned real Lemon Squeezy URL (https://brightbuy-store.lemonsqueezy.com/checkout/custom/...).
+  - Webhook endpoint verified: HMAC SHA-256 signature checked, database order updated to paid, payment marked completed, and confirmation email successfully dispatched.

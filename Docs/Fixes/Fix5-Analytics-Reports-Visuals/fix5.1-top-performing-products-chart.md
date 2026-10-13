@@ -54,3 +54,8 @@ In `frontend/src/components/reports/charts/ReportBarChart.tsx`:
 1. The Top Performing Products chart directly displays readable product names along the chart axis without requiring hover.
 2. Long product titles are gracefully truncated with full titles visible on tooltip hover.
 3. Chart renders responsively across desktop and tablet screen sizes.
+
+## Verification & Notes
+
+- The backend query joins `order_items` to `product_variants` and `products`, selects `p.product_name`, and passes it through the route response. `backend/tests/topProductsReport.test.js` verifies the join, field, and revenue conversion.
+- Both top products charts use the vertical layout. The shared chart displays every category tick, truncates long labels at 20 characters, reserves 155px for the name axis, expands height with row count, and shows the full product name in the tooltip.

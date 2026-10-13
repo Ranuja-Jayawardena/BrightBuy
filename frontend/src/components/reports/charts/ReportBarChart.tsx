@@ -33,9 +33,9 @@ export interface ReportBarChartProps {
   isLoading?: boolean;
 }
 
-const truncateLabel = (label: string, maxLen = 20) => {
-  if (!label || typeof label !== 'string') return '';
-  return label.length > maxLen ? `${label.slice(0, maxLen)}…` : label;
+const truncateCategory = (value: string | number) => {
+  const label = String(value);
+  return label.length > 20 ? `${label.slice(0, 19)}…` : label;
 };
 
 export const ReportBarChart: React.FC<ReportBarChartProps> = ({
@@ -87,7 +87,7 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
           {emptyMessage}
         </div>
       ) : (
-        <div style={{ height, width: '100%' }}>
+        <div style={{ height: isVertical ? Math.max(height, data.length * 42 + 80) : height, width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
@@ -107,11 +107,12 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
                   <YAxis
                     type="category"
                     dataKey={xKey}
-                    tickFormatter={(val: string) => truncateLabel(val, 20)}
+                    tickFormatter={truncateCategory}
+                    interval={0}
                     tick={{ fill: '#64748b', fontSize: 12 }}
                     tickLine={false}
                     axisLine={{ stroke: '#cbd5e1' }}
-                    width={yAxisWidth}
+                    width={yAxisWidth || 155}
                   />
                 </>
               ) : (
@@ -132,7 +133,7 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
               )}
               <Tooltip
                 formatter={formatTooltip}
-                labelFormatter={(label) => (xKey === 'product_name' ? `Product Name: ${label}` : label)}
+                labelFormatter={isVertical && xKey === 'product_name' ? (label) => `Product Name: ${String(label)}` : undefined}
                 contentStyle={{
                   backgroundColor: '#ffffff',
                   borderRadius: '8px',

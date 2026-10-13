@@ -16,7 +16,7 @@ Fix 5 enhances business intelligence and reporting readability in the admin repo
 
 ## What's Done
 
-- **5.1 Top Performing Products Chart Display (A):** Converted Top Performing Products chart to horizontal bars (`layout="vertical"`) with full product category names along the Y-axis (width 140, max 20 char truncation with ellipsis) and explicit product tooltips in `/admin/reports` and `/admin/reports/sales`.
+- **5.1 Top Performing Products (A, C):** Confirmed product names in the API response and updated both report charts with horizontal revenue bars, readable name labels, and full names in tooltips.
 
 ---
 
