@@ -285,7 +285,7 @@ INSERT INTO orders (customer_id, order_date, status, total_amount) VALUES (
 -- Order Items
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 34),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'KIT-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'AUD-003-BLK'),
     2,
     99.99
 );
@@ -303,13 +303,13 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 31),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'MCL-001-WHT-M'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-002-BLK'),
     2,
     49.5
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 31),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     1,
     399
 );
@@ -333,7 +333,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 30),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'MCL-001-WHT-M'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-002-BLK'),
     1,
     49.5
 );
@@ -345,7 +345,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 29),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'HAP-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-003-BLK'),
     2,
     179.99
 );
@@ -357,19 +357,19 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 27),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'KIT-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'AUD-003-BLK'),
     2,
     99.99
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 27),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'HAP-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-003-BLK'),
     1,
     179.99
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 27),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'APP-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'IOT-002-5M-RGB'),
     1,
     69
 );
@@ -381,31 +381,31 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 26),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     1,
     399
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 25),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'HAP-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-003-BLK'),
     2,
     179.99
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 25),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'HAP-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-003-BLK'),
     2,
     179.99
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 24),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'MCL-001-WHT-M'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-002-BLK'),
     2,
     49.5
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 24),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     2,
     399
 );
@@ -417,7 +417,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 22),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     2,
     399
 );
@@ -429,7 +429,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 20),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'KIT-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'AUD-003-BLK'),
     1,
     99.99
 );
@@ -453,19 +453,19 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 19),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'APP-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'IOT-002-5M-RGB'),
     2,
     69
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 18),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'APP-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'IOT-002-5M-RGB'),
     1,
     69
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 17),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'KIT-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'AUD-003-BLK'),
     2,
     99.99
 );
@@ -477,13 +477,13 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 17),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     2,
     399
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 16),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     1,
     399
 );
@@ -495,13 +495,13 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 15),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'APP-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'IOT-002-5M-RGB'),
     2,
     69
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 15),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'APP-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'IOT-002-5M-RGB'),
     2,
     69
 );
@@ -519,13 +519,13 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 13),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'APP-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'IOT-002-5M-RGB'),
     2,
     69
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 13),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'HAP-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-003-BLK'),
     1,
     179.99
 );
@@ -543,13 +543,13 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 12),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     2,
     399
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 11),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'HAP-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-003-BLK'),
     1,
     179.99
 );
@@ -573,25 +573,25 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 9),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'KIT-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'AUD-003-BLK'),
     1,
     99.99
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 9),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'APP-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'IOT-002-5M-RGB'),
     1,
     69
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 9),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     1,
     399
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 8),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'APP-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'IOT-002-5M-RGB'),
     1,
     69
 );
@@ -609,7 +609,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 7),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     2,
     399
 );
@@ -645,7 +645,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 4),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'MCL-001-WHT-M'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-002-BLK'),
     1,
     49.5
 );
@@ -657,7 +657,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 3),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'APP-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'IOT-002-5M-RGB'),
     1,
     69
 );
@@ -669,13 +669,13 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 1),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'CLN-001-WHT'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'DSP-003-25-BLK'),
     2,
     399
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 0),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'KIT-001-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'AUD-003-BLK'),
     2,
     99.99
 );
