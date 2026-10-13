@@ -1,5 +1,12 @@
 const productModel = require('../models/productModel');
 
+async function getProductSuggestions(query) {
+  if (typeof query !== 'string' || query.trim().length < 2 || query.trim().length > 100) {
+    const error = new Error('q must contain 2 to 100 characters'); error.status = 400; throw error;
+  }
+  return { suggestions: await productModel.getSuggestions(query.trim()) };
+}
+
 /**
  * Service to fetch paginated product list with search, filtering, and sorting.
  *
@@ -129,6 +136,7 @@ async function getProductDetails(productId) {
 }
 
 module.exports = {
+  getProductSuggestions,
   getProductsList,
   getProductDetails,
   positiveQueryInteger,

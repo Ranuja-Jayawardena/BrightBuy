@@ -17,6 +17,7 @@ Fix 2 addresses the product catalog search and filtering engine. It introduces d
 ## What's Done
 
 - **2.1 Backend (C):** Added active variant price indexes, validated price range query parameters, and matched filtered product counts to returned product cards. Member A's storefront controls remain open.
+- **2.2 Backend (C):** Added `pg_trgm` indexes and `GET /api/products/suggestions?q=...` with input validation, literal wildcard handling, active product filtering, and a six-result limit. Member A's autocomplete UI remains open.
 
 ---
 
@@ -25,7 +26,7 @@ Fix 2 addresses the product catalog search and filtering engine. It introduces d
 | # | Fix Item | Assigned | Depends On | Priority | Status |
 |---|----------|----------|------------|----------|--------|
 | 2.1 | [Price Range Filtering & Composite Indexing](fix2.1-price-range-filter-indexing.md) | C (Backend/DB), A (UI) | — | High | In Progress (C Complete) |
-| 2.2 | [Search Autocomplete & pg_trgm GIN Indexing](fix2.2-search-autocomplete-suggestions.md) | C (Backend/DB), A (UI) | — | High | Not Started |
+| 2.2 | [Search Autocomplete & pg_trgm GIN Indexing](fix2.2-search-autocomplete-suggestions.md) | C (Backend/DB), A (UI) | — | High | In Progress (C Complete) |
 
 ---
 

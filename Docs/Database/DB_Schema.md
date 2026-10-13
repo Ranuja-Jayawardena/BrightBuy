@@ -76,6 +76,9 @@ Table products {
 
   indexes {
     product_name
+    product_name [name: 'idx_products_name_trgm', note: 'GIN gin_trgm_ops, WHERE is_active = true']
+    brand [name: 'idx_products_brand_trgm', note: 'GIN gin_trgm_ops, WHERE is_active = true']
+    description [name: 'idx_products_description_trgm', note: 'GIN gin_trgm_ops, WHERE is_active = true']
   }
 }
 
