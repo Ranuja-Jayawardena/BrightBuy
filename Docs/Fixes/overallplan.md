@@ -88,6 +88,8 @@ Fix 6 has **0/4 items verified complete under the revised gates**. 6.1–6.4 are
   - [ ] **7.4** Database Reseed Orchestration, Flyway Verification & Storefront Validation — **E (DevOps), A (UI), B (UI)** → [fix7.4-database-reseed-pipeline-verification.md](Fix7-Tech-Catalog-Specialization/fix7.4-database-reseed-pipeline-verification.md)
   - [ ] **7.5** Cloud Media Assets, Tech Imagery & S3 Bucket Synchronization — **E (DevOps), C (Media)** → [fix7.5-cloud-media-assets-s3-sync.md](Fix7-Tech-Catalog-Specialization/fix7.5-cloud-media-assets-s3-sync.md)
 
+Fix 7.2 is In Progress: `04_products.sql` now defines 40 technology products, 65 variants and 80 primary/secondary URL rows. The SKU matrix is published. The new S3 objects, fresh database execution and downstream links/orders still need verification; do not mark 7.2 complete until its image URLs resolve.
+
 - [ ] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
   - [ ] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
   - [ ] **8.2: Catalog Timestamp Migration Verification** | C (catalog), E (migration/environment) | [Details](Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)

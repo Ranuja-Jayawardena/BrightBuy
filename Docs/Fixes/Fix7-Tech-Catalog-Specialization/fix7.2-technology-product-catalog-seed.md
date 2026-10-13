@@ -1,7 +1,7 @@
 # Fix 7.2: Technology Product Catalog, Variant & Media Seed Alignment
 
 > **Parent Group:** [Fix 7: Consumer Technology Catalog Specialization](fix7-tech-catalog-specialization.md)  
-> **Status:** Planned  
+> **Status:** In Progress — seed SQL and SKU matrix updated; S3 objects and database execution unverified
 > **Assigned To:** Member C (Backend Products & Seed Data)  
 > **Depends On:** [Fix 7.1: Technology Taxonomy Hierarchy](fix7.1-technology-taxonomy-hierarchy.md)  
 > **Blocks:** [Fix 7.3](fix7.3-catalog-links-order-seed-integrity.md), [Fix 7.4](fix7.4-database-reseed-pipeline-verification.md)  
@@ -36,15 +36,15 @@
 ## Tasks (Member C)
 
 ### 1. Overhaul `backend/db/seed/04_products.sql`
-- [ ] Retain and polish existing 16 technology products (`ELC-001`..`ELC-004`, `SPH-001`..`SPH-004`, `LAP-001`..`LAP-004`, `AUD-001`..`AUD-004`).
-- [ ] Replace the 24 non-tech products with 24 consumer technology products:
+- [x] Retain the existing 16 technology products (`ELC-001`..`ELC-004`, `SPH-001`..`SPH-004`, `LAP-001`..`LAP-004`, `AUD-001`..`AUD-004`).
+- [x] Replace the 24 non-tech products with 24 consumer technology products:
   - `TAB-001` to `TAB-004`: Tablets & E-Readers (e.g., NovaTab Pro 11, PaperInk E-Reader)
   - `DSP-001` to `DSP-004`: Displays & Monitors (e.g., UltraView 34" Curved OLED, ProArt 4K Studio Display)
   - `PER-001` to `PER-004`: PC Peripherals (e.g., Apex Mech Pro Keyboard, SwiftPrecision Wireless Mouse)
   - `WTR-001` to `WTR-004`: Wearables & Smartwatches (e.g., ChronoFit Ultra, PulseBand HR)
   - `IOT-001` to `IOT-004`: Smart Home & IoT (e.g., SecureView Video Doorbell, LumenRGB Smart Bulb Pack)
   - `STR-001` to `STR-004`: Storage & Accessories (e.g., FlashDrive Pro 2TB NVMe SSD, MagPower 100W Dock)
-- [ ] Insert realistic tech `product_variants` for all new products:
+- [x] Insert realistic tech `product_variants` for all new products:
   - Specific technical variant attributes (e.g., 256GB / 512GB, Space Gray / Silver, Wi-Fi / 5G).
   - Realistic prices, stock quantities (with appropriate low-stock and out-of-stock variations for testing).
 - [ ] Insert `product_images` with valid AWS S3 `image_url` links (both primary and secondary views per [Fix 7.5](fix7.5-cloud-media-assets-s3-sync.md)):
@@ -52,7 +52,9 @@
   - Secondary (`is_primary = false, sort_order = 1`): `https://brightbuy-media-storage-695945476492.s3.us-east-1.amazonaws.com/products/{productId}/secondary.webp`
 
 ### 2. Publish New Tech SKU Matrix
-- [ ] Publish the complete list of 40 `base_sku` values and associated `variant_sku` values in the shared table below for Member A (`05_catalog_links.sql`) and Member D (`07_orders.sql`).
+- [x] Publish the complete list of 40 `base_sku` values and associated `variant_sku` values in the shared table below for Member A (`05_catalog_links.sql`) and Member D (`07_orders.sql`).
+
+The SQL now has 40 tech products, 65 variants and 80 image URL records. New SKU values were checked against the table below. The URL rows are present, but their S3 objects are supplied by Fix 7.5 and have not been verified. Fresh database execution and downstream `05_catalog_links.sql` / `07_orders.sql` integration belong to Fix 7.4 and 7.3 respectively. Do not reseed an existing shared database with this file.
 
 ---
 
@@ -75,7 +77,7 @@
 | `AUD-001` | Sonus QuietComfort Elite | Sonus | Headphones & Earbuds | `AUD-001-BLK`, `AUD-001-WHT` |
 | `AUD-002` | Pulse True Wireless Earbuds | Sonus | Headphones & Earbuds | `AUD-002-BLK`, `AUD-002-BLU` |
 | `AUD-003` | BassBoom 360 Bluetooth Speaker | BassBoom | Speakers & Soundbars | `AUD-003-BLK`, `AUD-003-RED` |
-| `AUD-004` | StudioMaster Reference Monitors | Sonus | Speakers & Soundbars | `AUD-004-PAIR` |
+| `AUD-004` | StudioMaster Reference Monitor Pair | Sonus | Speakers & Soundbars | `AUD-004-PAIR` |
 | `TAB-001` | LuminaPad Pro 12.9 | Lumina | Tablets & E-Readers | `TAB-001-128-GRY`, `TAB-001-256-SLV` |
 | `TAB-002` | AuraPad Air 10.5 | Aura | Tablets & E-Readers | `TAB-002-64-BLU`, `TAB-002-128-WHT` |
 | `TAB-003` | PaperInk Color E-Reader 7" | NovaTech | Tablets & E-Readers | `TAB-003-32G-BLK` |
