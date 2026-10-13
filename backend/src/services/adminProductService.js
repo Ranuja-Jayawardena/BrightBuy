@@ -1,8 +1,7 @@
 const adminProductModel = require('../models/adminProductModel');
-const { detectMimeType } = require('./imageService');
+const s3Service = require('./s3Service');
 
-const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
+const ALLOWED_IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 
 function createHttpError(status, message) {
   const error = new Error(message);
@@ -145,6 +144,7 @@ async function listProducts(queryParams) {
       base_sku: row.base_sku,
       is_active: row.is_active,
       primary_image_id: row.primary_image_id || null,
+      primary_image_url: row.primary_image_url || null,
       variant_count: parseInt(row.variant_count, 10) || 0,
       total_stock: parseInt(row.total_stock, 10) || 0,
       categories: Array.isArray(row.categories) ? row.categories : [],
@@ -177,6 +177,7 @@ async function getProductDetail(productId) {
       ...mapProduct(product),
       images: images.map((image) => ({
         image_id: image.image_id,
+        image_url: image.image_url,
         sort_order: image.sort_order,
         is_primary: image.is_primary,
         created_at: image.created_at,
@@ -231,37 +232,30 @@ async function softDeleteProduct(productId) {
   return product ? { product: mapProduct(product) } : null;
 }
 
-async function createImage(productId, file, body) {
+async function presignImage(productId, body) {
+  requireBody(body);
   if (!await adminProductModel.productExists(productId)) {
     return null;
   }
-  if (!file || !file.buffer || file.buffer.length === 0) {
-    throw createHttpError(400, 'image file is required');
-  }
-  if (file.buffer.length > MAX_IMAGE_SIZE_BYTES) {
-    throw createHttpError(400, 'image file must be 5MB or smaller');
-  }
-  const mimeType = detectMimeType(file.buffer);
-  if (!ALLOWED_IMAGE_TYPES.has(mimeType)) {
-    throw createHttpError(400, 'image file must be PNG, JPEG, GIF, or WebP');
-  }
+  if (!ALLOWED_IMAGE_TYPES.has(body.contentType)) throw createHttpError(400, 'contentType must be image/jpeg, image/png, or image/webp');
+  normalizeString(body.fileName, 'fileName', { required: true, maxLength: 255 });
+  return s3Service.generatePresignedUploadUrl({ productId, contentType: body.contentType, fileName: body.fileName });
+}
 
+async function createImage(productId, body) {
+  requireBody(body);
+  if (!await adminProductModel.productExists(productId)) return null;
+  const fileKey = s3Service.keyFromPublicUrl(body.image_url, productId);
+  if (!fileKey) throw createHttpError(400, 'image_url must be a valid S3 URL for this product');
+  if (!await s3Service.objectExists(fileKey)) throw createHttpError(400, 'Image has not been uploaded to S3');
   const image = await adminProductModel.createImage({
     product_id: productId,
-    image_data: file.buffer,
+    image_url: body.image_url,
     sort_order: parseNonNegativeInteger(body.sort_order, 'sort_order', 0),
     is_primary: parseBoolean(body.is_primary, 'is_primary', false),
   });
 
-  return {
-    image: {
-      image_id: image.image_id,
-      product_id: image.product_id,
-      sort_order: image.sort_order,
-      is_primary: image.is_primary,
-      created_at: image.created_at,
-    },
-  };
+  return { image };
 }
 
 async function updateImage(imageId, body) {
@@ -275,6 +269,10 @@ async function updateImage(imageId, body) {
 
 async function deleteImage(imageId) {
   const image = await adminProductModel.deleteImage(imageId);
+  if (image) {
+    const fileKey = s3Service.keyFromPublicUrl(image.image_url, image.product_id);
+    if (fileKey) await s3Service.deleteS3Object(fileKey);
+  }
   return image ? { image } : null;
 }
 
@@ -323,6 +321,7 @@ module.exports = {
   setProductStatus,
   softDeleteProduct,
   createImage,
+  presignImage,
   updateImage,
   deleteImage,
   createVariant,

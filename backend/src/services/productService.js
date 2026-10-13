@@ -50,6 +50,7 @@ async function getProductsList(queryParams) {
     brand: row.brand,
     base_sku: row.base_sku,
     primary_image_id: row.primary_image_id || null,
+    primary_image_url: row.primary_image_url || null,
     min_price: row.min_price !== null ? parseFloat(row.min_price) : null,
     max_price: row.max_price !== null ? parseFloat(row.max_price) : null,
     variant_count: parseInt(row.variant_count, 10) || 0,
@@ -120,6 +121,7 @@ async function getProductDetails(productId) {
       base_sku: product.base_sku,
       images: images.map((img) => ({
         image_id: img.image_id,
+        image_url: img.image_url,
         sort_order: img.sort_order,
         is_primary: img.is_primary,
       })),

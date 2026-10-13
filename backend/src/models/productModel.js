@@ -184,6 +184,11 @@ async function findProducts({ page = 1, limit = 12, search, categoryId, brand, m
         ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.image_id ASC
         LIMIT 1
       ) AS primary_image_id,
+      (
+        SELECT pi.image_url FROM product_images pi
+        WHERE pi.product_id = p.product_id
+        ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.image_id ASC LIMIT 1
+      ) AS primary_image_url,
       v.min_price,
       v.max_price,
       COALESCE(v.variant_count, 0) AS variant_count,
@@ -250,7 +255,7 @@ async function findProductById(id) {
 }
 
 /**
- * Find image metadata for a product (strictly metadata, NO BYTEA image_data).
+ * Find image URLs and metadata for a product.
  * @param {number} productId
  * @returns {Promise<Array<Object>>}
  */
@@ -258,6 +263,7 @@ async function findProductImages(productId) {
   const query = `
     SELECT
       image_id,
+      image_url,
       sort_order,
       is_primary
     FROM product_images

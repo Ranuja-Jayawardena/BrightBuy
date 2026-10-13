@@ -70,11 +70,21 @@ async function deleteProduct(req, res, next) {
 
 async function createImage(req, res, next) {
   try {
-    const result = await adminProductService.createImage(parseId(req.params.id), req.file, req.body);
+    const result = await adminProductService.createImage(parseId(req.params.id), req.body);
     if (!result) {
       return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
     }
     res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function presignImage(req, res, next) {
+  try {
+    const result = await adminProductService.presignImage(parseId(req.params.id), req.body);
+    if (!result) return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -148,6 +158,7 @@ module.exports = {
   setProductStatus,
   deleteProduct,
   createImage,
+  presignImage,
   updateImage,
   deleteImage,
   createVariant,
