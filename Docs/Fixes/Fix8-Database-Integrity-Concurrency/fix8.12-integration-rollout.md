@@ -77,7 +77,7 @@ A migration rollback may require a forward corrective migration or controlled re
 
 | Environment / revision | Migration versions | Real DB race tests | UI/regression | Role tests | Backup/rollback | Result |
 | --- | --- | --- | --- | --- | --- | --- |
-| Local isolated | Pending | Not run | Not run | Not run | Pending | Unverified |
+| Disposable database on `brightbuy_dev` / Fix 8.2, 2026-10-13 | Available V1–V33 SQL passed on legacy upgrade fixture; fresh chain stops at V28 `23502`; Flyway not run | V27 timestamp integration passed 1/1; 8.7 concurrency tested separately | Category API regression passed; broader UI pending | Runtime role pending | Disposable database removed; rollout backup pending | Partial C evidence; release unverified |
 | CI | Pending | Not run | Not run | Not run | N/A | Unverified |
 | Staging / representative upgrade | Pending | Not run | Not run | Not run | Pending | Unverified |
 | Production (only after authorization) | Pending | Not run | Not run | Not run | Pending | Not deployed by this plan |

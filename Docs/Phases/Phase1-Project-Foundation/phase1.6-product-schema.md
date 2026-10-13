@@ -64,7 +64,7 @@ Create the core product tables (products, variants, images) and seed the 40-prod
   - `idx_product_images_single_primary` as a partial unique index on `product_images(product_id) WHERE is_primary = true` ensuring strictly at most one primary image per product.
   - `idx_product_images_product_sort` on `product_images(product_id, sort_order)`.
 - **Database Schema Sync:** Added all indexes and constraint annotations into `DB_Schema.md`.
-- **Catalog timestamps (V27):** `products` and `product_variants` retain their insert defaults; PostgreSQL `BEFORE UPDATE` triggers now set each row's `updated_at`. The backend no longer assigns those timestamps. Related-row changes do not update the parent product timestamp.
+- **Catalog timestamps (V27):** `products` and `product_variants` retain their insert defaults; PostgreSQL row-level `BEFORE UPDATE` triggers set each updated row's `updated_at` to the transaction start timestamp, including no-op updates. The backend no longer assigns those timestamps. Related-row changes do not update the parent product timestamp.
 
 ### Published SKU & Catalog Matrix (For Members A, B, and D)
 

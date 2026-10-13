@@ -32,7 +32,7 @@ These are source-code findings, not results from a live concurrency exercise. Th
 | Item | Assigned | Depends on | Status |
 | --- | --- | --- | --- |
 | [8.1: Contracts, Data Preflight & Migration Coordination](fix8.1-contracts-preflight.md) | E (lead), D (payments/cart), C (catalog) | Existing phase/fix baseline | Complete |
-| [8.2: Catalog Timestamp Migration Verification](fix8.2-catalog-timestamp-verification.md) | C (lead), E (migration verification) | 8.1 environment/migration audit | In Progress |
+| [8.2: Catalog Timestamp Migration Verification](fix8.2-catalog-timestamp-verification.md) | C (lead), E (migration verification) | 8.1 environment/migration audit | In Progress — V27 isolated checks pass; fresh V28/Flyway target gates pending |
 | [8.3: Cart Uniqueness & Checkout Concurrency](fix8.3-cart-checkout-concurrency.md) | D | 8.1 cart/API contract | Not Started |
 | [8.4: Order Transitions & Payment Event Consistency](fix8.4-order-payment-consistency.md) | D (lead), E (webhook infrastructure review), C (admin handoff) | 8.1 payment decisions; 8.3 lock contract | Not Started |
 | [8.5: Delivery Cardinality & Value Constraints](fix8.5-delivery-value-constraints.md) | D (lead), E (migration review) | 8.1 delivery decisions; 8.4 writer compatibility | Not Started |
