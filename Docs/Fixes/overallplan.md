@@ -97,17 +97,14 @@ Fix 7 is complete (5/5 items complete: 7.1, 7.2, 7.3, 7.4, and 7.5). In `05_cata
   - [x] **8.4: Order Transitions & Payment Event Consistency** | D (implementation), E (webhook security review), C (admin order ownership handoff) | [Details](Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
   - [x] **8.5: Delivery Cardinality & Value Constraints** | D; E reviews migration sequencing | [Details](Fix8-Database-Integrity-Concurrency/fix8.5-delivery-value-constraints.md)
   - [x] **8.6: Concurrent Super Admin Protection** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
+  - [x] **8.7: Category Hierarchy Integrity** | C | [Details](Fix8-Database-Integrity-Concurrency/fix8.7-category-cycle-protection.md)
   - [x] **8.8: Manual Inventory Adjustment Audit** | C (implementation), E (privilege/routine review) | [Details](Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
   - [x] **8.9: Checkout & Admin Conflict Handling** | B | [Details](Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
   - [x] **8.10: Storefront & Report Regression Verification** | A (lead), C (report query support) | [Details](Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
   - [x] **8.11: Application & Migration Database Accounts** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
   - [ ] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
 
-<<<<<<< HEAD
 Fix 8 has 11/12 items complete (8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 8.10 & 8.11 Complete). Remaining item is 8.12 (integration rollout).
-=======
-Fix 8 has 10/12 items complete (8.1–8.9 and 8.11). 8.10 is In Progress: C's isolated catalog/report checks passed; A's browser checks and verification with B's completed 8.9 work remain. 8.12 integration rollout is pending.
->>>>>>> origin/dev
 
 ---
 
