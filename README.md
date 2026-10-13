@@ -172,5 +172,68 @@ This will run:
 
 ---
 
+## 🌐 Production Deployment (AWS EC2)
+
+The live production deployment is self-hosted on **AWS EC2** using a containerized multi-service stack orchestrated by Docker Compose.
+
+* **Live Storefront URL:** [http://18.208.53.186](http://18.208.53.186)
+* **Live Health Check:** [http://18.208.53.186/api/health](http://18.208.53.186/api/health)
+* **Elastic IP:** `18.208.53.186` (EC2 `t3.micro`, Region: `us-east-1`)
+* **Infrastructure Registry:** Detailed AWS CLI audit trail and provisioned resources are documented in [Docs/Deployment/aws-infrastructure.md](Docs/Deployment/aws-infrastructure.md).
+
+### Architecture Overview
+
+```text
+Incoming Traffic (HTTP 80 / HTTPS 443)
+                    │
+                    ▼
+     ┌──────────────────────────────┐
+     │    Nginx (Reverse Proxy)     │
+     └──────────────┬───────────────┘
+                    │
+         ┌──────────┴──────────┐
+         │ /api/*              │ /*
+         ▼                     ▼
+┌──────────────────┐  ┌──────────────────┐
+│ Express Backend  │  │ Next.js Frontend │
+│   (Port 5000)    │  │   (Port 3000)    │
+└────────┬─────────┘  └──────────────────┘
+         │
+         ▼
+┌──────────────────────────────────────────────┐
+│        PostgreSQL Engine (Port 5432)         │
+│  ├── brightbuy_prod (Live website data)      │
+│  └── brightbuy_dev  (Remote team dev data)   │
+└──────────────────────────────────────────────┘
+```
+
+### Remote Development Database (For Local Development)
+All team members can point their local `backend/.env` directly to the shared remote PostgreSQL engine on AWS without needing to run a local database:
+```env
+DB_HOST=18.208.53.186
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=BrightBuy2026SecurePass!
+DB_NAME=brightbuy_dev
+```
+> **Environment Isolation:** Team members connect exclusively to `brightbuy_dev`. The live production site connects exclusively to `brightbuy_prod`. Experiments, test runs, and seed resets in `brightbuy_dev` never touch or corrupt live production data.
+
+### Automated CI/CD Workflow (GitHub Actions)
+1. **Continuous Integration (`.github/workflows/ci.yml`):**
+   - Automatically triggers on every push and pull request targeting `main`.
+   - Starts a PostgreSQL test container with Flyway migrations.
+   - Runs Jest test suites (91 unit & integration tests) and product validation tests.
+   - Verifies Next.js production build (`npm run build`) and ESLint checks.
+   - Verifies backend and frontend production Docker images build successfully.
+2. **Continuous Deployment (`.github/workflows/cd.yml`):**
+   - Automatically triggers on push/merge to `main` upon passing CI checks.
+   - Securely SSHes into the EC2 instance using GitHub repository secrets (`EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY`).
+   - Pulls the latest `main` commit.
+   - Executes `docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build --remove-orphans`.
+   - Performs a curl health check verifying HTTP 200 OK before completing the deployment.
+
+---
+
 ## 👥 Team Assignments & Phase Tracking
 See [Docs/overallplan.md](Docs/overallplan.md) for full phase plans, subphases, and assigned team members.
+

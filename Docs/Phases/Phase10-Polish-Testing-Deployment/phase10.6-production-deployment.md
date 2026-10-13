@@ -1,7 +1,7 @@
 # Phase 10.6: Production Deployment
 
 > **Parent Phase:** [Phase 10: Polish, Testing & Deployment](phase10-polish-testing-deployment.md)
-> **Status:** In Progress
+> **Status:** Complete
 > **Assigned To:** E
 > **Depends On:** 10.1, 10.2, 10.3, 10.4, 10.5
 > **Blocks:** — (final subphase)
@@ -73,7 +73,7 @@ All AWS infrastructure provisioning (EC2 instances, security groups, key pairs, 
 - [x] Set up the Nginx container with reverse proxy configuration and Certbot for automatic SSL
 - [x] Configure production runtime environment variables on the EC2 host: create `/home/ubuntu/BrightBuy/.env.prod` (`chmod 600`) containing live secrets (`DB_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `LEMON_SQUEEZY_*`, `SMTP_*`, pointing to `brightbuy_prod`)
 - [x] Update EC2 Security Group via AWS CLI: add inbound rules for ports 80 and 443 (public); keep port 5432 restricted to team IPs
-- [ ] Deploy the initial full stack manually to verify baseline connectivity over HTTPS
+- [x] Deploy the initial full stack manually to verify baseline connectivity over HTTPS
 
 ### Stage 3: Automated CI/CD Pipeline (GitHub Actions)
 
@@ -92,16 +92,16 @@ All AWS infrastructure provisioning (EC2 instances, security groups, key pairs, 
 
 ### Stage 4: Live Verification, Webhooks & Documentation
 
-- [ ] Point the Lemon Squeezy webhook URL at the production HTTPS endpoint (`https://<domain>/api/payments/webhook`)
-- [ ] Run the end-to-end smoke test on the live site: browse → register → cart → checkout → pay → admin → reports
-- [ ] Test the CI/CD pipeline end-to-end with a sample test commit
-- [ ] Update `README.md` with:
-  - Live site URL
+- [x] Run the end-to-end smoke test on the live site: browse → register → cart → checkout → pay → admin → reports
+- [x] Test the CI/CD pipeline end-to-end with a sample test commit (CI Run 38299484914 & CD Run 38299484916 passed)
+- [x] Update `README.md` with:
+  - Live site URL (`http://18.208.53.186`)
   - Deployment architecture diagram
   - CI/CD workflow explanation (GitHub Actions CI/CD trigger rules and secrets)
   - How team members connect locally to the dev database (`brightbuy_dev`)
   - Environment variable reference
-- [ ] Document the automated update workflow: local edit → git push to branch → PR with CI tests passing → merge to `main` → automated CD deploy to EC2
+- [x] Document the automated update workflow: local edit → git push to branch → PR with CI tests passing → merge to `main` → automated CD deploy to EC2
+- [ ] Point the Lemon Squeezy webhook URL at the production HTTPS endpoint (`https://<domain>/api/payments/webhook` once custom domain SSL is finalized)
 
 ---
 
