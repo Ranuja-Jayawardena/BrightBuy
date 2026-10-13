@@ -1,6 +1,6 @@
 # Fix 8: Database Integrity & Concurrency
 
-> **Status:** In Progress (4 / 12 fix items complete; 8.1, 8.3, 8.6 & 8.7 Complete; V27 code exists, database verification pending)
+> **Status:** In Progress (5 / 12 fix items complete; 8.1, 8.2, 8.3, 8.6 & 8.7 Complete)
 > **Members:** A (storefront/reports), B (checkout/admin UI), C (catalog/inventory), D (cart/orders/payments), E (auth/database infrastructure)
 > **Priority:** Critical
 > **Master trackers:** [Fixes](../overallplan.md) | [Project](../../overallplan.md)
@@ -15,7 +15,7 @@ Protect existing checkout, payment, catalog, and staff workflows against invalid
 The code uses parameterized SQL through pg and application-managed transactions. Keep that architecture. Do not introduce an ORM, query builder, new authentication library, or wholesale stored-procedure rewrite.
 
 Verified during planning:
-- V27 defines timestamp triggers for products and product_variants; the backend assignments were removed. Applying V27 to a target database has not been verified.
+- V27 defines timestamp triggers for products and product_variants; backend assignments were removed. V27 triggers are verified on target PostgreSQL (`brightbuy_dev`) and via automated integration test suite (`npm run test:catalog-timestamp`).
 - Checkout locks variants, but reads the cart before those locks and clears all cart items at the end. Duplicate checkout and concurrent edits remain exposed.
 - Admin order transition validation happens before the model's transaction lock.
 - Payment success only skips orders currently paid. Payment failure updates by order_id without guarding completed payments. The webhook controller currently routes order_refunded through the failure handler and uses an in-memory deduplication set. Treat refund handling and event identity as explicit contract decisions.
@@ -32,7 +32,7 @@ These are source-code findings, not results from a live concurrency exercise. Th
 | Item | Assigned | Depends on | Status |
 | --- | --- | --- | --- |
 | [8.1: Contracts, Data Preflight & Migration Coordination](fix8.1-contracts-preflight.md) | E (lead), D (payments/cart), C (catalog) | Existing phase/fix baseline | Complete |
-| [8.2: Catalog Timestamp Migration Verification](fix8.2-catalog-timestamp-verification.md) | C (lead), E (migration verification) | 8.1 environment/migration audit | In Progress |
+| [8.2: Catalog Timestamp Migration Verification](fix8.2-catalog-timestamp-verification.md) | C (lead), E (migration verification) | 8.1 environment/migration audit | Complete — PostgreSQL 15 & automated test suite |
 | [8.3: Cart Uniqueness & Checkout Concurrency](fix8.3-cart-checkout-concurrency.md) | D | 8.1 cart/API contract | Complete |
 | [8.4: Order Transitions & Payment Event Consistency](fix8.4-order-payment-consistency.md) | D (lead), E (webhook infrastructure review), C (admin handoff) | 8.1 payment decisions; 8.3 lock contract | Not Started |
 | [8.5: Delivery Cardinality & Value Constraints](fix8.5-delivery-value-constraints.md) | D (lead), E (migration review) | 8.1 delivery decisions; 8.4 writer compatibility | Not Started |
