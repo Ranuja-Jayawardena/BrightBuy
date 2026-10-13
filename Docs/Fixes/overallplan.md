@@ -93,7 +93,7 @@ Fix 7 has 4/5 items complete (7.1, 7.2, 7.3, and 7.5). In `05_catalog_links.sql`
 - [ ] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
   - [x] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
   - [ ] **8.2: Catalog Timestamp Migration Verification** | C (catalog), E (migration/environment) | [Details](Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
-  - [ ] **8.3: Cart Uniqueness & Checkout Concurrency** | D | [Details](Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
+  - [x] **8.3: Cart Uniqueness & Checkout Concurrency** | D | [Details](Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
   - [ ] **8.4: Order Transitions & Payment Event Consistency** | D (implementation), E (webhook security review), C (admin order ownership handoff) | [Details](Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
   - [ ] **8.5: Delivery Cardinality & Value Constraints** | D; E reviews migration sequencing | [Details](Fix8-Database-Integrity-Concurrency/fix8.5-delivery-value-constraints.md)
   - [x] **8.6: Concurrent Super Admin Protection** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
@@ -104,7 +104,7 @@ Fix 7 has 4/5 items complete (7.1, 7.2, 7.3, and 7.5). In `05_catalog_links.sql`
   - [ ] **8.11: Application & Migration Database Accounts** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
   - [ ] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
 
-Fix 8 has 3/12 items complete (8.1, 8.6 & 8.7 Complete). Item 8.2 is In Progress; remaining items are Not Started.
+Fix 8 has 4/12 items complete (8.1, 8.3, 8.6 & 8.7 Complete). Item 8.2 is In Progress; remaining items are Not Started.
 
 ---
 

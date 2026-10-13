@@ -142,8 +142,13 @@ Table variant_attribute_values {
 
 Table carts {
   cart_id serial [pk]
-  customer_id int [ref: > customers.customer_id, not null]
+  customer_id int [unique, ref: > customers.customer_id, not null]
   created_at timestamp [default: `now()`]
+
+  indexes {
+    (customer_id) [unique, name: 'idx_carts_customer_id_unique']
+  }
+  note: 'Guarded by V29: Exactly one active cart per customer (D3).'
 }
 
 Table cart_items {
@@ -169,6 +174,22 @@ Table orders {
     customer_id
     (status, order_date)
   }
+}
+
+Table order_idempotency_keys {
+  key_id serial [pk]
+  customer_id int [ref: > customers.customer_id, delete: cascade, not null]
+  idempotency_key varchar(255) [not null]
+  request_hash varchar(64) [not null]
+  order_id int [ref: > orders.order_id, delete: set null]
+  response_body jsonb [not null]
+  created_at timestamp [default: `now()`]
+
+  indexes {
+    (customer_id, idempotency_key) [unique, name: 'uq_order_idempotency_customer_key']
+    (customer_id, idempotency_key) [name: 'idx_order_idempotency_lookup']
+  }
+  note: 'Introduced in V29: Durable idempotency mapping for checkout requests (D3).'
 }
 
 Table order_items {
