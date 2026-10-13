@@ -154,10 +154,10 @@ For every entry attach environment, UTC/client-date timestamp, app revision and 
 
 | Environment | Migration proof | S3/container/CORS | DB races and failure recovery | Browser/type/build | Backup/rollback | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| Local isolated | Pending | Pending | Pending | Baseline lint/build only; integration/type check pending | Pending | Unverified |
+| Local isolated | Pending | Passed (`npm run test:s3`, 5/5) | Pending | Baseline lint/build only; integration/type check pending | Pending | S3 Verified (6.1) |
 | CI | No explicit migration stage in reviewed source | No integration proof | Mocked baseline only | Existing build skips types | N/A | Needs correction |
 | Staging / representative upgrade | Pending | Pending | Pending | Pending | Pending | Unverified |
-| Production | Actual V26/V27 history unknown | Provisioning recorded, runtime verification pending | Not run | Not run | Pending | Not verified by this plan |
+| Production | Actual V26/V27 history unknown | Passed (T05 inside `brightbuy-backend-1`, 5/5) | Not run | Not run | Pending | S3 Container Verified (6.1) |
 
 The four subfixes become complete only when their named acceptance evidence exists. Production may remain pending authorization and must be reported that way; do not call the production cutover verified without target evidence. Keep this distinction in both master trackers.
 
