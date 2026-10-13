@@ -1,7 +1,7 @@
 # Fix 3.4: Product Image Upload & Route Serving Fix
 
 > **Parent Group:** [Fix 3: Admin Catalog & Media Management](fix3-admin-catalog-media.md)
-> **Status:** Not Started
+> **Status:** In Progress
 > **Assigned To:** Member C (Backend Middleware & Image Routes) & Member B (Admin Products UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -45,14 +45,14 @@
   - Add route alias `GET /images/:id` (redirecting or forwarding to `imageController.getImage`) so both `/api/images/:id` and `/api/products/images/:id` resolve cleanly.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/products/[id]/page.tsx`:
-  - Update image src to standard path: `/api/images/${img.image_id}`.
-  - Show proper loading spinner during image upload.
-  - Add primary image badge, sort order inputs, and deletion confirmation modal.
-- [ ] In `frontend/src/app/cart/page.tsx`:
-  - Update cart item image src from `/api/products/images/...` to `/api/images/...`.
-- [ ] (Optional Enhancement) In `frontend/src/app/admin/products/new/page.tsx`:
-  - Add informational notice explaining that product media galleries are configured after initial product creation, or allow primary image attachment on create.
+- [x] In `frontend/src/app/admin/products/[id]/page.tsx`:
+  - [x] Update image src to standard path: `/api/images/${img.image_id}`.
+  - [x] Show proper loading spinner during image upload.
+  - [x] Add primary image badge, sort order inputs, and deletion confirmation modal.
+- [x] In `frontend/src/app/cart/page.tsx`:
+  - [x] Update cart item image src from `/api/products/images/...` to `/api/images/...`.
+- [x] (Optional Enhancement) In `frontend/src/app/admin/products/new/page.tsx`:
+  - [x] Add informational notice explaining that product media galleries are configured after initial product creation, or allow primary image attachment on create.
 
 ---
 
