@@ -1,6 +1,6 @@
 # Fix 1: Customer Account & Storefront UX
 
-> **Status:** In Progress (2 / 4 fix items complete)
+> **Status:** In Progress (3 / 4 fix items complete)
 > **Members:** E (Backend Auth), A (Storefront UI), B (Frontend Auth/Addresses), C (Catalog Seed)
 > **Priority:** High
 > **Related Phases:** Phase 3 (Auth), Phase 4 (Browsing), Phase 1.4 (Addresses)
@@ -18,6 +18,7 @@ Fix 1 focuses on customer-facing account experience and storefront catalog accur
 
 - **1.1 Backend Profile & Password APIs (E):** Implemented `PUT /api/auth/profile` and `PUT /api/auth/password` in `authController.js` guarded by `requireAuth`.
 - **1.2 Dynamic Brand Filtering (C, A):** Added the active brands endpoint and replaced the storefront's hardcoded list with catalog-derived options, preserving the selected brand in the URL.
+- **1.3 Apparel Variant Matrix (C, A):** Completed the seeded apparel color and size matrix and made the storefront selector indicate availability and switch to real combinations.
 - **1.4 Address Form Cancel Feedback Fix:** Separated `onSuccess` and `onCancel` callbacks in `AddressForm` to prevent false success alert on modal dismiss or cancel, with clean form state resetting on `/addresses`.
 
 ---
@@ -28,7 +29,7 @@ Fix 1 focuses on customer-facing account experience and storefront catalog accur
 |---|----------|----------|------------|----------|--------|
 | 1.1 | [Customer Profile Management & Navigation](fix1.1-customer-profile-management.md) | E (API), A (UI) | — | High | In Progress |
 | 1.2 | [Dynamic Brand Filtering & Seed Catalog Alignment](fix1.2-brand-filtering-dynamic-catalog.md) | C (Backend/Seed), A (UI) | — | Medium | Complete |
-| 1.3 | [Apparel Variant Matrix Completeness](fix1.3-apparel-variant-matrix.md) | C (Seed), A (UI) | — | Medium | Not Started |
+| 1.3 | [Apparel Variant Matrix Completeness](fix1.3-apparel-variant-matrix.md) | C (Seed), A (UI) | — | Medium | Complete |
 | 1.4 | [Address Form Cancel Feedback Fix](fix1.4-address-form-cancel-feedback.md) | B (Frontend) | — | Low | Complete |
 
 ---
