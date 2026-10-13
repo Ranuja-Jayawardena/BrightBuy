@@ -68,6 +68,7 @@ Table categories {
   category_name varchar(100) [not null]
   parent_category_id int [ref: > categories.category_id]
   is_active boolean [not null, default: true]
+  note: 'V33 prevents parent cycles on INSERT/UPDATE and rejects category_id changes. Category writes use READ COMMITTED and a transaction advisory lock; the statement result is checked after multi-row writes.'
 
   indexes {
     parent_category_id
