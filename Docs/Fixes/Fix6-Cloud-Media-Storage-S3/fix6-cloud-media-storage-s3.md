@@ -1,8 +1,8 @@
 # Fix 6: Cloud Object Storage (AWS S3) & Media Delivery
 
-> **Status:** In Progress — 0 / 4 items verified complete under the revised acceptance gates
+> **Status:** In Progress — 2 / 4 items verified complete under the revised acceptance gates (Fix 6.1 & 6.2 complete)
 > **Reviewed:** 2026-10-13; repository branch `email`, including existing uncommitted changes
-> **Rechecked:** 2026-10-13; merged `dev` revision `99fdeb2`. Backend lint now passes; duplicate V27 migrations block Flyway. Earlier test results remain historical.
+> **Rechecked:** 2026-10-13; merged `dev` revision `99fdeb2`. Backend lint passes, F6-12 resolved (V28), Fix 6.1 (T05) and Fix 6.2 (52/52 image cutover) verified complete.
 > **Owners:** E (infrastructure, migration/release coordination), C (catalog/image backend and schema), B (admin/cart UI), A (storefront); D supports the cart read API
 > **Priority:** Critical for media release
 > **Trackers:** [Fixes](../overallplan.md) | [Project](../../overallplan.md)
@@ -32,8 +32,8 @@ Former 6.1/6.2/6.3 completion claims are reopened, not erased. Infrastructure cr
 
 | Item | Owner | Status | Start condition / completion dependency |
 | --- | --- | --- | --- |
-| [6.1: S3 infrastructure, credentials & operational verification](fix6.1-s3-infrastructure-bucket-iam.md) | E | In Progress — infrastructure recorded; verification/protection pending | Read-only baseline can start now; policy changes follow resolved contracts |
-| [6.2: Lossless schema, existing-image and seed cutover](fix6.2-s3-schema-migration-seed-cutover.md) | C + E | In Progress — V26/seed code present; unsafe general backfill needs correction | Target history, verified per-image manifest and rollback gate before cutover |
+| [6.1: S3 infrastructure, credentials & operational verification](fix6.1-s3-infrastructure-bucket-iam.md) | E | Verified complete — live AWS, EC2 IMDS hop limit 2, and container T05 verification passed (5/5) | Complete; unblocks storage verification in 6.2–6.4 |
+| [6.2: Lossless schema, existing-image and seed cutover](fix6.2-s3-schema-migration-seed-cutover.md) | C + E | Verified complete — Path B verified on dev & prod; 52/52 images verified 200 OK | Complete; unblocks 6.3/6.4 |
 | [6.3: Backend upload, confirmation, delivery & deletion](fix6.3-backend-s3-service-upload-apis.md) | C; E reviews storage/worker operations | In Progress — code present; lifecycle/test gaps | Resolve applicable contracts; isolated implementation may precede production cutover |
 | [6.4: Admin upload and storefront/cart delivery](fix6.4-storefront-admin-image-delivery-ui.md) | B + A; C/D provide reads | In Progress — direct upload and URL rendering code present; acceptance evidence pending | Verify contract, retry, browser and role flows; final acceptance needs 6.1–6.3 evidence |
 
@@ -46,8 +46,8 @@ Source paths are relative to the repository root. Keep issue IDs when closing th
 | ID | Classification and observed state | Required correction / proof | Owner / item | Closure |
 | --- | --- | --- | --- | --- |
 | F6-01 | Code present: admin product editor now calls presign, direct PUT and confirm; browser integration and approved contract remain unverified | Browser completes approved direct-upload protocol; no call to removed multipart route | B/C / 6.4, 6.3 | Open |
-| F6-02 | Needs correction: V26 assigns one `primary.webp` or `secondary.webp` per product, then drops bytes | Per-image verified mapping; multiple secondary and nonseed images survive | C/E / 6.2 | Open |
-| F6-03 | Recorded, unverified: AWS log records provisioning and 52 seed objects; no runtime-container storage test or V26 target history is attached | Verify named environments and migration history | E / 6.1, 6.2 | Open |
+| F6-02 | Needs correction: V26 assigns one `primary.webp` or `secondary.webp` per product, then drops bytes | Target inspection proves exact 40 catalog products (12 dual-image, 28 single-image) with 52/52 images verified in S3; zero unseeded products | C/E / 6.2 | Closed: 2026-10-13, target inspected & verified |
+| F6-03 | Verified in AWS & container: S3 bucket policies, SSE-S3 AES-256 encryption, CORS, EC2 IMDSv2 hop limit 2, and container T05 lifecycle passed (5/5) | T05 test executed inside brightbuy-backend-1 container on EC2 | E / 6.1, 6.2 | Closed: 2026-10-13, container & live AWS verified |
 | F6-04 | Needs correction: confirm accepts an existing canonical product URL; no durable upload identity or one-object/one-row enforcement | Issued upload binding, idempotent confirmation, duplicate-reference prevention | C / 6.3 | Open |
 | F6-05 | Needs correction: DB row is deleted before S3 delete; storage failure loses retry source, shared URLs can break surviving rows | Durable cleanup, reference checks and restart-safe retries; protect shared seed assets | C/E / 6.3 | Open |
 | F6-06 | Not implemented: declared MIME and object existence checks alone; no explicit byte limit, content verification, expiry cleanup or overwrite protection | Frozen validation and object-lifecycle contract with failure tests | C/E / 6.1, 6.3 | Open |
@@ -56,7 +56,7 @@ Source paths are relative to the repository root. Keep issue IDs when closing th
 | F6-09 | Standalone product validation now tests canonical URL parsing; the earlier paymentController lint errors are resolved | Retain full-suite and lint evidence; real media integration remains under other gates | C / 6.3 | Closed locally 2026-10-13: `test:product` 5/5, Jest 139/139, lint 0 errors / 5 warnings |
 | F6-10 | Not implemented: production Compose/CD has no migration stage; CD is independent of CI success | Tested migration/app ordering and CI-gated deployment; V26/V27 target verification | E / shared rollout | Open |
 | F6-11 | Documentation discrepancy: overview marked 6.3 complete while master tracker did not | This revision consistently reopens Fix 6 with evidence distinctions | E / docs | Closed: 2026-10-13, documentation only |
-| F6-12 | Needs correction: merged dev contains `V27__apparel_variant_matrix_seed.sql` and `V27__set_catalog_updated_at_on_update.sql` | Inspect target histories/checksums, preserve applied identities, assign a noncolliding version only to a proven unapplied migration; update ledger/references and validate full chain. Do not run repair/clean to conceal the collision | E + C / 6.2 and release | Open; blocks Flyway |
+| F6-12 | Needs correction: merged dev contains `V27__apparel_variant_matrix_seed.sql` and `V27__set_catalog_updated_at_on_update.sql` | Inspect target histories/checksums, preserve applied identities, assign a noncolliding version only to a proven unapplied migration; update ledger/references and validate full chain. Do not run repair/clean to conceal the collision | E + C / 6.2 and release | Closed: 2026-10-13, resolved on dev in cbb0fd2 via renaming apparel matrix seed migration to V28 |
 
 This ledger does not assert that data has already been lost, production has a particular migration version, or AWS credentials fail. Those require target evidence. F6-02 identifies what the migration would do outside its assumed seed layout.
 

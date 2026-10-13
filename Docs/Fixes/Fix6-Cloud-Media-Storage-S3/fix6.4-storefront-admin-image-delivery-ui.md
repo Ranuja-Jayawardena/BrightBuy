@@ -31,7 +31,7 @@ Confirm actual file locations before edits. B coordinates shared cart types/stor
 
 - [ ] Obtain resolved M2/M3/M5/M8 and actual examples: method/body, upload identity, required headers, size/type limits, expiry, confirm responses/replay/errors, processing behavior if any, delete/retry semantics and authorization.
 - [ ] Identify permanent URL fields precisely: list/card `primary_image_url`, detail/gallery `images[].image_url`, cart `primary_image_url`. Keep existing ID fields.
-- [ ] C demonstrates the migrated isolated backend; D supplies an actual cart response with the additive nullable URL. Do not guess that the current cart response already contains it.
+- [x] C demonstrates the migrated isolated backend; D supplies an actual cart response with the additive nullable URL (`primary_image_url` verified live with S3 URL and null fallback).
 - [ ] Record stale-tab/release behavior. Mock work can start after the contract is frozen; integrated completion waits for the working backend/storage.
 
 **Stop condition:** the server still accepts URL-only confirmation, the contract is unresolved or storage/CORS is unverified. Report the named dependency; continue independent UI/type preparation against approved mocks.
@@ -62,26 +62,26 @@ Do not call the removed multipart endpoint. Preserve the existing create-product
 | Navigation/reload interrupts confirm | Use the agreed recovery/refetch behavior; if identity retention is selected, store only allowed nonsensitive fields and clear them per M8 |
 | Processing/cleanup takes time | Show accurate pending state; do not display success based solely on storage PUT or pretend public bytes vanished immediately |
 
-- [ ] Preserve file/metadata after recoverable errors, and provide explicit retry/new-upload actions.
+- [x] Preserve file/metadata after recoverable errors, and provide explicit retry/new-upload actions.
 - [ ] Verify `apiFetch`'s automatic 401 replay with a confirm identity; the current helper reuses options, but actual integration still needs a test.
-- [ ] Keep user-facing error messages free of SQL constraint text, signatures and AWS internals.
+- [x] Keep user-facing error messages free of SQL constraint text, signatures and AWS internals.
 
 ## Step 4 — Preserve gallery mutations (B)
 
-- [ ] Keep primary badges, sort inputs and deletion modal; display permanent final URLs only after confirmation.
-- [ ] Primary/reorder requests use the frozen API and handle conflicts by refetching committed state. Avoid stale optimistic badges/order after a rejected write.
-- [ ] Delete success follows M8: remove/refetch the gallery row when accepted; if cleanup is pending, describe it accurately. On timeout/repeated request use the documented replay/refetch behavior.
-- [ ] Handle deleting the selected primary/preview without stale selection or a broken modal. Follow M5's no-primary/promotion rule rather than inventing one in the client.
-- [ ] Role loss during upload is handled on confirm; only permitted catalog staff see/use upload actions. Browser controls do not replace server authorization.
+- [x] Keep primary badges, sort inputs and deletion modal; display permanent final URLs only after confirmation.
+- [x] Primary/reorder requests use the frozen API and handle conflicts by refetching committed state. Avoid stale optimistic badges/order after a rejected write.
+- [x] Delete success follows M8: remove/refetch the gallery row when accepted; if cleanup is pending, describe it accurately. On timeout/repeated request use the documented replay/refetch behavior.
+- [x] Handle deleting the selected primary/preview without stale selection or a broken modal. Follow M5's no-primary/promotion rule rather than inventing one in the client.
+- [x] Role loss during upload is handled on confirm; only permitted catalog staff see/use upload actions. Browser controls do not replace server authorization.
 
 ## Step 5 — Use permanent URLs throughout reads (A/B with C/D)
 
-- [ ] Add typed URL fields without removing ID fields: `ProductSummary.primary_image_url?: string | null`, `ProductImage.image_url: string`, and the cart equivalent after D's response exists. Use the finalized API optionality; make a field required only when every supported response supplies it.
-- [ ] Cards use `primary_image_url`; detail selection can continue using `image_id` while rendering the selected object's `image_url`; gallery uses each `image_url`; cart uses its additive URL.
-- [ ] If old API responses need temporary compatibility, M8 explicitly defines legacy ID fallback and removal timing. On the final verified contract direct URLs are the normal path; null/missing image uses a placeholder.
-- [ ] Choose or create an actual local placeholder during implementation. Confirm the asset exists; the old `/placeholder-product.svg` path was a proposed name, not proof of a shipped file.
-- [ ] Handle URL load failures with a local fallback and guard against repeated onError loops. Include alt text and stable dimensions/layout. Reset fallback state when the image changes.
-- [ ] Retain listing/detail/cart behavior, active-product filtering, variant selection, out-of-stock controls and staff purchase restrictions.
+- [x] Add typed URL fields without removing ID fields: `ProductSummary.primary_image_url?: string | null`, `ProductImage.image_url: string`, and the cart equivalent after D's response exists. Use the finalized API optionality; make a field required only when every supported response supplies it.
+- [x] Cards use `primary_image_url`; detail selection can continue using `image_id` while rendering the selected object's `image_url`; gallery uses each `image_url`; cart uses its additive URL.
+- [x] If old API responses need temporary compatibility, M8 explicitly defines legacy ID fallback and removal timing. On the final verified contract direct URLs are the normal path; null/missing image uses a placeholder.
+- [x] Choose or create an actual local placeholder during implementation. Confirm the asset exists; the old `/placeholder-product.svg` path was a proposed name, not proof of a shipped file.
+- [x] Handle URL load failures with a local fallback and guard against repeated onError loops. Include alt text and stable dimensions/layout. Reset fallback state when the image changes.
+- [x] Retain listing/detail/cart behavior, active-product filtering, variant selection, out-of-stock controls and staff purchase restrictions.
 
 ### Image component configuration rule
 

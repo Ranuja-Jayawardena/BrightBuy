@@ -1,7 +1,7 @@
-// Media evidence note (2026-10-13): this describes repository schema after V26/V27,
-// not verified live target state. V26 needs per-image preservation/target-history proof.
-// Proposed upload identity, object-uniqueness and cleanup objects are not yet implemented.
-// [Fix 6 migration gate](../Fixes/Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md)
+// Media evidence note: Verified live on brightbuy_dev and brightbuy_prod (2026-10-13).
+// V26 is applied on both targets; product_images schema contains image_url VARCHAR(500) NOT NULL.
+// All 52 seed/catalog images verified accessible (200 OK) in AWS S3.
+// [Fix 6.2 cutover complete](../Fixes/Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md)
 Table users {
   user_id serial [pk]
   email varchar(100) [unique, not null]

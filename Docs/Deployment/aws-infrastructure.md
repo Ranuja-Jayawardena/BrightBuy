@@ -80,6 +80,8 @@
 | 2026-10-13 | `aws iam add-role-to-instance-profile ...` | Role added to profile | Linked `BrightBuy-EC2-S3-Access-Role` to instance profile |
 | 2026-10-13 | `aws ec2 associate-iam-instance-profile --instance-id i-0a19078299834fba2 ...` | `iip-assoc-0303cab1c6ce4f7a1` | Associated instance profile with live EC2 instance |
 | 2026-10-13 | `ssh ubuntu@18.208.53.186 ...` | `.env.prod` updated | Configured `AWS_REGION` and `AWS_S3_BUCKET_NAME` on EC2 |
+| 2026-10-13 | `aws ec2 modify-instance-metadata-options --instance-id i-0a19078299834fba2 --http-put-response-hop-limit 2 --http-endpoint enabled` | `HttpPutResponseHopLimit: 2`, `State: applied` | Increased IMDS hop limit to 2 to enable Docker bridge container credential access |
+| 2026-10-13 | `docker exec brightbuy-backend-1 node --test test/s3-infrastructure.test.js` | 5/5 tests passed (`duration_ms: 1128`) | T05 verification passed inside backend container on EC2: IAM role resolution, staging isolation, disposable lifecycle, CORS, seed delivery |
 
 ---
 

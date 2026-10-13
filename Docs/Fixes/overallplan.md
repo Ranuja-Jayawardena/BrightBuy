@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (14 / 35 fix items complete across 8 fix groups; Fix 6 reopened for verified acceptance)
+**Status:** In Progress (18 / 35 fix items complete across 8 fix groups; Fix 6.1, 6.2, 7.3 & 8.1 verified complete)
 
 ---
 
@@ -74,24 +74,24 @@ This document is the **master tracker** for all post-development fixes, patches,
   - [x] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
 
 - [ ] **Fix 6: Cloud Object Storage (AWS S3) & Media Delivery** → [fix6-cloud-media-storage-s3.md](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md)
-  - [ ] **6.1** AWS S3 Infrastructure, Bucket Security & EC2 IAM Integration — **E (DevOps)** → [fix6.1-s3-infrastructure-bucket-iam.md](Fix6-Cloud-Media-Storage-S3/fix6.1-s3-infrastructure-bucket-iam.md)
-  - [ ] **6.2** Database Schema Migration & S3 Seed Cutover — **C (DB), E (Architecture)** → [fix6.2-s3-schema-migration-seed-cutover.md](Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md)
+  - [x] **6.1** AWS S3 Infrastructure, Bucket Security & EC2 IAM Integration — **E (DevOps)** → [fix6.1-s3-infrastructure-bucket-iam.md](Fix6-Cloud-Media-Storage-S3/fix6.1-s3-infrastructure-bucket-iam.md)
+  - [x] **6.2** Database Schema Migration & S3 Seed Cutover — **C (DB), E (Architecture)** → [fix6.2-s3-schema-migration-seed-cutover.md](Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md)
   - [ ] **6.3** Backend S3 Service & Pre-signed Upload APIs — **C (API)** → [fix6.3-backend-s3-service-upload-apis.md](Fix6-Cloud-Media-Storage-S3/fix6.3-backend-s3-service-upload-apis.md)
   - [ ] **6.4** Storefront & Admin Direct Image Delivery & Upload UI — **A (UI), B (UI)** → [fix6.4-storefront-admin-image-delivery-ui.md](Fix6-Cloud-Media-Storage-S3/fix6.4-storefront-admin-image-delivery-ui.md)
 
-Fix 6 has **0/4 items verified complete under the revised gates**. 6.1–6.4 are In Progress: provisioning or code exists, but operational evidence and known corrections remain. The direct-upload and URL-rendering code is present; browser and lifecycle acceptance remain unverified. Earlier completion claims are retained as historical evidence in the [overview issue ledger](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md); they do not close the new gates. Start with the [shared contracts, verification and rollout guide](Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md). Recheck on merged dev `99fdeb2`: backend lint passes (0 errors / 5 warnings), the obsolete product image test still fails, and two V27 migrations block Flyway until F6-12 is resolved against target history.
+Fix 6 has **2/4 items verified complete under the revised gates** (6.1 and 6.2 verified complete; 52/52 images verified 200 OK in S3). 6.3–6.4 are In Progress. F6-12 migration collision is resolved (apparel seed matrix renamed to V28), backend lint passes (0 errors / 5 warnings), and standalone product validation passes (5/5).
 
 - [ ] **Fix 7: Consumer Technology Catalog Specialization** → [fix7-tech-catalog-specialization.md](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
   - [x] **7.1** Technology Taxonomy & Category Hierarchy Restructuring — **A (Taxonomy)** → [fix7.1-technology-taxonomy-hierarchy.md](Fix7-Tech-Catalog-Specialization/fix7.1-technology-taxonomy-hierarchy.md)
   - [ ] **7.2** Technology Product Catalog, Variant & Media Seed Alignment — **C (Products)** → [fix7.2-technology-product-catalog-seed.md](Fix7-Tech-Catalog-Specialization/fix7.2-technology-product-catalog-seed.md)
-  - [ ] **7.3** Catalog Links, Attribute Values & Order History Referential Integrity — **A (Links), D (Orders)** → [fix7.3-catalog-links-order-seed-integrity.md](Fix7-Tech-Catalog-Specialization/fix7.3-catalog-links-order-seed-integrity.md)
+  - [x] **7.3** Catalog Links, Attribute Values & Order History Referential Integrity — **A (Links), D (Orders)** → [fix7.3-catalog-links-order-seed-integrity.md](Fix7-Tech-Catalog-Specialization/fix7.3-catalog-links-order-seed-integrity.md)
   - [ ] **7.4** Database Reseed Orchestration, Flyway Verification & Storefront Validation — **E (DevOps), A (UI), B (UI)** → [fix7.4-database-reseed-pipeline-verification.md](Fix7-Tech-Catalog-Specialization/fix7.4-database-reseed-pipeline-verification.md)
   - [ ] **7.5** Cloud Media Assets, Tech Imagery & S3 Bucket Synchronization — **E (DevOps), C (Media)** → [fix7.5-cloud-media-assets-s3-sync.md](Fix7-Tech-Catalog-Specialization/fix7.5-cloud-media-assets-s3-sync.md)
 
-Fix 7.2 is In Progress: `04_products.sql` now defines 40 technology products, 65 variants and 80 primary/secondary URL rows. The SKU matrix is published. Fix 7.5 is also In Progress: all 80 local WebP assets pass format, dimension and size checks; sourced photo credits and generated-image provenance are recorded. S3 sync and public URL checks have not run. Fresh database execution and downstream links/orders remain pending. Do not mark 7.2 or 7.5 complete until every referenced image URL resolves.
+Fix 7 has 2/5 items complete (7.1 and 7.3). In `05_catalog_links.sql`, all 40 tech products map across 12 tech subcategories and 65 variants have tech attributes. In `07_orders.sql`, order items reference valid tech SKUs. Fix 7.2 remains in progress: `04_products.sql` defines 40 technology products, 65 variants and 80 primary/secondary image URL rows, with the SKU matrix published. For Fix 7.5, all 80 local WebP assets pass format, dimension and size checks; sourced photo credits and generated-image provenance are recorded. S3 sync, public URL checks and fresh database execution remain pending. Do not mark 7.2 or 7.5 complete until every referenced image URL resolves.
 
 - [ ] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
-  - [ ] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
+  - [x] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
   - [ ] **8.2: Catalog Timestamp Migration Verification** | C (catalog), E (migration/environment) | [Details](Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
   - [ ] **8.3: Cart Uniqueness & Checkout Concurrency** | D | [Details](Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
   - [ ] **8.4: Order Transitions & Payment Event Consistency** | D (implementation), E (webhook security review), C (admin order ownership handoff) | [Details](Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
@@ -104,7 +104,7 @@ Fix 7.2 is In Progress: `04_products.sql` now defines 40 technology products, 65
   - [ ] **8.11: Application & Migration Database Accounts** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
   - [ ] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
 
-Fix 8 has 0/12 items complete. Item 8.2 is In Progress because V27/backend timestamp edits already exist; actual database verification is pending. All other items are Not Started.
+Fix 8 has 1/12 items complete (8.1 Complete). Item 8.2 is In Progress because V27/backend timestamp edits already exist; actual database verification is pending. All other items are Not Started.
 
 ---
 
