@@ -60,7 +60,10 @@ async function sendEmail(toOrOptions, subject, html, text) {
     bodyText = text;
   }
 
-  const from = process.env.EMAIL_FROM || '"BrightBuy" <no-reply@brightbuy.local>';
+  const configuredFrom = process.env.EMAIL_FROM || process.env.SMTP_USER || 'no-reply@brightbuy.local';
+  const from = configuredFrom.includes('<')
+    ? configuredFrom
+    : { name: 'BrightBuy', address: configuredFrom };
 
   try {
     const activeTransporter = getTransporter();
