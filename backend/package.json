@@ -14,7 +14,8 @@
     "test:catalog-timestamp": "node --test test/catalog-timestamp-integration.test.js",
     "test:media-concurrency": "node --test test/s3-media-concurrency.test.js",
     "test:db-accounts": "node --test test/database-account-separation.test.js",
-    "test:inventory-audit": "node --test test/inventory-audit-integration.test.js"
+    "test:inventory-audit": "node --test test/inventory-audit-integration.test.js",
+    "test:regression": "node --test test/storefront-report-regression.test.js"
   },
   "jest": {
     "testMatch": [
