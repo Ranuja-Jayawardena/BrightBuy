@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '@/services/api';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -493,15 +494,16 @@ export default function EditProductPage() {
       }
 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Failed to save variant');
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || errData.error || 'Failed to save variant');
       }
 
       setIsVariantModalOpen(false);
       setEditingVariant(null);
-      fetchData();
+      await fetchData();
     } catch (err: any) {
-      alert(err.message);
+      alert(sanitizeConflictError(err, 'Failed to save variant'));
+      await fetchData();
     }
   };
 
@@ -509,10 +511,14 @@ export default function EditProductPage() {
     if (!confirm('Deactivate this variant?')) return;
     try {
       const res = await apiFetch(`/api/admin/variants/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to deactivate variant');
-      fetchData();
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || errData.error || 'Failed to deactivate variant');
+      }
+      await fetchData();
     } catch (err: any) {
-      alert(err.message);
+      alert(sanitizeConflictError(err, 'Failed to deactivate variant'));
+      await fetchData();
     }
   };
 

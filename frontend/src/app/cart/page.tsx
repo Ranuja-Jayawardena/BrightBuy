@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import { Button } from '@/components/ui/button';
 import { 
   Trash2, 
@@ -113,7 +114,9 @@ function CartContent() {
     try {
       await updateItem(cartItemId, newQty);
     } catch (err: any) {
-      setCartError(err.message || 'Unable to update item quantity.');
+      // Refetch authoritative cart state to clear stale or rolled back numbers
+      await useCartStore.getState().fetchCart();
+      setCartError(sanitizeConflictError(err, 'Unable to update item quantity.'));
     } finally {
       setUpdatingItemId(null);
     }
@@ -125,7 +128,8 @@ function CartContent() {
     try {
       await removeItem(cartItemId);
     } catch (err: any) {
-      setCartError(err.message || 'Unable to remove item from cart.');
+      await useCartStore.getState().fetchCart();
+      setCartError(sanitizeConflictError(err, 'Unable to remove item from cart.'));
     } finally {
       setRemovingId(null);
     }

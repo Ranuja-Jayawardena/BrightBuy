@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/services/api';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -144,15 +145,17 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         body: JSON.stringify({ status: nextStatus })
       });
 
+      const d = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || 'Failed to update order status');
+        throw new Error(d.message || d.error || 'Failed to update order status');
       }
 
       setSuccess(`Order status updated to ${nextStatus.toUpperCase()}`);
       await fetchOrder();
     } catch (err: any) {
-      setError(err.message);
+      setError(sanitizeConflictError(err, 'Failed to update order status'));
+      // Refetch authoritative state to clear any stale optimistic UI
+      await fetchOrder();
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -174,15 +177,16 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         })
       });
 
+      const d = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || 'Failed to update delivery');
+        throw new Error(d.message || d.error || 'Failed to update delivery');
       }
 
       setSuccess('Delivery details successfully updated');
       await fetchOrder();
     } catch (err: any) {
-      setError(err.message);
+      setError(sanitizeConflictError(err, 'Failed to update delivery'));
+      await fetchOrder();
     } finally {
       setIsUpdatingDelivery(false);
     }

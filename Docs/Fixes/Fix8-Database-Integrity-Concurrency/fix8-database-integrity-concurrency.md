@@ -1,6 +1,6 @@
 # Fix 8: Database Integrity & Concurrency
 
-> **Status:** In Progress (9 / 12 fix items complete; 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8 & 8.11 Complete)
+> **Status:** In Progress (10 / 12 fix items complete; 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9 & 8.11 Complete)
 > **Members:** A (storefront/reports), B (checkout/admin UI), C (catalog/inventory), D (cart/orders/payments), E (auth/database infrastructure)
 > **Priority:** Critical
 > **Master trackers:** [Fixes](../overallplan.md) | [Project](../../overallplan.md)
@@ -39,7 +39,7 @@ These are source-code findings, not results from a live concurrency exercise. Th
 | [8.6: Concurrent Super Admin Protection](fix8.6-super-admin-protection.md) | E | 8.1 staff contract | Complete |
 | [8.7: Category Hierarchy Integrity](fix8.7-category-cycle-protection.md) | C | 8.1 category contract | Complete — isolated PostgreSQL 15 verification |
 | [8.8: Manual Inventory Adjustment Audit](fix8.8-inventory-audit.md) | C (lead), E (permissions review) | 8.1 audit decision; 8.2 timestamp baseline; 8.3/8.4 lock contract | Complete — transactional model audit & V34 immutability trigger |
-| [8.9: Checkout & Admin Conflict Handling](fix8.9-checkout-admin-ui.md) | B | 8.3–8.8 API handoffs; mock work after 8.1 | Not Started |
+| [8.9: Checkout & Admin Conflict Handling](fix8.9-checkout-admin-ui.md) | B | 8.3–8.8 API handoffs; mock work after 8.1 | Complete |
 | [8.10: Storefront & Report Regression Verification](fix8.10-storefront-report-regression.md) | A (lead), C (report query support) | 8.2–8.5, 8.7–8.9; actual Fix 6 baseline | Not Started |
 | [8.11: Application & Migration Database Accounts](fix8.11-database-account-separation.md) | E | 8.1 privilege audit; 8.2–8.8 final database objects | Complete — V35 role provisioning & least-privilege grants |
 | [8.12: PostgreSQL Integration Tests & Controlled Rollout](fix8.12-integration-rollout.md) | E (lead), A/B/C/D (area verification) | 8.1–8.11; test-harness preparation may start after 8.1 | Not Started |
