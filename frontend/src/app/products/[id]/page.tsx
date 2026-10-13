@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const { addItem, isLoading: isCartLoading } = useCartStore();
   
   const productId = params.id as string;
@@ -26,6 +26,7 @@ export default function ProductDetailPage() {
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [addedSuccess, setAddedSuccess] = useState(false);
+  const [showStaffRestrictedModal, setShowStaffRestrictedModal] = useState(false);
 
   const loadProduct = async () => {
     try {
@@ -106,6 +107,11 @@ export default function ProductDetailPage() {
       router.push(`/login?redirect=/products/${productId}`);
       return;
     }
+
+    if (user?.role === 'admin') {
+      setShowStaffRestrictedModal(true);
+      return;
+    }
     
     try {
       await addItem(variantId, qty);
@@ -113,8 +119,13 @@ export default function ProductDetailPage() {
       setTimeout(() => {
         setAddedSuccess(false);
       }, 3000);
-    } catch (error: any) {
-      alert(error.message || 'Failed to add item to cart');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to add item to cart';
+      if (message.toLowerCase().includes('staff') || message.toLowerCase().includes('customer') || message.toLowerCase().includes('forbidden')) {
+        setShowStaffRestrictedModal(true);
+      } else {
+        alert(message);
+      }
     }
   };
 
@@ -379,9 +390,46 @@ export default function ProductDetailPage() {
               SKU: {selectedVariant ? selectedVariant.variant_sku : product.base_sku}
             </p>
           </div>
-
         </div>
       </div>
+
+      {/* Staff Purchase Restricted Modal */}
+      {showStaffRestrictedModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card border rounded-2xl max-w-md w-full p-6 shadow-xl animate-in fade-in-50 zoom-in-95 duration-150">
+            <div className="flex items-center gap-3.5 mb-4">
+              <div className="p-3 rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                <AlertCircle className="w-6 h-6 shrink-0" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-foreground">Staff Account Restricted</h3>
+                <p className="text-xs text-muted-foreground">Store Purchasing Policy</p>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Employees and administrators cannot make store purchases or add items to cart. Please log out and sign in with a standard customer account to place orders.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row justify-end gap-2.5">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowStaffRestrictedModal(false)}
+              >
+                Continue Browsing
+              </Button>
+              <Button 
+                variant="destructive"
+                onClick={async () => {
+                  setShowStaffRestrictedModal(false);
+                  await logout();
+                  router.push('/login');
+                }}
+              >
+                Log Out
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

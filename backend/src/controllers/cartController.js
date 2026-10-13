@@ -12,7 +12,7 @@ const getCart = async (req, res) => {
     try {
         const customer_id = req.user ? req.user.customer_id : null;
         if (!customer_id) {
-            return res.status(403).json({ error: 'forbidden', message: 'Only customers can have carts', statusCode: 403 });
+            return res.status(403).json({ error: 'forbidden', message: 'Administrative and staff accounts cannot create or modify shopping carts', statusCode: 403 });
         }
         
         const cart_id = await cartModel.getOrCreateCart(customer_id);
@@ -48,7 +48,7 @@ const addItem = async (req, res) => {
     try {
         const customer_id = req.user ? req.user.customer_id : null;
         if (!customer_id) {
-            return res.status(403).json({ error: 'forbidden', message: 'Only customers can add items to cart', statusCode: 403 });
+            return res.status(403).json({ error: 'forbidden', message: 'Administrative and staff accounts cannot create or modify shopping carts', statusCode: 403 });
         }
         
         const { variant_id, quantity } = req.body || {};
@@ -93,7 +93,7 @@ const updateItemQuantity = async (req, res) => {
     try {
         const customer_id = req.user ? req.user.customer_id : null;
         if (!customer_id) {
-            return res.status(403).json({ error: 'forbidden', message: 'Only customers can update cart items', statusCode: 403 });
+            return res.status(403).json({ error: 'forbidden', message: 'Administrative and staff accounts cannot create or modify shopping carts', statusCode: 403 });
         }
         
         if (!isPositiveInt(req.params.id)) {
@@ -141,7 +141,7 @@ const removeItem = async (req, res) => {
     try {
         const customer_id = req.user ? req.user.customer_id : null;
         if (!customer_id) {
-            return res.status(403).json({ error: 'forbidden', message: 'Only customers can remove cart items', statusCode: 403 });
+            return res.status(403).json({ error: 'forbidden', message: 'Administrative and staff accounts cannot create or modify shopping carts', statusCode: 403 });
         }
         
         if (!isPositiveInt(req.params.id)) {

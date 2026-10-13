@@ -1,7 +1,7 @@
 # Fix 4.1: Staff Cart & Purchase Policy Enforcement
 
 > **Parent Group:** [Fix 4: Role Permissions & Operations](fix4-role-permissions-operations.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member B (Frontend Cart UI & Navbar) & Member D (Backend Cart API)
 > **Depends On:** —
 > **Blocks:** —
@@ -45,16 +45,16 @@ In `frontend/src/app/products/[id]/page.tsx`:
 ## Tasks
 
 ### Backend — Member D
-- [ ] In `backend/src/controllers/cartController.js`:
-  - Verify all cart endpoints (`GET /api/cart`, `POST /api/cart/items`, `PUT /api/cart/items/:id`, `DELETE /api/cart/items/:id`) enforce customer-only access and return 403 Forbidden for staff accounts.
+- [x] In `backend/src/controllers/cartController.js`:
+  - [x] Verify all cart endpoints (`GET /api/cart`, `POST /api/cart/items`, `PUT /api/cart/items/:id`, `DELETE /api/cart/items/:id`) enforce customer-only access and return 403 Forbidden for staff accounts.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/components/Navbar.tsx`:
-  - Conditionally render the cart icon only when `user?.role !== 'admin'`.
-- [ ] In `frontend/src/app/products/[id]/page.tsx`:
-  - Add `StaffPurchaseRestrictedModal` triggered whenever a staff user attempts to add items to cart.
-- [ ] In `frontend/src/app/cart/page.tsx`:
-  - Add route protection redirecting staff to `/admin` or displaying the restriction banner.
+- [x] In `frontend/src/components/Navbar.tsx`:
+  - [x] Conditionally render the cart icon only when `user?.role !== 'admin'`.
+- [x] In `frontend/src/app/products/[id]/page.tsx`:
+  - [x] Add `StaffPurchaseRestrictedModal` triggered whenever a staff user attempts to add items to cart.
+- [x] In `frontend/src/app/cart/page.tsx`:
+  - [x] Add route protection redirecting staff to `/admin` or displaying the restriction banner.
 
 ---
 

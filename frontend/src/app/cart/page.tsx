@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
 import { Button } from '@/components/ui/button';
 import { 
@@ -20,6 +22,37 @@ import {
 } from 'lucide-react';
 
 export default function CartPage() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      const timer = setTimeout(() => {
+        router.replace('/admin');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [user, router]);
+
+  if (user?.role === 'admin') {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-24 text-center">
+        <div className="w-16 h-16 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <AlertCircle className="h-8 w-8" />
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight mb-2">Staff Account Restricted</h2>
+        <p className="text-muted-foreground mb-6 text-sm leading-relaxed">
+          Employees and administrators cannot maintain shopping carts or make store purchases. Redirecting you to the admin management dashboard...
+        </p>
+        <Link href="/admin">
+          <Button className="gap-2">
+            Go to Admin Dashboard <ArrowRight className="w-4 h-4" />
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <ProtectedRoute>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

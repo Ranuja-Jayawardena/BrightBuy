@@ -66,7 +66,7 @@ This document is the **master tracker** for all post-development fixes, patches,
   - [ ] **3.4** Product Image Upload & Route Serving Fix — **C (API), B (UI)** → [fix3.4-product-image-upload-serving.md](Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md)
 
 - [ ] **Fix 4: Role Permissions & Operations** → [fix4-role-permissions-operations.md](Fix4-Role-Permissions-Operations/fix4-role-permissions-operations.md)
-  - [ ] **4.1** Staff Cart & Purchase Policy Enforcement — **B (UI), D (API)** → [fix4.1-staff-cart-purchase-restriction.md](Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md)
+  - [x] **4.1** Staff Cart & Purchase Policy Enforcement — **B (UI), D (API)** → [fix4.1-staff-cart-purchase-restriction.md](Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md)
   - [ ] **4.2** Super Admin Employee Management & Deactivation — **E (DB/API), B (UI)** → [fix4.2-employee-lifecycle-role-management.md](Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md)
   - [ ] **4.3** Order Fulfillment: Courier Tracking vs. Store Pickup — **D (API), B (UI)** → [fix4.3-order-delivery-mode-fulfillment.md](Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md)
 
