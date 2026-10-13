@@ -5,7 +5,11 @@ jest.mock('../src/models/adminProductModel', () => ({
   productExists: jest.fn(), createImage: jest.fn(), setProductActiveStatus: jest.fn(),
 }));
 jest.mock('../src/models/adminCategoryModel', () => ({ findCategoryById: jest.fn() }));
-jest.mock('../src/models/imageModel', () => ({ findImageDataById: jest.fn() }));
+jest.mock('../src/models/imageModel', () => ({ findImageUrlById: jest.fn() }));
+jest.mock('../src/services/s3Service', () => ({
+  generatePresignedUploadUrl: jest.fn(), keyFromPublicUrl: jest.fn(),
+  objectExists: jest.fn(), deleteS3Object: jest.fn(),
+}));
 jest.mock('../src/config/db', () => ({ query: jest.fn(), on: jest.fn() }));
 
 const products = require('../src/services/adminProductService');
@@ -14,6 +18,7 @@ const categories = require('../src/services/adminCategoryService');
 const categoryModel = require('../src/models/adminCategoryModel');
 const imageModel = require('../src/models/imageModel');
 const imageService = require('../src/services/imageService');
+const s3Service = require('../src/services/s3Service');
 const imageController = require('../src/controllers/imageController');
 const db = require('../src/config/db');
 const salesController = require('../src/controllers/salesReportController');
@@ -89,29 +94,35 @@ describe('category hierarchy', () => {
 });
 
 describe('image upload and retrieval', () => {
-  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00]);
+  const imageUrl = 'https://bucket.s3.us-east-1.amazonaws.com/products/7/example.webp';
 
-  test('validates bytes and stores image metadata', async () => {
+  test('validates image URL and stores image metadata', async () => {
     productModel.productExists.mockResolvedValue(true);
-    productModel.createImage.mockResolvedValue({ image_id: 4, product_id: 7, sort_order: 1, is_primary: true });
-    await expect(products.createImage(7, { buffer: png }, { sort_order: '1', is_primary: 'true' })).resolves.toEqual({ image: expect.objectContaining({ image_id: 4 }) });
-    expect(productModel.createImage).toHaveBeenCalledWith(expect.objectContaining({ image_data: png, sort_order: 1, is_primary: true }));
-    await expect(products.createImage(7, { buffer: Buffer.from('invalid') }, {})).rejects.toMatchObject({ status: 400 });
+    s3Service.keyFromPublicUrl.mockReturnValue('products/7/example.webp');
+    s3Service.objectExists.mockResolvedValue(true);
+    productModel.createImage.mockResolvedValue({ image_id: 4, product_id: 7, image_url: imageUrl, sort_order: 1, is_primary: true });
+    await expect(products.createImage(7, { image_url: imageUrl, sort_order: '1', is_primary: 'true' })).resolves.toEqual({ image: expect.objectContaining({ image_id: 4, image_url: imageUrl }) });
+    expect(productModel.createImage).toHaveBeenCalledWith(expect.objectContaining({ image_url: imageUrl, sort_order: 1, is_primary: true }));
+    s3Service.keyFromPublicUrl.mockReturnValue(null);
+    await expect(products.createImage(7, { image_url: 'https://evil.example/image' })).rejects.toMatchObject({ status: 400 });
     expect(productModel.createImage).toHaveBeenCalledTimes(1);
   });
 
-  test('returns binary content and supports conditional GET', async () => {
-    imageModel.findImageDataById.mockResolvedValue({ image_data: png });
+  test('presigns only allowed image types for existing products', async () => {
+    productModel.productExists.mockResolvedValue(true);
+    s3Service.generatePresignedUploadUrl.mockResolvedValue({ uploadUrl: 'signed', fileKey: 'products/7/key.webp', publicUrl: imageUrl });
+    await expect(products.presignImage(7, { contentType: 'image/webp', fileName: 'front.webp' })).resolves.toMatchObject({ uploadUrl: 'signed' });
+    await expect(products.presignImage(7, { contentType: 'image/gif', fileName: 'front.gif' })).rejects.toMatchObject({ status: 400 });
+  });
+
+  test('redirects legacy image route to S3', async () => {
+    imageModel.findImageUrlById.mockResolvedValue({ image_url: imageUrl });
     const result = await imageService.getImageById(4);
-    expect(result).toMatchObject({ imageData: png, mimeType: 'image/png' });
-    const res = { set: jest.fn(), status: jest.fn().mockReturnThis(), send: jest.fn(), end: jest.fn() };
+    expect(result).toMatchObject({ image_url: imageUrl });
+    const res = { redirect: jest.fn(), status: jest.fn().mockReturnThis() };
     const next = jest.fn();
-    await imageController.getImage({ params: { id: '4' }, headers: {} }, res, next);
-    expect(res.set).toHaveBeenCalledWith(expect.objectContaining({ 'Content-Type': 'image/png', ETag: result.etag }));
-    expect(res.send).toHaveBeenCalledWith(png);
-    await imageController.getImage({ params: { id: '4' }, headers: { 'if-none-match': result.etag } }, res, next);
-    expect(res.status).toHaveBeenCalledWith(304);
-    expect(res.end).toHaveBeenCalled();
+    await imageController.getImage({ params: { id: '4' } }, res, next);
+    expect(res.redirect).toHaveBeenCalledWith(302, imageUrl);
     expect(next).not.toHaveBeenCalled();
   });
 });

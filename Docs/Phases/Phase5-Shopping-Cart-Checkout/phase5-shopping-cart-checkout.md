@@ -76,4 +76,11 @@ This cart and checkout flow is extended and refined by the following post-develo
 - **[Fix 4.1: Staff Cart & Purchase Policy Enforcement](../../Fixes/Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md):** Enforces business rule prohibiting admin and employee accounts from placing orders; displays clear modal explaining policy and suppresses cart icon in navigation for staff.
 - **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Standardizes delivery modes (`pickup` vs `home_delivery`) during order creation and defines fulfillment rules.
 
+## Fix 7 follow-up
 
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.3: Cart Uniqueness & Checkout Concurrency](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.3-cart-checkout-concurrency.md)
+- [Fix 7.9: Checkout & Admin Conflict Handling](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.9-checkout-admin-ui.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

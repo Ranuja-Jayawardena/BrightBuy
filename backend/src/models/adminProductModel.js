@@ -54,6 +54,11 @@ async function findProducts({ page, limit, search }) {
         ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.image_id ASC
         LIMIT 1
       ) AS primary_image_id,
+      (
+        SELECT pi.image_url FROM product_images pi
+        WHERE pi.product_id = p.product_id
+        ORDER BY pi.is_primary DESC, pi.sort_order ASC, pi.image_id ASC LIMIT 1
+      ) AS primary_image_url,
       COALESCE(v.variant_count, 0) AS variant_count,
       COALESCE(v.total_stock, 0) AS total_stock,
       COALESCE(
@@ -116,7 +121,7 @@ async function findProductDetail(productId) {
 
 async function findProductImages(productId) {
   const result = await db.query(`
-    SELECT image_id, sort_order, is_primary, created_at
+    SELECT image_id, image_url, sort_order, is_primary, created_at
     FROM product_images
     WHERE product_id = $1
     ORDER BY is_primary DESC, sort_order ASC, image_id ASC
@@ -204,8 +209,7 @@ async function updateProduct(productId, { product_name, brand, description, base
         brand = CASE WHEN $3::boolean THEN $4 ELSE brand END,
         description = CASE WHEN $5::boolean THEN $6 ELSE description END,
         base_sku = COALESCE($7, base_sku),
-        is_active = COALESCE($8, is_active),
-        updated_at = CURRENT_TIMESTAMP
+        is_active = COALESCE($8, is_active)
       WHERE product_id = $1
       RETURNING product_id, product_name, brand, description, base_sku, is_active, created_at, updated_at
     `, [
@@ -240,7 +244,7 @@ async function updateProduct(productId, { product_name, brand, description, base
 async function setProductActiveStatus(productId, isActive) {
   const result = await db.query(`
     UPDATE products
-    SET is_active = $2, updated_at = CURRENT_TIMESTAMP
+    SET is_active = $2
     WHERE product_id = $1
     RETURNING product_id, product_name, brand, description, base_sku, is_active, created_at, updated_at
   `, [productId, isActive]);
@@ -250,7 +254,7 @@ async function setProductActiveStatus(productId, isActive) {
 async function softDeleteProduct(productId) {
   const result = await db.query(`
     UPDATE products
-    SET is_active = false, updated_at = CURRENT_TIMESTAMP
+    SET is_active = false
     WHERE product_id = $1
     RETURNING product_id, product_name, brand, description, base_sku, is_active, created_at, updated_at
   `, [productId]);
@@ -267,7 +271,7 @@ async function replaceProductCategories(client, productId, categoryIds) {
   }
 }
 
-async function createImage({ product_id, image_data, sort_order, is_primary }) {
+async function createImage({ product_id, image_url, sort_order, is_primary }) {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
@@ -275,10 +279,10 @@ async function createImage({ product_id, image_data, sort_order, is_primary }) {
       await client.query('UPDATE product_images SET is_primary = false WHERE product_id = $1', [product_id]);
     }
     const result = await client.query(`
-      INSERT INTO product_images (product_id, image_data, sort_order, is_primary)
+      INSERT INTO product_images (product_id, image_url, sort_order, is_primary)
       VALUES ($1, $2, $3, $4)
-      RETURNING image_id, product_id, sort_order, is_primary, created_at
-    `, [product_id, image_data, sort_order, is_primary]);
+      RETURNING image_id, product_id, image_url, sort_order, is_primary, created_at
+    `, [product_id, image_url, sort_order, is_primary]);
     await client.query('COMMIT');
     return result.rows[0];
   } catch (error) {
@@ -293,7 +297,7 @@ async function updateImage(imageId, { sort_order, is_primary }) {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
-    const existing = await client.query('SELECT image_id, product_id, sort_order, is_primary FROM product_images WHERE image_id = $1', [imageId]);
+    const existing = await client.query('SELECT image_id, product_id, image_url, sort_order, is_primary FROM product_images WHERE image_id = $1', [imageId]);
     if (existing.rowCount === 0) {
       await client.query('ROLLBACK');
       return null;
@@ -307,7 +311,7 @@ async function updateImage(imageId, { sort_order, is_primary }) {
       UPDATE product_images
       SET sort_order = $2, is_primary = $3
       WHERE image_id = $1
-      RETURNING image_id, product_id, sort_order, is_primary, created_at
+      RETURNING image_id, product_id, image_url, sort_order, is_primary, created_at
     `, [imageId, sort_order === undefined ? image.sort_order : sort_order, nextPrimary]);
     await client.query('COMMIT');
     return result.rows[0];
@@ -323,7 +327,7 @@ async function deleteImage(imageId) {
   const result = await db.query(`
     DELETE FROM product_images
     WHERE image_id = $1
-    RETURNING image_id, product_id, sort_order, is_primary
+    RETURNING image_id, product_id, image_url, sort_order, is_primary
   `, [imageId]);
   return result.rows[0] || null;
 }
@@ -359,8 +363,7 @@ async function updateVariant(variantId, { variant_sku, variant_name, price, stoc
         variant_sku = COALESCE($2, variant_sku),
         variant_name = COALESCE($3, variant_name),
         price = COALESCE($4, price),
-        stock_quantity = COALESCE($5, stock_quantity),
-        updated_at = CURRENT_TIMESTAMP
+        stock_quantity = COALESCE($5, stock_quantity)
       WHERE variant_id = $1
       RETURNING variant_id, product_id, variant_sku, variant_name, price, stock_quantity, is_active
     `, [variantId, variant_sku, variant_name || null, price, stock_quantity]);
@@ -384,7 +387,7 @@ async function updateVariant(variantId, { variant_sku, variant_name, price, stoc
 async function softDeleteVariant(variantId) {
   const result = await db.query(`
     UPDATE product_variants
-    SET is_active = false, updated_at = CURRENT_TIMESTAMP
+    SET is_active = false
     WHERE variant_id = $1
     RETURNING variant_id, product_id, variant_sku, variant_name, price, stock_quantity, is_active
   `, [variantId]);
