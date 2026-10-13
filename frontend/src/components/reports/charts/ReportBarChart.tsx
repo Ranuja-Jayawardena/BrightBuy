@@ -26,6 +26,7 @@ export interface ReportBarChartProps {
   description?: string;
   height?: number;
   layout?: 'horizontal' | 'vertical';
+  yAxisWidth?: number;
   formatYAxis?: (val: number) => string;
   formatTooltip?: (value: any, name: string) => [string, string];
   emptyMessage?: string;
@@ -45,6 +46,7 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
   description,
   height = 320,
   layout = 'horizontal',
+  yAxisWidth = 140,
   formatYAxis,
   formatTooltip,
   emptyMessage = 'No data available for the selected period.',
@@ -90,9 +92,9 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
             <BarChart
               data={data}
               layout={layout}
-              margin={{ top: 10, right: 20, left: 10, bottom: 20 }}
+              margin={isVertical ? { top: 10, right: 30, left: 10, bottom: 10 } : { top: 10, right: 20, left: 10, bottom: 20 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.6} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.6} horizontal={!isVertical} vertical={isVertical} />
               {isVertical ? (
                 <>
                   <XAxis
@@ -110,7 +112,7 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
                     tick={{ fill: '#64748b', fontSize: 12 }}
                     tickLine={false}
                     axisLine={{ stroke: '#cbd5e1' }}
-                    width={155}
+                    width={yAxisWidth || 155}
                   />
                 </>
               ) : (
@@ -147,7 +149,7 @@ export const ReportBarChart: React.FC<ReportBarChartProps> = ({
                   dataKey={bar.key}
                   name={bar.name}
                   fill={bar.fill}
-                  radius={[4, 4, 0, 0]}
+                  radius={isVertical ? [0, 4, 4, 0] : [4, 4, 0, 0]}
                 />
               ))}
             </BarChart>

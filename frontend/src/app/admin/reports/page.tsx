@@ -252,7 +252,7 @@ export default function AdminReportsOverviewPage() {
             ]}
             title="Top Performing Products"
             description="Best sellers ranked by total generated revenue"
-            height={320}
+            height={360}
             formatYAxis={(val) => `$${(val / 1000).toFixed(0)}k`}
             formatTooltip={(val) => [`$${Number(val).toLocaleString()}`, 'Revenue']}
             isLoading={loading}

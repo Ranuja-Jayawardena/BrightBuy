@@ -43,7 +43,7 @@
 ### Storefront UI — Member A
 - [x] Update `frontend/src/app/products/page.tsx`:
   - Remove hardcoded `BRANDS` constant.
-  - Fetch available brands dynamically from `/api/products/brands` on component mount.
+  - Fetch available brands dynamically from `/api/products/brands` on component mount (with graceful fallback to loaded catalog brands).
   - Render brand filter chips/list dynamically with count or clean labels.
   - Preserve active filter state in query params (`?brand=Apple`).
 

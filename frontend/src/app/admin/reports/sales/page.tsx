@@ -257,6 +257,7 @@ export default function AdminReportsSalesPage() {
           ]}
           title="Top Products by Revenue"
           description="Leading revenue generators across catalog"
+          height={360}
           formatYAxis={(val) => `$${(val / 1000).toFixed(0)}k`}
           formatTooltip={(val) => [`$${Number(val).toLocaleString()}`, 'Revenue']}
           emptyMessage="No product sales recorded in this period."

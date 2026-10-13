@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (11 / 14 fix items complete across 5 fix groups)
+**Status:** Complete (14 / 14 fix items complete across 5 fix groups)
 
 ---
 
@@ -49,15 +49,15 @@ This document is the **master tracker** for all post-development fixes, patches,
 
 ## Fix Progress Tracker
 
-- [ ] **Fix 1: Customer Account & Storefront UX** → [fix1-customer-account-storefront.md](Fix1-Customer-Account-Storefront/fix1-customer-account-storefront.md)
-  - [ ] **1.1** Customer Profile Management & Navigation — **E (API), A (UI)** → [fix1.1-customer-profile-management.md](Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md)
+- [x] **Fix 1: Customer Account & Storefront UX** → [fix1-customer-account-storefront.md](Fix1-Customer-Account-Storefront/fix1-customer-account-storefront.md)
+  - [x] **1.1** Customer Profile Management & Navigation — **E (API), A (UI)** → [fix1.1-customer-profile-management.md](Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md)
   - [x] **1.2** Dynamic Brand Filtering & Seed Catalog Alignment — **C (Seed/API), A (UI)** → [fix1.2-brand-filtering-dynamic-catalog.md](Fix1-Customer-Account-Storefront/fix1.2-brand-filtering-dynamic-catalog.md)
   - [x] **1.3** Apparel Variant Matrix Completeness — **C (Seed), A (UI)** → [fix1.3-apparel-variant-matrix.md](Fix1-Customer-Account-Storefront/fix1.3-apparel-variant-matrix.md)
   - [x] **1.4** Address Form Cancel Feedback Fix — **B (UI)** → [fix1.4-address-form-cancel-feedback.md](Fix1-Customer-Account-Storefront/fix1.4-address-form-cancel-feedback.md)
 
-- [ ] **Fix 2: Search & Filter Performance** → [fix2-search-filter-performance.md](Fix2-Search-Filter-Performance/fix2-search-filter-performance.md)
-  - [ ] **2.1** Price Range Filtering & Composite Indexing — **C (DB/API), A (UI)** → [fix2.1-price-range-filter-indexing.md](Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md)
-  - [ ] **2.2** Search Autocomplete & pg_trgm GIN Indexing — **C (DB/API), A (UI)** → [fix2.2-search-autocomplete-suggestions.md](Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md)
+- [x] **Fix 2: Search & Filter Performance** → [fix2-search-filter-performance.md](Fix2-Search-Filter-Performance/fix2-search-filter-performance.md)
+  - [x] **2.1** Price Range Filtering & Composite Indexing — **C (DB/API), A (UI)** → [fix2.1-price-range-filter-indexing.md](Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md)
+  - [x] **2.2** Search Autocomplete & pg_trgm GIN Indexing — **C (DB/API), A (UI)** → [fix2.2-search-autocomplete-suggestions.md](Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md)
 
 - [x] **Fix 3: Admin Catalog & Media Management** → [fix3-admin-catalog-media.md](Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md)
   - [x] **3.1** Admin Sticky Sidebar Layout — **B (UI)** → [fix3.1-admin-sidebar-sticky-layout.md](Fix3-Admin-Catalog-Media/fix3.1-admin-sidebar-sticky-layout.md)

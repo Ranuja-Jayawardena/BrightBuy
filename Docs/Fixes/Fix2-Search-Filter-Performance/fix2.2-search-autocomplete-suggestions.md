@@ -1,7 +1,7 @@
 # Fix 2.2: Search Autocomplete & pg_trgm GIN Indexing
 
 > **Parent Group:** [Fix 2: Search & Filter Performance](fix2-search-filter-performance.md)
-> **Status:** In Progress (C backend complete; A UI pending)
+> **Status:** Complete
 > **Assigned To:** Member C (Backend Models & Search Index) & Member A (Storefront Search Dropdown UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -70,7 +70,7 @@ LIMIT 6;
 - [x] Update `Docs/Database/DB_Schema.md`.
 
 ### Storefront UI — Member A
-- [ ] In `frontend/src/components/Navbar.tsx` and/or storefront search input:
+- [x] In `frontend/src/components/Navbar.tsx` and/or storefront search input:
   - Add debounced input hook (250ms).
   - Fetch suggestions from `/api/products/suggestions?q={query}` when query >= 2 chars.
   - Display elegant floating suggestions dropdown menu (product title, brand, category tag).

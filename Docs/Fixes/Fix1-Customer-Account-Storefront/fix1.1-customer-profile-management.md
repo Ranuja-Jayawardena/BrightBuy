@@ -1,7 +1,7 @@
 # Fix 1.1: Customer Profile Management & Navigation
 
 > **Parent Group:** [Fix 1: Customer Account & Storefront UX](fix1-customer-account-storefront.md)
-> **Status:** In Progress
+> **Status:** Complete
 > **Assigned To:** Member E (Backend Auth & Profile API) & Member A (Storefront Profile UI & Navbar)
 > **Depends On:** —
 > **Blocks:** —
@@ -40,12 +40,12 @@
 - [x] Wire routes into `backend/src/routes/authRoutes.js` protected with `requireAuth`.
 
 ### Frontend — Member A
-- [ ] Create `/profile` page in `frontend/src/app/profile/page.tsx`:
+- [x] Create `/profile` page in `frontend/src/app/profile/page.tsx`:
   - Protected with `ProtectedRoute`.
   - Display personal information form (`first_name`, `last_name`, `email` [read-only], `phone`).
   - Provide a separate "Change Password" section/tab with current password, new password, and confirmation fields.
   - Show clear success and error alerts.
-- [ ] Update `frontend/src/components/Navbar.tsx`:
+- [x] Update `frontend/src/components/Navbar.tsx`:
   - For logged-in customers, replace the plain text greeting with an interactive user menu or explicit links:
     - Profile (`/profile`)
     - My Orders (`/orders`)

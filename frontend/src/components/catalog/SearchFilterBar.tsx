@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import React from 'react';
+import { SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { SearchAutocomplete } from './SearchAutocomplete';
 
 interface SearchFilterBarProps {
   searchQuery: string;
@@ -20,31 +21,17 @@ export function SearchFilterBar({
   onSortChange,
   brands
 }: SearchFilterBarProps) {
-  // Local state for debouncing
-  const [localSearch, setLocalSearch] = useState(searchQuery);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onSearchChange(localSearch);
-    }, 400); // 400ms debounce
-
-    return () => clearTimeout(timer);
-  }, [localSearch, onSearchChange]);
-
   return (
     <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
       
-      {/* Search Bar */}
-      <div className="relative w-full md:max-w-md group">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
-          <Search size={18} />
-        </div>
-        <input
-          type="text"
-          placeholder="Search for products..."
-          value={localSearch}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
-          className="w-full bg-slate-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-900 transition-all outline-none"
+      {/* Search Bar with Autocomplete Suggestions */}
+      <div className="w-full md:max-w-md">
+        <SearchAutocomplete
+          value={searchQuery}
+          onSearchSubmit={(q: string) => onSearchChange(q)}
+          onQueryChange={(q: string) => onSearchChange(q)}
+          placeholder="Search products by name or brand..."
+          variant="catalog"
         />
       </div>
 

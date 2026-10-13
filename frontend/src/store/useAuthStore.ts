@@ -7,8 +7,10 @@ export interface User {
   role: string;
   first_name?: string;
   last_name?: string;
+  phone?: string | null;
   employee_id?: number;
   employee_role?: 'super_admin' | 'inventory_manager' | 'order_dispatcher' | 'catalog_manager' | 'analyst';
+  is_active?: boolean;
 }
 
 export interface AuthState {
@@ -19,12 +21,17 @@ export interface AuthState {
   register: (data: Record<string, string>) => Promise<void>;
   logout: () => Promise<void>;
   fetchMe: () => Promise<void>;
+  updateProfile: (data: { first_name: string; last_name: string; phone?: string | null }) => Promise<User>;
+  updatePassword: (passwords: { current_password: string; new_password: string }) => Promise<void>;
+  setUser: (user: User | null) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true, // Start true until fetchMe completes
+
+  setUser: (user) => set({ user }),
 
   login: async (credentials) => {
     set({ isLoading: true });
@@ -94,6 +101,38 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     } catch (error) {
       set({ user: null, isAuthenticated: false, isLoading: false });
+    }
+  },
+
+  updateProfile: async (data) => {
+    const res = await apiFetch('/api/auth/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to update profile');
+    }
+
+    const resData = await res.json();
+    if (resData.user) {
+      set({ user: resData.user });
+    }
+    return resData.user;
+  },
+
+  updatePassword: async (passwords) => {
+    const res = await apiFetch('/api/auth/password', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(passwords),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to update password');
     }
   },
 }));

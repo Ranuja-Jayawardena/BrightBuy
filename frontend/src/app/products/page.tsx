@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { catalogService } from '@/services/catalogService';
 import { Category, ProductSummary, PaginationMeta } from '@/types/catalog';
-import { CategorySidebar } from '@/components/catalog/CategorySidebar';
+import { ProductFilterSidebar } from '@/components/catalog/ProductFilterSidebar';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { SearchFilterBar } from '@/components/catalog/SearchFilterBar';
 import { Pagination } from '@/components/catalog/Pagination';
@@ -31,6 +31,8 @@ function ProductsContent() {
   const categoryId = searchParams.get('category_id') ? parseInt(searchParams.get('category_id')!, 10) : null;
   const brand = searchParams.get('brand') || 'All';
   const sort = searchParams.get('sort') || '';
+  const minPrice = searchParams.get('min_price') || '';
+  const maxPrice = searchParams.get('max_price') || '';
 
   // Dynamic SEO Title update
   useEffect(() => {
@@ -71,6 +73,25 @@ function ProductsContent() {
     router.push(`${pathname}${query}`);
   }, [searchParams, router, pathname]);
 
+  const updatePriceParams = useCallback((min: string | null, max: string | null) => {
+    const current = new URLSearchParams(searchParams.toString());
+    if (min === null || min === '') {
+      current.delete('min_price');
+    } else {
+      current.set('min_price', min);
+    }
+    if (max === null || max === '') {
+      current.delete('max_price');
+    } else {
+      current.set('max_price', max);
+    }
+    current.set('page', '1');
+
+    const queryString = current.toString();
+    const query = queryString ? `?${queryString}` : '';
+    router.push(`${pathname}${query}`);
+  }, [searchParams, router, pathname]);
+
   const loadData = useCallback(async () => {
     let isMounted = true;
     try {
@@ -88,7 +109,9 @@ function ProductsContent() {
         search,
         category_id: categoryId || undefined,
         brand: brand !== 'All' ? brand : undefined,
-        sort
+        sort,
+        min_price: minPrice || undefined,
+        max_price: maxPrice || undefined,
       });
 
       if (isMounted) {
@@ -103,13 +126,14 @@ function ProductsContent() {
     } finally {
       if (isMounted) setLoading(false);
     }
-  }, [page, search, categoryId, brand, sort, categories.length]);
+  }, [page, search, categoryId, brand, sort, minPrice, maxPrice, categories.length]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  const hasActiveFilters = Boolean(search || (brand && brand !== 'All') || categoryId);
+  const hasPriceFilter = Boolean(minPrice || maxPrice);
+  const hasActiveFilters = Boolean(search || (brand && brand !== 'All') || categoryId || hasPriceFilter);
   const activeCategory = categoryId 
     ? categories.flatMap((c: Category) => [c, ...(c.children || [])]).find((c: Category) => c.category_id === categoryId)
     : null;
@@ -137,10 +161,13 @@ function ProductsContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="flex flex-col lg:flex-row gap-8">
           
-          <CategorySidebar 
+          <ProductFilterSidebar 
             categories={categories} 
             selectedCategoryId={categoryId} 
             onSelectCategory={(id: number | null) => updateUrlParams('category_id', id ? id.toString() : null)} 
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            onPriceChange={updatePriceParams}
           />
 
           <div className="flex-1">
@@ -162,7 +189,7 @@ function ProductsContent() {
                 {search && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
                     Search: &quot;{search}&quot;
-                    <button onClick={() => updateUrlParams('search', null)} className="hover:text-blue-900">
+                    <button type="button" onClick={() => updateUrlParams('search', null)} className="hover:text-blue-900" aria-label="Remove search filter">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -170,7 +197,7 @@ function ProductsContent() {
                 {brand !== 'All' && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
                     Brand: {brand}
-                    <button onClick={() => updateUrlParams('brand', null)} className="hover:text-blue-900">
+                    <button type="button" onClick={() => updateUrlParams('brand', null)} className="hover:text-blue-900" aria-label="Remove brand filter">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -178,12 +205,26 @@ function ProductsContent() {
                 {activeCategory && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
                     Category: {activeCategory.category_name}
-                    <button onClick={() => updateUrlParams('category_id', null)} className="hover:text-blue-900">
+                    <button type="button" onClick={() => updateUrlParams('category_id', null)} className="hover:text-blue-900" aria-label="Remove category filter">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+                {hasPriceFilter && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
+                    Price: {minPrice && maxPrice ? `$${minPrice} – $${maxPrice}` : minPrice ? `≥ $${minPrice}` : `≤ $${maxPrice}`}
+                    <button
+                      type="button"
+                      onClick={() => updatePriceParams(null, null)}
+                      className="hover:text-blue-900 ml-0.5"
+                      aria-label="Remove price filter"
+                    >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 <button
+                  type="button"
                   onClick={() => router.push('/products')}
                   className="ml-auto text-blue-600 hover:text-blue-800 font-semibold underline underline-offset-2"
                 >
