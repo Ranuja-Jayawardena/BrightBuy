@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { apiFetch } from '@/services/api';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -137,9 +138,11 @@ export default function AdminCategoriesPage() {
       setIsCreating(false);
       setEditingCategory(null);
       setFormData({ category_name: '', parent_category_id: '', is_active: true });
-      fetchCategories();
+      await fetchCategories();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to save category');
+      setError(sanitizeConflictError(err, 'Failed to save category'));
+      // Retain form input so user does not lose changes, but refetch authoritative category list
+      await fetchCategories();
     } finally {
       setIsSubmitting(false);
     }
@@ -163,14 +166,15 @@ export default function AdminCategoriesPage() {
 
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || 'Failed to update category status');
+        throw new Error(d.message || d.error || 'Failed to update category status');
       }
 
       setSuccess(`Category "${categoryName}" marked as ${nextStatus ? 'Active' : 'Inactive'}.`);
     } catch (err: unknown) {
-      // Revert optimistic update
+      // Revert optimistic update and refetch authoritative state
       setCategories((prev) => updateCategoryInTree(prev, id, currentStatus));
-      setError(err instanceof Error ? err.message : 'Failed to update category status');
+      setError(sanitizeConflictError(err, 'Failed to update category status'));
+      await fetchCategories();
     } finally {
       setTogglingId(null);
     }

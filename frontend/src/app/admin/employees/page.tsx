@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiFetch } from '@/services/api';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -165,9 +166,10 @@ export default function AdminEmployeesPage() {
 
       setSuccess(`Employee ${formData.first_name} ${formData.last_name} (${formData.email}) registered as ${STAFF_ROLES.find(r => r.value === formData.role)?.label || formData.role} successfully.`);
       closeCreateModal();
-      fetchEmployees();
+      await fetchEmployees();
     } catch (err: any) {
-      setFormError(err.message);
+      setFormError(sanitizeConflictError(err, 'Failed to register new employee'));
+      await fetchEmployees();
     } finally {
       setIsSubmitting(false);
     }
@@ -204,7 +206,9 @@ export default function AdminEmployeesPage() {
       );
       setSuccess(data.message || `Employee ${nextStatus ? 'activated' : 'deactivated'} successfully.`);
     } catch (err: any) {
-      setError(err.message);
+      setError(sanitizeConflictError(err, 'Failed to update employee status'));
+      // Authoritative state refetch: Revert any optimistic drift or database rollback
+      await fetchEmployees();
     } finally {
       setTogglingId(null);
     }
@@ -279,8 +283,10 @@ export default function AdminEmployeesPage() {
 
       setSuccess(`Employee ${editFormData.first_name.trim()} ${editFormData.last_name.trim()} updated successfully.`);
       closeEditModal();
+      await fetchEmployees();
     } catch (err: any) {
-      setEditFormError(err.message);
+      setEditFormError(sanitizeConflictError(err, 'Failed to update employee'));
+      await fetchEmployees();
     } finally {
       setIsEditSubmitting(false);
     }

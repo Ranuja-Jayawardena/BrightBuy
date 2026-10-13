@@ -97,14 +97,13 @@ Fix 7 is complete (5/5 items complete: 7.1, 7.2, 7.3, 7.4, and 7.5). In `05_cata
   - [x] **8.4: Order Transitions & Payment Event Consistency** | D (implementation), E (webhook security review), C (admin order ownership handoff) | [Details](Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
   - [x] **8.5: Delivery Cardinality & Value Constraints** | D; E reviews migration sequencing | [Details](Fix8-Database-Integrity-Concurrency/fix8.5-delivery-value-constraints.md)
   - [x] **8.6: Concurrent Super Admin Protection** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
-  - [x] **8.7: Category Hierarchy Integrity** | C | [Details](Fix8-Database-Integrity-Concurrency/fix8.7-category-cycle-protection.md)
   - [x] **8.8: Manual Inventory Adjustment Audit** | C (implementation), E (privilege/routine review) | [Details](Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
-  - [ ] **8.9: Checkout & Admin Conflict Handling** | B | [Details](Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+  - [x] **8.9: Checkout & Admin Conflict Handling** | B | [Details](Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
   - [x] **8.10: Storefront & Report Regression Verification** | A (lead), C (report query support) | [Details](Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
   - [x] **8.11: Application & Migration Database Accounts** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
   - [ ] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
 
-Fix 8 has 10/12 items complete (8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.10 & 8.11 Complete). Remaining items are Not Started or pending dependency completion.
+Fix 8 has 11/12 items complete (8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 8.10 & 8.11 Complete). Remaining item is 8.12 (integration rollout).
 
 ---
 
@@ -154,7 +153,7 @@ Replace the apparel and home catalog seed with a coherent consumer technology ta
 
 Database-enforced integrity, cart/checkout locking and retries, payment-event consistency, staff/category guards, inventory audit, separate database accounts, and real PostgreSQL verification. Owners follow AGENTS.md: A storefront/reports; B checkout/admin UI; C catalog/inventory; D orders/payments; E staff/migrations/deployment. Begin with 8.1 decisions and preflight; do not infer production migrations have run. Views and new reporting features remain deferred.
 
-**Priority:** Critical | **Progress:** 0/12 complete
+**Priority:** Critical | **Progress:** 10/12 complete
 
 [Full details](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
 
