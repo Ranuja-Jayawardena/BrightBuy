@@ -38,7 +38,7 @@ These are source-code findings, not results from a live concurrency exercise. Th
 | [8.5: Delivery Cardinality & Value Constraints](fix8.5-delivery-value-constraints.md) | D (lead), E (migration review) | 8.1 delivery decisions; 8.4 writer compatibility | Complete |
 | [8.6: Concurrent Super Admin Protection](fix8.6-super-admin-protection.md) | E | 8.1 staff contract | Complete |
 | [8.7: Category Hierarchy Integrity](fix8.7-category-cycle-protection.md) | C | 8.1 category contract | Complete — isolated PostgreSQL 15 verification |
-| [8.8: Manual Inventory Adjustment Audit](fix8.8-inventory-audit.md) | C (lead), E (permissions review) | 8.1 audit decision; 8.2 timestamp baseline; 8.3/8.4 lock contract | Complete — transactional model audit & V34 immutability trigger |
+| [8.8: Manual Inventory Adjustment Audit](fix8.8-inventory-audit.md) | C (lead), E (permissions review) | 8.1 audit decision; 8.2 timestamp baseline; 8.3/8.4 lock contract | Complete implementation — V34 and isolated PostgreSQL test pass; runtime-role/browser checks in 8.11/8.9 |
 | [8.9: Checkout & Admin Conflict Handling](fix8.9-checkout-admin-ui.md) | B | 8.3–8.8 API handoffs; mock work after 8.1 | Not Started |
 | [8.10: Storefront & Report Regression Verification](fix8.10-storefront-report-regression.md) | A (lead), C (report query support) | 8.2–8.5, 8.7–8.9; actual Fix 6 baseline | Not Started |
 | [8.11: Application & Migration Database Accounts](fix8.11-database-account-separation.md) | E | 8.1 privilege audit; 8.2–8.8 final database objects | Complete — V35 role provisioning & least-privilege grants |

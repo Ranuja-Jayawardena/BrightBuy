@@ -151,7 +151,7 @@ Table product_variants {
   variant_sku varchar(50) [unique, not null]
   variant_name varchar(100)
   price decimal(10,2) [not null, note: 'CHECK price >= 0']
-  stock_quantity int [not null, default: 0, note: 'CHECK stock_quantity >= 0']
+  stock_quantity int [not null, default: 0, note: 'CHECK stock_quantity >= 0; manual audit is written by backend transaction']
   is_active boolean [not null, default: true]
   updated_at timestamp [default: `now()`, note: 'V27 row trigger sets transaction timestamp on every UPDATE, including no-op updates']
 
@@ -359,4 +359,19 @@ Table email_jobs {
   indexes {
     (next_attempt_at, job_id)
   }
+}
+
+Table inventory_adjustments {
+  adjustment_id serial [pk]
+  variant_id int [ref: > product_variants.variant_id, not null]
+  employee_id int [ref: > employees.employee_id, not null]
+  previous_quantity int [not null]
+  new_quantity int [not null]
+  reason varchar(255) [not null, note: 'V34 CHECK rejects blank reasons']
+  created_at timestamp [default: `now()`]
+
+  indexes {
+    variant_id
+  }
+  note: 'V34 rejects UPDATE/DELETE of history and checks nonnegative, changed quantities. Existing rows are retained.'
 }

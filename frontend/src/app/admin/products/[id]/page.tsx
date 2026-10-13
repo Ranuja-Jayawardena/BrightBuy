@@ -95,6 +95,7 @@ export default function EditProductPage() {
   // Variant modal state
   const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
   const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
+  const [stockReason, setStockReason] = useState('');
   const [variantForm, setVariantForm] = useState({
     variant_sku: '',
     variant_name: '',
@@ -474,7 +475,10 @@ export default function EditProductPage() {
         ...variantForm,
         variant_name: variantForm.variant_name || null,
         price: Number(variantForm.price),
-        stock_quantity: Number(variantForm.stock_quantity)
+        stock_quantity: Number(variantForm.stock_quantity),
+        ...(editingVariant && Number(variantForm.stock_quantity) !== editingVariant.stock_quantity
+          ? { reason: stockReason.trim() }
+          : {})
       };
 
       let res;
@@ -494,11 +498,12 @@ export default function EditProductPage() {
 
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.error || 'Failed to save variant');
+        throw new Error(errData.message || errData.error || 'Failed to save variant');
       }
 
       setIsVariantModalOpen(false);
       setEditingVariant(null);
+      setStockReason('');
       fetchData();
     } catch (err: any) {
       alert(err.message);
@@ -621,6 +626,7 @@ export default function EditProductPage() {
               <Button size="sm" onClick={() => {
                 setEditingVariant(null);
                 setVariantForm({ variant_sku: '', variant_name: '', price: '', stock_quantity: '0', attributes: [] });
+                setStockReason('');
                 setIsVariantModalOpen(true);
               }}>
                 <Plus className="w-4 h-4 mr-2" /> Add Variant
@@ -655,6 +661,7 @@ export default function EditProductPage() {
                         stock_quantity: String(v.stock_quantity),
                         attributes: [...v.attributes]
                       });
+                      setStockReason('');
                       setIsVariantModalOpen(true);
                     }}>Edit</Button>
                     <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDeleteVariant(v.variant_id)}>
@@ -902,6 +909,18 @@ export default function EditProductPage() {
                   <Input required type="number" min="0" value={variantForm.stock_quantity} onChange={e => setVariantForm({...variantForm, stock_quantity: e.target.value})} />
                 </div>
               </div>
+              {editingVariant && Number(variantForm.stock_quantity) !== editingVariant.stock_quantity && (
+                <div className="space-y-2">
+                  <Label htmlFor="stock-reason">Reason for stock change *</Label>
+                  <Input
+                    id="stock-reason"
+                    required
+                    maxLength={255}
+                    value={stockReason}
+                    onChange={e => setStockReason(e.target.value)}
+                  />
+                </div>
+              )}
               
               <div className="pt-2">
                 <div className="flex justify-between items-center mb-2">
