@@ -1,7 +1,7 @@
 # Fix 7.2: Technology Product Catalog, Variant & Media Seed Alignment
 
 > **Parent Group:** [Fix 7: Consumer Technology Catalog Specialization](fix7-tech-catalog-specialization.md)  
-> **Status:** In Progress — seed SQL and SKU matrix updated; S3 objects and database execution unverified
+> **Status:** In Progress — Member C seed and local media work verified; S3 objects and database execution unverified
 > **Assigned To:** Member C (Backend Products & Seed Data)  
 > **Depends On:** [Fix 7.1: Technology Taxonomy Hierarchy](fix7.1-technology-taxonomy-hierarchy.md)  
 > **Blocks:** [Fix 7.3](fix7.3-catalog-links-order-seed-integrity.md), [Fix 7.4](fix7.4-database-reseed-pipeline-verification.md)  
@@ -54,7 +54,7 @@
 ### 2. Publish New Tech SKU Matrix
 - [x] Publish the complete list of 40 `base_sku` values and associated `variant_sku` values in the shared table below for Member A (`05_catalog_links.sql`) and Member D (`07_orders.sql`).
 
-The SQL now has 40 tech products, 65 variants and 80 image URL records. New SKU values were checked against the table below. The URL rows are present, but their S3 objects are supplied by Fix 7.5 and have not been verified. Fresh database execution and downstream `05_catalog_links.sql` / `07_orders.sql` integration belong to Fix 7.4 and 7.3 respectively. Do not reseed an existing shared database with this file.
+The SQL now has 40 tech products, 65 variants and 80 image URL records. `node scripts/validate-fix7.2-seed.cjs` checks SKU references and image mappings; `node scripts/validate-seed-images.cjs` checks all 80 local WebP files. Both pass. The URL rows are present, but S3 still serves old 34-byte placeholders for sampled primary URLs and returns 403 for a sampled secondary URL (checked 2026-10-13). Member E owns the S3 sync in Fix 7.5. Fresh database execution belongs to Fix 7.4, and downstream `05_catalog_links.sql` / `07_orders.sql` integration belongs to Fix 7.3. Do not reseed an existing shared database with this file or mark 7.2 complete until the public image URLs serve the intended assets.
 
 ---
 
