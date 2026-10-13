@@ -21,12 +21,12 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user?.role !== 'admin') {
       fetchCart();
     } else {
       clearCart();
     }
-  }, [isAuthenticated, fetchCart, clearCart]);
+  }, [isAuthenticated, user?.role, fetchCart, clearCart]);
 
   const handleLogout = async () => {
     try {
@@ -64,16 +64,18 @@ export function Navbar() {
 
         {/* Right Navigation - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link href="/cart">
-            <Button variant="ghost" size="sm" className="relative hover:bg-slate-100 dark:hover:bg-zinc-800">
-              <ShoppingCart className="h-5 w-5 text-slate-700 dark:text-zinc-300" />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white shadow">
-                  {itemCount}
-                </span>
-              )}
-            </Button>
-          </Link>
+          {user?.role !== 'admin' && (
+            <Link href="/cart">
+              <Button variant="ghost" size="sm" className="relative hover:bg-slate-100 dark:hover:bg-zinc-800">
+                <ShoppingCart className="h-5 w-5 text-slate-700 dark:text-zinc-300" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white shadow">
+                    {itemCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          )}
 
           {!isLoading && (
             <>
@@ -114,16 +116,18 @@ export function Navbar() {
 
         {/* Mobile Actions & Toggle */}
         <div className="flex md:hidden items-center space-x-2">
-          <Link href="/cart">
-            <Button variant="ghost" size="sm" className="relative p-2">
-              <ShoppingCart className="h-5 w-5" />
-              {itemCount > 0 && (
-                <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
-                  {itemCount}
-                </span>
-              )}
-            </Button>
-          </Link>
+          {user?.role !== 'admin' && (
+            <Link href="/cart">
+              <Button variant="ghost" size="sm" className="relative p-2">
+                <ShoppingCart className="h-5 w-5" />
+                {itemCount > 0 && (
+                  <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+                    {itemCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          )}
 
           <Button
             variant="ghost"
