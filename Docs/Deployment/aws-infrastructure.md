@@ -82,6 +82,7 @@
 | 2026-10-13 | `ssh ubuntu@18.208.53.186 ...` | `.env.prod` updated | Configured `AWS_REGION` and `AWS_S3_BUCKET_NAME` on EC2 |
 | 2026-10-13 | `aws ec2 modify-instance-metadata-options --instance-id i-0a19078299834fba2 --http-put-response-hop-limit 2 --http-endpoint enabled` | `HttpPutResponseHopLimit: 2`, `State: applied` | Increased IMDS hop limit to 2 to enable Docker bridge container credential access |
 | 2026-10-13 | `docker exec brightbuy-backend-1 node --test test/s3-infrastructure.test.js` | 5/5 tests passed (`duration_ms: 1128`) | T05 verification passed inside backend container on EC2: IAM role resolution, staging isolation, disposable lifecycle, CORS, seed delivery |
+| 2026-10-13 | `aws s3 sync backend/db/seed/assets/ s3://brightbuy-media-storage-695945476492/products/ --exclude "SOURCES.md" --content-type "image/webp" --cache-control "public, max-age=31536000, immutable"` | 80 objects synced (40 primary + 40 secondary WebP) | Fix 7.5: Synced specialized consumer technology media assets; 80/80 URLs verified HTTP 200 |
 
 ---
 

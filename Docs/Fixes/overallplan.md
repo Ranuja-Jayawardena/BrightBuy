@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (19 / 35 fix items complete across 8 fix groups; Fix 6.1, 6.2, 7.3, 8.1 & 8.6 verified complete)
+**Status:** In Progress (21 / 35 fix items complete across 8 fix groups; Fix 6.1, 6.2, 7.1, 7.2, 7.3, 7.5, 8.1 & 8.6 verified complete)
 
 ---
 
@@ -83,12 +83,12 @@ Fix 6 has **2/4 items verified complete under the revised gates** (6.1 and 6.2 v
 
 - [ ] **Fix 7: Consumer Technology Catalog Specialization** → [fix7-tech-catalog-specialization.md](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
   - [x] **7.1** Technology Taxonomy & Category Hierarchy Restructuring — **A (Taxonomy)** → [fix7.1-technology-taxonomy-hierarchy.md](Fix7-Tech-Catalog-Specialization/fix7.1-technology-taxonomy-hierarchy.md)
-  - [ ] **7.2** Technology Product Catalog, Variant & Media Seed Alignment — **C (Products)** → [fix7.2-technology-product-catalog-seed.md](Fix7-Tech-Catalog-Specialization/fix7.2-technology-product-catalog-seed.md)
+  - [x] **7.2** Technology Product Catalog, Variant & Media Seed Alignment — **C (Products)** → [fix7.2-technology-product-catalog-seed.md](Fix7-Tech-Catalog-Specialization/fix7.2-technology-product-catalog-seed.md)
   - [x] **7.3** Catalog Links, Attribute Values & Order History Referential Integrity — **A (Links), D (Orders)** → [fix7.3-catalog-links-order-seed-integrity.md](Fix7-Tech-Catalog-Specialization/fix7.3-catalog-links-order-seed-integrity.md)
   - [ ] **7.4** Database Reseed Orchestration, Flyway Verification & Storefront Validation — **E (DevOps), A (UI), B (UI)** → [fix7.4-database-reseed-pipeline-verification.md](Fix7-Tech-Catalog-Specialization/fix7.4-database-reseed-pipeline-verification.md)
-  - [ ] **7.5** Cloud Media Assets, Tech Imagery & S3 Bucket Synchronization — **E (DevOps), C (Media)** → [fix7.5-cloud-media-assets-s3-sync.md](Fix7-Tech-Catalog-Specialization/fix7.5-cloud-media-assets-s3-sync.md)
+  - [x] **7.5** Cloud Media Assets, Tech Imagery & S3 Bucket Synchronization — **E (DevOps), C (Media)** → [fix7.5-cloud-media-assets-s3-sync.md](Fix7-Tech-Catalog-Specialization/fix7.5-cloud-media-assets-s3-sync.md)
 
-Fix 7 has 2/5 items complete (7.1 and 7.3). In `05_catalog_links.sql`, all 40 tech products map across 12 tech subcategories and 65 variants have tech attributes. In `07_orders.sql`, order items reference valid tech SKUs. Fix 7.2 remains in progress: `04_products.sql` defines 40 technology products, 65 variants and 80 primary/secondary image URL rows, with the SKU matrix published. For Fix 7.5, all 80 local WebP assets pass format, dimension and size checks; sourced photo credits and generated-image provenance are recorded. S3 sync, public URL checks and fresh database execution remain pending. Do not mark 7.2 or 7.5 complete until every referenced image URL resolves.
+Fix 7 has 4/5 items complete (7.1, 7.2, 7.3, and 7.5). In `05_catalog_links.sql`, all 40 tech products map across 12 tech subcategories and 65 variants have tech attributes. In `07_orders.sql`, order items reference valid tech SKUs. Fix 7.2 and Fix 7.5 are verified complete: all 40 technology products, 65 variants and 80 primary/secondary image URLs are defined, all 80 WebP assets are synchronized to S3 bucket `brightbuy-media-storage-695945476492/products/`, and all 80 public image URLs return HTTP 200 with image/webp. Fix 7.4 (Database reseed orchestration & verification) is unblocked.
 
 - [ ] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
   - [x] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
