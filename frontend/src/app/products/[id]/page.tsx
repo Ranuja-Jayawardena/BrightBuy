@@ -249,6 +249,7 @@ export default function ProductDetailPage() {
             {selectedImageId ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img 
+                key={selectedImageId}
                 src={
                   product.images?.find(img => img.image_id === selectedImageId)?.image_url ||
                   `/api/images/${selectedImageId}`
@@ -277,6 +278,7 @@ export default function ProductDetailPage() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
+                    key={img.image_url || img.image_id}
                     src={img.image_url || `/api/images/${img.image_id}`} 
                     alt="Thumbnail"
                     onError={(e) => {

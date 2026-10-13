@@ -93,10 +93,10 @@ Run the explicit TypeScript check from the companion: the current build skips ty
 
 - [ ] T05/T06/T08/T10/T12/T14/T17 browser cases pass against real isolated S3 and migrated PostgreSQL, not only mocks.
 - [ ] Exercise allowed formats, empty/oversized files, storage rejection, expired URL, confirm timeout, double click, auth refresh, two tabs, abort/navigation, primary/reorder/delete conflict and stale frontend revision.
-- [ ] Verify cards, detail, gallery and cart use final URLs; missing/failed image uses the local fallback without a retry loop. Both legacy server read routes remain covered by C's tests.
+- [x] Verify cards, detail, gallery and cart use final URLs; missing/failed image uses the local fallback without a retry loop. Both legacy server read routes remain covered by C's tests.
 - [ ] Verify customer/unauthenticated/inventory-only users cannot upload and authorized staff can; keep existing cart/purchase rules.
-- [ ] Run frontend lint, production build and explicit type check; record browser target/revision/origin and sanitized outcomes in the companion.
-- [ ] A/B coordinate shared store/type changes; C/D confirm response compatibility; E receives stale-client and rollout evidence.
+- [x] Run frontend lint, production build and explicit type check; record browser target/revision/origin and sanitized outcomes in the companion.
+- [x] A/B coordinate shared store/type changes; C/D confirm response compatibility; E receives stale-client and rollout evidence.
 
 ## Definition of Done
 

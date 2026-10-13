@@ -18,6 +18,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="aspect-square bg-slate-50 relative overflow-hidden flex items-center justify-center p-6">
           {(product.primary_image_url || product.primary_image_id) ? (
             <img
+              key={product.primary_image_url || product.primary_image_id || product.product_id}
               src={product.primary_image_url || `/api/images/${product.primary_image_id}`}
               alt={product.product_name}
               onError={(e) => {
