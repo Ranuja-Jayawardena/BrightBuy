@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Loader2, AlertCircle, Lock, Mail, ArrowRight } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginFormContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +19,8 @@ export default function LoginPage() {
   
   const { login, isLoading } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +46,15 @@ export default function LoginPage() {
     setFieldErrors({});
 
     try {
-      await login({ email: email.trim().toLowerCase(), password });
-      router.push('/');
+      const result = await login({ email: email.trim().toLowerCase(), password });
+      // Honor ?redirect= param first, then auto-route admins to /admin
+      if (redirectTo) {
+        router.push(redirectTo);
+      } else if (result?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
     }
@@ -141,7 +150,7 @@ export default function LoginPage() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4 pt-2 border-t">
+        <CardFooter className="flex flex-col space-y-3 pt-3 border-t">
           <Link href="/forgot-password" className="text-sm text-primary hover:underline">Forgot your password?</Link>
           <div className="text-sm text-center text-muted-foreground w-full">
             Don&apos;t have an account yet?{' '}
@@ -149,8 +158,22 @@ export default function LoginPage() {
               Create an account
             </Link>
           </div>
+          <div className="text-xs text-center text-muted-foreground w-full pt-1 border-t border-dashed">
+            Staff or administrator?{' '}
+            <Link href="/admin/login" className="text-muted-foreground hover:text-foreground font-medium underline underline-offset-2">
+              Operations Portal Sign In
+            </Link>
+          </div>
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-[calc(100vh-4rem)] items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>}>
+      <LoginFormContent />
+    </Suspense>
   );
 }

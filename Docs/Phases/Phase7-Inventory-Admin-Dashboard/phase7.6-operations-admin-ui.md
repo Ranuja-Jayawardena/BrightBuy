@@ -39,3 +39,11 @@ Build the day-to-day operations screens for admins.
 - **Staff Accounts**: Built `frontend/src/app/admin/employees/page.tsx` with employee roster list and a secure creation modal submitting to `POST /api/admin/employees` with front-end validation (min 8 char password, unique email error handling).
 - **Dashboard Hub**: Upgraded `frontend/src/app/admin/page.tsx` to act as an operations hub displaying summary counts and direct links to all operational modules.
 
+---
+
+## Related Fixes & Patches
+
+- **[Fix 4.2: Employee Lifecycle & Role Management](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Adds active/inactive switch for employee accounts and restricts employee role modifications to Super Admin.
+- **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Updates admin order management and delivery update modal to differentiate Store Pickup (no tracking code required) from Courier Home Delivery (courier name and tracking code required).
+
+

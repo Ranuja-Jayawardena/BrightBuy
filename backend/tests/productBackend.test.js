@@ -2,7 +2,7 @@ process.env.NODE_ENV = 'test';
 
 jest.mock('../src/models/adminProductModel', () => ({
   createProduct: jest.fn(), updateProduct: jest.fn(), softDeleteProduct: jest.fn(),
-  productExists: jest.fn(), createImage: jest.fn(),
+  productExists: jest.fn(), createImage: jest.fn(), setProductActiveStatus: jest.fn(),
 }));
 jest.mock('../src/models/adminCategoryModel', () => ({ findCategoryById: jest.fn() }));
 jest.mock('../src/models/imageModel', () => ({ findImageDataById: jest.fn() }));
@@ -46,6 +46,18 @@ describe('product CRUD', () => {
     productModel.softDeleteProduct.mockResolvedValue({ product_id: 7, is_active: false });
     await expect(products.softDeleteProduct(7)).resolves.toEqual({ product: expect.objectContaining({ is_active: false }) });
     expect(productModel.softDeleteProduct).toHaveBeenCalledWith(7);
+  });
+
+  test('updateProduct supports is_active and setProductStatus reactivates product', async () => {
+    productModel.setProductActiveStatus.mockResolvedValue({ product_id: 7, is_active: true });
+    await expect(products.setProductStatus(7, { is_active: true })).resolves.toEqual({
+      product: expect.objectContaining({ product_id: 7, is_active: true }),
+    });
+    expect(productModel.setProductActiveStatus).toHaveBeenCalledWith(7, true);
+
+    await expect(products.updateProduct(7, { is_active: true })).resolves.toEqual({
+      product: expect.objectContaining({ product_id: 7, is_active: true }),
+    });
   });
 });
 

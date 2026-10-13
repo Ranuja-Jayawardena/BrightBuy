@@ -2,6 +2,7 @@ Table users {
   user_id serial [pk]
   email varchar(100) [unique, not null]
   password_hash varchar(255) [not null]
+  email_verified_at timestamp
   role varchar(20) [not null, default: 'customer']
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
@@ -22,6 +23,12 @@ Table employees {
   first_name varchar(50) [not null]
   last_name varchar(50) [not null]
   phone varchar(20)
+  role varchar(30) [not null, default: 'super_admin', note: 'super_admin | inventory_manager | order_dispatcher | catalog_manager | analyst']
+  is_active boolean [not null, default: true]
+
+  indexes {
+    (is_active) [name: 'idx_employees_active']
+  }
 }
 
 Table addresses {
@@ -210,4 +217,38 @@ Table refresh_tokens {
   token_hash varchar(255) [not null]
   expires_at timestamp [not null]
   created_at timestamp [default: `now()`]
+}
+
+Table auth_email_tokens {
+  token_id bigserial [pk]
+  user_id int [ref: > users.user_id, not null]
+  purpose varchar(20) [not null, note: 'verify | reset']
+  token_hash char(64) [unique, not null]
+  expires_at timestamp [not null]
+  used_at timestamp
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (user_id, purpose)
+  }
+}
+
+Table email_jobs {
+  job_id bigserial [pk]
+  event_key varchar(150) [unique]
+  recipient varchar(254) [not null]
+  subject text [not null]
+  html text [not null]
+  plain_text text [not null]
+  status varchar(20) [not null, default: 'pending', note: 'pending | sending | sent | failed']
+  attempts int [not null, default: 0]
+  next_attempt_at timestamp [not null, default: `now()`]
+  locked_at timestamp
+  sent_at timestamp
+  last_error text
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (next_attempt_at, job_id)
+  }
 }

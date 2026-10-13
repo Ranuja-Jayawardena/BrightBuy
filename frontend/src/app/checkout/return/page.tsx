@@ -13,7 +13,7 @@ function CheckoutReturnContent() {
   const [status, setStatus] = useState<'polling' | 'success' | 'error'>('polling');
   const [errorMsg, setErrorMsg] = useState('');
   const maxAttempts = 20; // 20 attempts * 2s = 40s wait time
-  const attemptsRef = useRef<number>(0);
+  const attemptsRef = useRef(0);
 
   useEffect(() => {
     if (!orderId) {
@@ -31,15 +31,16 @@ function CheckoutReturnContent() {
         const data = await res.json();
         
         const paymentStatus = data.order?.payment?.payment_status;
+        const orderStatus = data.order?.status;
         
-        if (paymentStatus === 'paid') {
+        if (paymentStatus === 'completed' || paymentStatus === 'paid' || orderStatus === 'paid') {
           setStatus('success');
           clearInterval(intervalId);
           // Redirect after a brief success message
           setTimeout(() => {
             router.push(`/checkout/success/${orderId}`);
           }, 1500);
-        } else if (paymentStatus === 'failed' || paymentStatus === 'cancelled') {
+        } else if (paymentStatus === 'failed' || paymentStatus === 'cancelled' || orderStatus === 'cancelled') {
           clearInterval(intervalId);
           router.push(`/checkout/cancel?order_id=${orderId}`);
         } else {

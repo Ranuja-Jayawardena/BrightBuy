@@ -1,4 +1,4 @@
-﻿# Phase 7.2: Category Admin APIs
+# Phase 7.2: Category Admin APIs
 
 > **Parent Phase:** [Phase 7: Inventory & Admin Dashboard](phase7-inventory-admin-dashboard.md)
 > **Status:** Complete
@@ -54,4 +54,11 @@ _Record any implementation decisions, trade-offs, or deviations from the plan he
 
 - Category responses are assembled into a nested `children` tree while retaining inactive nodes and their relationships.
 - Re-parenting uses a recursive ancestor query and returns `400 { error: "Circular category hierarchy" }` when the target is its own descendant.
+
+---
+
+## Related Fixes & Patches
+
+- **[Fix 3.3: Category Status Switch & Hierarchical Propagation](../../Fixes/Fix3-Admin-Catalog-Media/fix3.3-category-status-toggle.md):** Connects `PUT /api/admin/categories/:id` (`is_active: boolean`) to a reactive toggle switch with hierarchical checks on child categories.
+
 

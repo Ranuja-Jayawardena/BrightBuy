@@ -7,18 +7,26 @@ import { useCartStore } from '@/store/useCartStore';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, ShoppingBag, Menu, X, LayoutDashboard } from 'lucide-react';
 
+const staffRoleLabels: Record<string, string> = {
+  super_admin: 'Super Admin',
+  inventory_manager: 'Inventory Manager',
+  order_dispatcher: 'Order Dispatcher',
+  catalog_manager: 'Catalog Manager',
+  analyst: 'Business Analyst',
+};
+
 export function Navbar() {
   const { user, isAuthenticated, isLoading, logout } = useAuthStore();
   const { itemCount, fetchCart, clearCart } = useCartStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user?.role !== 'admin') {
       fetchCart();
     } else {
       clearCart();
     }
-  }, [isAuthenticated, fetchCart, clearCart]);
+  }, [isAuthenticated, user?.role, fetchCart, clearCart]);
 
   const handleLogout = async () => {
     try {
@@ -56,16 +64,18 @@ export function Navbar() {
 
         {/* Right Navigation - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link href="/cart">
-            <Button variant="ghost" size="sm" className="relative hover:bg-slate-100 dark:hover:bg-zinc-800">
-              <ShoppingCart className="h-5 w-5 text-slate-700 dark:text-zinc-300" />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white shadow">
-                  {itemCount}
-                </span>
-              )}
-            </Button>
-          </Link>
+          {user?.role !== 'admin' && (
+            <Link href="/cart">
+              <Button variant="ghost" size="sm" className="relative hover:bg-slate-100 dark:hover:bg-zinc-800">
+                <ShoppingCart className="h-5 w-5 text-slate-700 dark:text-zinc-300" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white shadow">
+                    {itemCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          )}
 
           {!isLoading && (
             <>
@@ -78,7 +88,7 @@ export function Navbar() {
                     <Link href="/admin">
                       <Button variant="outline" size="sm" className="gap-1.5 border-slate-300 dark:border-zinc-700">
                         <LayoutDashboard className="h-3.5 w-3.5" />
-                        Admin
+                        {user?.employee_role ? (staffRoleLabels[user.employee_role] || user.employee_role) : 'Admin'}
                       </Button>
                     </Link>
                   )}
@@ -106,16 +116,18 @@ export function Navbar() {
 
         {/* Mobile Actions & Toggle */}
         <div className="flex md:hidden items-center space-x-2">
-          <Link href="/cart">
-            <Button variant="ghost" size="sm" className="relative p-2">
-              <ShoppingCart className="h-5 w-5" />
-              {itemCount > 0 && (
-                <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
-                  {itemCount}
-                </span>
-              )}
-            </Button>
-          </Link>
+          {user?.role !== 'admin' && (
+            <Link href="/cart">
+              <Button variant="ghost" size="sm" className="relative p-2">
+                <ShoppingCart className="h-5 w-5" />
+                {itemCount > 0 && (
+                  <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+                    {itemCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          )}
 
           <Button
             variant="ghost"
@@ -152,7 +164,7 @@ export function Navbar() {
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-base font-medium text-slate-800 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-900"
                 >
                   <LayoutDashboard className="h-4 w-4" />
-                  Admin Dashboard
+                  {user?.employee_role ? `${staffRoleLabels[user.employee_role] || user.employee_role} Dashboard` : 'Admin Dashboard'}
                 </Link>
               )}
               <Button

@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 export default function AddressesPage() {
-  const { addresses, cities, fetchAddresses, fetchCities, removeAddress, setDefault, isLoading } = useAddressStore();
+  const { addresses, fetchAddresses, fetchCities, removeAddress, setDefault, isLoading } = useAddressStore();
   const [isAdding, setIsAdding] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -95,12 +95,18 @@ export default function AddressesPage() {
               </Button>
             </div>
             <AddressForm 
+              key={editingAddress ? `edit-${editingAddress.address_id}` : 'new'}
               address={editingAddress} 
-              onClose={() => { 
+              onSuccess={() => { 
+                const message = editingAddress ? 'Address updated' : 'Address added successfully';
                 setIsAdding(false); 
                 setEditingAddress(null); 
-                setSuccessMessage(editingAddress ? 'Address updated' : 'Address added successfully');
+                setSuccessMessage(message);
               }} 
+              onCancel={() => {
+                setIsAdding(false);
+                setEditingAddress(null);
+              }}
             />
           </div>
         )}
@@ -188,7 +194,15 @@ export default function AddressesPage() {
   );
 }
 
-function AddressForm({ address, onClose }: { address: Address | null, onClose: () => void }) {
+function AddressForm({ 
+  address, 
+  onSuccess, 
+  onCancel 
+}: { 
+  address: Address | null; 
+  onSuccess: () => void; 
+  onCancel: () => void; 
+}) {
   const { addAddress, updateAddress, cities, isLoading } = useAddressStore();
   const [formData, setFormData] = useState({
     address_line1: address?.address_line1 || '',
@@ -231,9 +245,10 @@ function AddressForm({ address, onClose }: { address: Address | null, onClose: (
           zip_code: formData.zip_code.trim()
         });
       }
-      onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to save address');
+      onSuccess();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save address';
+      setError(message);
     }
   };
 
@@ -317,7 +332,7 @@ function AddressForm({ address, onClose }: { address: Address | null, onClose: (
       </div>
 
       <div className="flex justify-end gap-2 pt-3 border-t">
-        <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={isLoading}>
+        <Button type="button" variant="outline" size="sm" onClick={onCancel} disabled={isLoading}>
           Cancel
         </Button>
         <Button type="submit" size="sm" disabled={isLoading}>

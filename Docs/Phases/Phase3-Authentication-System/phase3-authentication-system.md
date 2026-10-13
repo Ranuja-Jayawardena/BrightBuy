@@ -51,3 +51,12 @@ B can build 3.3 right away against the API contracts in [phase3.1-auth-api-endpo
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+---
+
+## Related Fixes & Patches
+
+This phase is extended and refined by the following post-development fix items in [Docs/Fixes/overallplan.md](../../Fixes/overallplan.md):
+- **[Fix 1.1: Customer Profile Management & Navigation](../../Fixes/Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md):** Adds customer profile editing endpoint (`PUT /api/auth/profile`), password change endpoint, `/profile` page, and interactive navbar customer menu.
+- **[Fix 4.1: Staff Cart & Purchase Policy Enforcement](../../Fixes/Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md):** Adds staff role check in auth store to intercept cart actions and hide cart in navbar.
+- **[Fix 4.2: Super Admin Employee Management & Deactivation](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Adds login-time active status verification (`is_active`) and Super Admin employee management endpoints.
+

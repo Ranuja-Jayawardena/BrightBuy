@@ -125,7 +125,7 @@ export function ReportDataTable<T extends Record<string, any>>({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 value={searchTerm}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}

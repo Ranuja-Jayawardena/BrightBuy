@@ -7,7 +7,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint src/",
-    "test": "node --localstorage-file=:memory: ./node_modules/jest/bin/jest.js --runInBand",
+    "test": "jest --runInBand",
     "test:product": "node --test test/product-validation.test.js"
   },
   "jest": {

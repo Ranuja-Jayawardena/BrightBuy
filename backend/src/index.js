@@ -8,6 +8,9 @@ const { apiLimiter } = require('./middleware/rateLimiter');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust reverse proxy (Nginx) headers like X-Forwarded-For
+app.set('trust proxy', 1);
+
 // Security Headers via Helmet (XSS, HSTS, Sniffing, Frameguard)
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow frontend to load media/images
@@ -118,10 +121,12 @@ app.use((err, req, res, _next) => {
   });
 });
 
+const HOST = process.env.HOST || '0.0.0.0';
+
 if (process.env.NODE_ENV !== 'test') {
   require('./services/emailQueue').startEmailWorker();
-  app.listen(PORT, '127.0.0.1', () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`Backend server running on http://${HOST}:${PORT}`);
   });
 }
 

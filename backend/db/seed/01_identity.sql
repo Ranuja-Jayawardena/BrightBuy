@@ -19,7 +19,8 @@ INSERT INTO users (email, password_hash, role) VALUES
 ('employee2@brightbuy.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC', 'admin');
 
 -- Employees (linked by email)
-INSERT INTO employees (user_id, first_name, last_name, phone) VALUES
-((SELECT user_id FROM users WHERE email = 'admin@brightbuy.com'), 'System', 'Admin', '555-0000'),
-((SELECT user_id FROM users WHERE email = 'employee1@brightbuy.com'), 'John', 'Doe', '555-0001'),
-((SELECT user_id FROM users WHERE email = 'employee2@brightbuy.com'), 'Jane', 'Smith', '555-0002');
+INSERT INTO employees (user_id, first_name, last_name, phone, role) VALUES
+((SELECT user_id FROM users WHERE email = 'admin@brightbuy.com'), 'System', 'Admin', '555-0000', 'super_admin'),
+((SELECT user_id FROM users WHERE email = 'employee1@brightbuy.com'), 'John', 'Doe', '555-0001', 'inventory_manager'),
+((SELECT user_id FROM users WHERE email = 'employee2@brightbuy.com'), 'Jane', 'Smith', '555-0002', 'order_dispatcher');
+

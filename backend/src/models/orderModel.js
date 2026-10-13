@@ -66,20 +66,44 @@ const createOrder = async (customer_id, address_id, delivery_mode) => {
         }
 
         // 4. Get Address and ETA
-        const addressResult = await client.query(`
-            SELECT a.address_line1, a.address_line2, a.city_id, a.zip_code, c.is_main_city, c.city_name
-            FROM addresses a
-            JOIN cities c ON a.city_id = c.city_id
-            WHERE a.address_id = $1 AND a.customer_id = $2
-        `, [address_id, customer_id]);
+        let address_line1;
+        let address_line2 = null;
+        let city_id;
+        let zip_code;
+        let estimated_delivery_days;
 
-        if (addressResult.rows.length === 0) {
+        if (address_id) {
+            const addressResult = await client.query(`
+                SELECT a.address_line1, a.address_line2, a.city_id, a.zip_code, c.is_main_city, c.city_name
+                FROM addresses a
+                JOIN cities c ON a.city_id = c.city_id
+                WHERE a.address_id = $1 AND a.customer_id = $2
+            `, [address_id, customer_id]);
+
+            if (addressResult.rows.length === 0) {
+                await client.query('ROLLBACK');
+                throw new Error('Address not found or does not belong to customer');
+            }
+
+            const address = addressResult.rows[0];
+            address_line1 = address.address_line1;
+            address_line2 = address.address_line2;
+            city_id = address.city_id;
+            zip_code = address.zip_code;
+            estimated_delivery_days = delivery_mode === 'store_pickup' ? 2 : (address.is_main_city ? 5 : 7);
+        } else if (delivery_mode === 'store_pickup') {
+            const cityResult = await client.query(`SELECT city_id FROM cities ORDER BY is_main_city DESC, city_id ASC LIMIT 1`);
+            const defaultCityId = cityResult.rows.length > 0 ? cityResult.rows[0].city_id : 1;
+
+            address_line1 = 'BrightBuy Central Retail Store & Pickup Gate';
+            address_line2 = '100 Main Street';
+            city_id = defaultCityId;
+            zip_code = '78701';
+            estimated_delivery_days = 2;
+        } else {
             await client.query('ROLLBACK');
             throw new Error('Address not found or does not belong to customer');
         }
-
-        const address = addressResult.rows[0];
-        const estimated_delivery_days = address.is_main_city ? 5 : 7;
 
         // 5. Create Order
         const orderResult = await client.query(`
@@ -111,10 +135,10 @@ const createOrder = async (customer_id, address_id, delivery_mode) => {
         `, [
             order.order_id,
             delivery_mode,
-            address.address_line1,
-            address.address_line2,
-            address.city_id,
-            address.zip_code,
+            address_line1,
+            address_line2,
+            city_id,
+            zip_code,
             estimated_delivery_days
         ]);
         const delivery = deliveryResult.rows[0];

@@ -7,7 +7,7 @@ import { apiFetch } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, AlertCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Image as ImageIcon } from 'lucide-react';
 
 interface CategoryNode {
   category_id: number;
@@ -161,6 +161,16 @@ export default function NewProductPage() {
               </label>
             ))}
             {categories.length === 0 && <span className="text-muted-foreground text-sm col-span-2">Loading categories...</span>}
+          </div>
+        </div>
+
+        <div className="p-4 rounded-lg border border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-900 flex items-start gap-3">
+          <ImageIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-semibold text-blue-900 dark:text-blue-300">Product Media & Gallery</p>
+            <p className="text-blue-700 dark:text-blue-400 mt-0.5">
+              Product images, variants, and inventory pricing can be configured on the product management dashboard immediately after creating this base product record.
+            </p>
           </div>
         </div>
 

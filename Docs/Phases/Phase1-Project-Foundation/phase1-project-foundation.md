@@ -134,3 +134,15 @@ Any column, constraint, or index not already in [DB_Schema.md](../../Database/DB
 - **Pre-assigned Flyway versions:** Versions are fixed up front in FK order so that the five schema subphases are fully decoupled.
 - **Natural-key lookups in seeds:** Prevents breakage when seed order or serial values change.
 
+---
+
+## Related Fixes & Patches
+
+This foundational schema and seed framework is extended by the following post-development fix items in [Docs/Fixes/overallplan.md](../../Fixes/overallplan.md):
+- **[Fix 1.2: Seed Brands & Dynamic Catalog Filtering](../../Fixes/Fix1-Customer-Account-Storefront/fix1.2-brand-filtering-dynamic-catalog.md):** Updates seed data in `04_products.sql` with consistent multi-item brands across categories.
+- **[Fix 1.3: Apparel Variant Matrix & Combinations](../../Fixes/Fix1-Customer-Account-Storefront/fix1.3-apparel-variant-matrix.md):** Expands seed data in `04_products.sql` and `05_catalog_links.sql` to include full Size x Color matrices.
+- **[Fix 2.1: Price Range Filter & Composite Index](../../Fixes/Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md):** Adds Flyway migration `V22__add_product_price_index.sql` (`idx_products_is_active_base_price`).
+- **[Fix 2.2: Search Autocomplete & GIN Trigram Indexing](../../Fixes/Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md):** Adds Flyway migration `V23__add_product_trgm_index.sql` enabling `pg_trgm` extension and trigram GIN indexes.
+- **[Fix 4.2: Employee Lifecycle & Role Management](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Adds Flyway migration `V24__add_employee_is_active.sql` adding `is_active` column to `employees`.
+
+
