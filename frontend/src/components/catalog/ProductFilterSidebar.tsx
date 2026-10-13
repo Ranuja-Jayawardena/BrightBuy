@@ -152,9 +152,21 @@ export function ProductFilterSidebar({
 
               {categories.map((category) => (
                 <div key={category.category_id} className="pt-2">
-                  <div className="px-3 py-2 text-sm font-semibold text-slate-900 flex items-center justify-between">
-                    {category.category_name}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onSelectCategory(category.category_id);
+                      setMobileExpanded(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm font-semibold rounded-lg flex items-center justify-between transition-colors ${
+                      selectedCategoryId === category.category_id
+                        ? 'bg-blue-50 text-blue-700 font-bold'
+                        : 'text-slate-900 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span>{category.category_name}</span>
+                    <span className="text-xs text-slate-400 font-normal">All</span>
+                  </button>
                   
                   {category.children && category.children.length > 0 && (
                     <div className="mt-1 space-y-1 pl-3 border-l-2 border-slate-100 ml-4">

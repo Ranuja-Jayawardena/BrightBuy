@@ -1,7 +1,7 @@
 # Fix 7.1: Technology Taxonomy & Category Hierarchy Restructuring
 
 > **Parent Group:** [Fix 7: Consumer Technology Catalog Specialization](fix7-tech-catalog-specialization.md)  
-> **Status:** Planned  
+> **Status:** Complete  
 > **Assigned To:** Member A (Frontend Storefront & Taxonomy Schema)  
 > **Depends On:** —  
 > **Blocks:** [Fix 7.2](fix7.2-technology-product-catalog-seed.md), [Fix 7.3](fix7.3-catalog-links-order-seed-integrity.md)  
@@ -22,8 +22,8 @@
 ## Tasks (Member A)
 
 ### 1. Overhaul `backend/db/seed/03_taxonomy.sql`
-- [ ] Remove all non-tech category insert statements (*Home Appliances*, *Kitchen*, *Cleaning*, *Apparel*, *Men's Clothing*, *Women's Clothing*).
-- [ ] Define clean consumer technology category hierarchy:
+- [x] Remove all non-tech category insert statements (*Home Appliances*, *Kitchen*, *Cleaning*, *Apparel*, *Men's Clothing*, *Women's Clothing*).
+- [x] Define clean consumer technology category hierarchy:
   - **Level 1 Parent Categories:**
     - `Electronics`
     - `Computers & Gaming`
@@ -36,15 +36,15 @@
     - Under `Audio & Sound`: `Headphones & Earbuds`, `Speakers & Soundbars`
     - Under `Smart Home & Wearables`: `Smartwatches & Fitness`, `Smart Lighting & Security`
     - Under `Accessories & Storage`: `Chargers & Cables`, `External Storage & SSDs`
-- [ ] Update variant attributes in `variant_attributes`:
+- [x] Update variant attributes in `variant_attributes`:
   - Insert: `Storage Capacity`, `RAM Size`, `Color`, `Connectivity`, `Screen Size`.
   - Deprecate: Clothing `Size` and `Material`.
 
 ### 2. Publish Taxonomy Contract
-- [ ] Publish the exact list of `category_name` and `attribute_name` values in the Key Decisions section below so Member C and Member D can reference them during Fix 7.2 and 7.3.
+- [x] Publish the exact list of `category_name` and `attribute_name` values in the Key Decisions section below so Member C and Member D can reference them during Fix 7.2 and 7.3.
 
 ### 3. Storefront UI Navigation Alignment
-- [ ] In `frontend/src/app/categories/page.tsx` and global navigation headers, ensure category breadcrumbs and tree components gracefully render the new tech taxonomy.
+- [x] In `frontend/src/app/categories/page.tsx` and global navigation headers, ensure category breadcrumbs and tree components gracefully render the new tech taxonomy.
 
 ---
 

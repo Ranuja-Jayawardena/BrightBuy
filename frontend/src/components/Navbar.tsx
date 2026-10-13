@@ -83,6 +83,12 @@ export function Navbar() {
             >
               Products
             </Link>
+            <Link
+              href="/categories"
+              className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 dark:text-zinc-300 dark:hover:text-white rounded-lg hover:bg-slate-100/70 dark:hover:bg-zinc-800 transition-colors"
+            >
+              Categories
+            </Link>
           </div>
         </div>
 
@@ -235,6 +241,13 @@ export function Navbar() {
             className="block px-3 py-2 rounded-lg text-base font-medium text-slate-800 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-900"
           >
             All Products
+          </Link>
+          <Link
+            href="/categories"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 rounded-lg text-base font-medium text-slate-800 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-900"
+          >
+            Categories
           </Link>
 
           {isAuthenticated ? (

@@ -80,7 +80,7 @@ This document is the **master tracker** for all post-development fixes, patches,
   - [x] **6.4** Storefront & Admin Direct Image Delivery & Upload UI — **A (UI), B (UI)** → [fix6.4-storefront-admin-image-delivery-ui.md](Fix6-Cloud-Media-Storage-S3/fix6.4-storefront-admin-image-delivery-ui.md)
 
 - [ ] **Fix 7: Consumer Technology Catalog Specialization** → [fix7-tech-catalog-specialization.md](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
-  - [ ] **7.1** Technology Taxonomy & Category Hierarchy Restructuring — **A (Taxonomy)** → [fix7.1-technology-taxonomy-hierarchy.md](Fix7-Tech-Catalog-Specialization/fix7.1-technology-taxonomy-hierarchy.md)
+  - [x] **7.1** Technology Taxonomy & Category Hierarchy Restructuring — **A (Taxonomy)** → [fix7.1-technology-taxonomy-hierarchy.md](Fix7-Tech-Catalog-Specialization/fix7.1-technology-taxonomy-hierarchy.md)
   - [ ] **7.2** Technology Product Catalog, Variant & Media Seed Alignment — **C (Products)** → [fix7.2-technology-product-catalog-seed.md](Fix7-Tech-Catalog-Specialization/fix7.2-technology-product-catalog-seed.md)
   - [ ] **7.3** Catalog Links, Attribute Values & Order History Referential Integrity — **A (Links), D (Orders)** → [fix7.3-catalog-links-order-seed-integrity.md](Fix7-Tech-Catalog-Specialization/fix7.3-catalog-links-order-seed-integrity.md)
   - [ ] **7.4** Database Reseed Orchestration, Flyway Verification & Storefront Validation — **E (DevOps), A (UI), B (UI)** → [fix7.4-database-reseed-pipeline-verification.md](Fix7-Tech-Catalog-Specialization/fix7.4-database-reseed-pipeline-verification.md)
