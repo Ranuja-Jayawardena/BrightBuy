@@ -132,7 +132,7 @@ function CartContent() {
                   <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border bg-muted/30 flex items-center justify-center relative">
                     {item.primary_image_id ? (
                       <img
-                        src={`/api/products/images/${item.primary_image_id}`}
+                        src={`/api/images/${item.primary_image_id}`}
                         alt={item.product_name}
                         className="h-full w-full object-cover object-center"
                       />

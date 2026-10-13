@@ -16,7 +16,8 @@ import {
   Trash2, 
   Star, 
   Plus,
-  Upload
+  Upload,
+  Loader2
 } from 'lucide-react';
 
 interface CategoryNode {
@@ -90,6 +91,10 @@ export default function EditProductPage() {
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [updatingImageId, setUpdatingImageId] = useState<number | null>(null);
+  const [imageToDelete, setImageToDelete] = useState<ImageType | null>(null);
+  const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
 
   const fetchData = async () => {
     try {
@@ -176,44 +181,82 @@ export default function EditProductPage() {
     formData.append('image', file);
     
     try {
+      setIsUploadingImage(true);
       const res = await apiFetch(`/api/admin/products/${productId}/images`, {
         method: 'POST',
         body: formData,
         // Don't set Content-Type header; fetch will set it with the boundary for FormData
       });
-      if (!res.ok) throw new Error('Failed to upload image');
-      fetchData();
-    } catch (err: any) {
-      alert(err.message);
-    }
-    
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || 'Failed to upload image');
+      }
+      await fetchData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to upload image');
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
   const handleSetPrimaryImage = async (imageId: number) => {
     try {
+      setUpdatingImageId(imageId);
       const res = await apiFetch(`/api/admin/images/${imageId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_primary: true })
       });
-      if (!res.ok) throw new Error('Failed to set primary image');
-      fetchData();
-    } catch (err: any) {
-      alert(err.message);
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || 'Failed to set primary image');
+      }
+      await fetchData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to set primary image');
+    } finally {
+      setUpdatingImageId(null);
     }
   };
 
-  const handleDeleteImage = async (imageId: number) => {
-    if (!confirm('Delete this image?')) return;
+  const handleUpdateSortOrder = async (imageId: number, sortOrder: number) => {
     try {
-      const res = await apiFetch(`/api/admin/images/${imageId}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete image');
-      fetchData();
-    } catch (err: any) {
-      alert(err.message);
+      setUpdatingImageId(imageId);
+      const res = await apiFetch(`/api/admin/images/${imageId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sort_order: sortOrder })
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || 'Failed to update sort order');
+      }
+      await fetchData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to update sort order');
+    } finally {
+      setUpdatingImageId(null);
+    }
+  };
+
+  const handleConfirmDeleteImage = async () => {
+    if (!imageToDelete) return;
+    try {
+      setDeletingImageId(imageToDelete.image_id);
+      const res = await apiFetch(`/api/admin/images/${imageToDelete.image_id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || 'Failed to delete image');
+      }
+      setImageToDelete(null);
+      await fetchData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to delete image');
+    } finally {
+      setDeletingImageId(null);
     }
   };
 
@@ -426,43 +469,126 @@ export default function EditProductPage() {
               <ImageIcon className="w-5 h-5 mr-2" /> Images
             </h2>
             
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               {product.images.sort((a,b) => a.sort_order - b.sort_order).map(img => (
-                <div key={img.image_id} className={`relative group border rounded-lg overflow-hidden aspect-square ${img.is_primary ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
-                  <img src={`/api/products/images/${img.image_id}`} alt="Product" className="w-full h-full object-cover" />
-                  
-                  {img.is_primary && (
-                    <div className="absolute top-2 left-2 bg-primary text-primary-foreground p-1 rounded-full">
-                      <Star className="w-3 h-3 fill-current" />
-                    </div>
-                  )}
-
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center gap-2">
-                    {!img.is_primary && (
-                      <Button size="sm" variant="secondary" onClick={() => handleSetPrimaryImage(img.image_id)}>
-                        Set Primary
-                      </Button>
+                <div 
+                  key={img.image_id} 
+                  className={`relative group border rounded-lg overflow-hidden bg-muted/20 flex flex-col ${
+                    img.is_primary ? 'ring-2 ring-primary ring-offset-2' : ''
+                  }`}
+                >
+                  <div className="relative aspect-square overflow-hidden bg-background">
+                    <img 
+                      src={`/api/images/${img.image_id}`} 
+                      alt="Product" 
+                      className="w-full h-full object-cover" 
+                    />
+                    
+                    {img.is_primary && (
+                      <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                        <Star className="w-3 h-3 fill-current" /> Primary
+                      </div>
                     )}
-                    <Button size="sm" variant="destructive" onClick={() => handleDeleteImage(img.image_id)}>
-                      <Trash2 className="w-4 h-4 mr-1" /> Delete
-                    </Button>
+
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center gap-2 p-2">
+                      {!img.is_primary && (
+                        <Button 
+                          size="sm" 
+                          variant="secondary" 
+                          disabled={updatingImageId === img.image_id}
+                          onClick={() => handleSetPrimaryImage(img.image_id)}
+                          className="w-28 text-xs"
+                        >
+                          {updatingImageId === img.image_id ? (
+                            <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                          ) : (
+                            <Star className="w-3 h-3 mr-1" />
+                          )}
+                          Set Primary
+                        </Button>
+                      )}
+                      <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        onClick={() => setImageToDelete(img)}
+                        className="w-28 text-xs"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Image Metadata / Sort Order Controls */}
+                  <div className="p-2.5 border-t bg-card flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground font-medium">Order:</span>
+                      <input 
+                        type="number" 
+                        min="0"
+                        defaultValue={img.sort_order}
+                        key={`${img.image_id}-${img.sort_order}`}
+                        onBlur={(e) => {
+                          const val = Number(e.target.value);
+                          if (val !== img.sort_order && !isNaN(val)) {
+                            handleUpdateSortOrder(img.image_id, val);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const val = Number((e.target as HTMLInputElement).value);
+                            if (val !== img.sort_order && !isNaN(val)) {
+                              handleUpdateSortOrder(img.image_id, val);
+                            }
+                          }
+                        }}
+                        disabled={updatingImageId === img.image_id}
+                        className="w-14 h-7 px-2 rounded border text-center font-mono text-xs bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
+                    {img.is_primary ? (
+                      <span className="text-[11px] font-semibold text-primary">Primary Media</span>
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground">Gallery</span>
+                    )}
                   </div>
                 </div>
               ))}
+              {product.images.length === 0 && (
+                <p className="text-sm text-muted-foreground italic col-span-full py-4 text-center">
+                  No images uploaded yet.
+                </p>
+              )}
             </div>
 
             <div 
-              className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-muted/50 cursor-pointer transition-colors"
-              onClick={() => fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                isUploadingImage 
+                  ? 'bg-muted/40 cursor-wait' 
+                  : 'hover:bg-muted/50 cursor-pointer'
+              }`}
+              onClick={() => {
+                if (!isUploadingImage) fileInputRef.current?.click();
+              }}
             >
-              <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm font-medium">Click to upload image</p>
-              <p className="text-xs text-muted-foreground mt-1">JPEG, PNG up to 2MB</p>
+              {isUploadingImage ? (
+                <>
+                  <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-2" />
+                  <p className="text-sm font-medium">Uploading image...</p>
+                  <p className="text-xs text-muted-foreground mt-1">Processing file buffer</p>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm font-medium">Click to upload image</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, WebP up to 2MB</p>
+                </>
+              )}
               <input 
                 type="file" 
                 ref={fileInputRef} 
                 className="hidden" 
                 accept="image/jpeg,image/png,image/webp" 
+                disabled={isUploadingImage}
                 onChange={handleImageUpload} 
               />
             </div>
@@ -538,6 +664,50 @@ export default function EditProductPage() {
                 <Button type="submit">Save Variant</Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Image Deletion Confirmation Modal */}
+      {imageToDelete && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card border rounded-xl max-w-sm w-full p-6 shadow-xl animate-in fade-in-50 zoom-in-95">
+            <h3 className="text-lg font-bold">Delete Product Image?</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              Are you sure you want to permanently remove this image from the product gallery? This action cannot be undone.
+            </p>
+            <div className="mt-4 rounded-lg overflow-hidden border aspect-video max-h-36 bg-muted/20 flex items-center justify-center">
+              <img 
+                src={`/api/images/${imageToDelete.image_id}`} 
+                alt="Image to delete" 
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                disabled={deletingImageId !== null}
+                onClick={() => setImageToDelete(null)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive" 
+                size="sm" 
+                disabled={deletingImageId !== null}
+                onClick={handleConfirmDeleteImage}
+              >
+                {deletingImageId !== null ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete Image'
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       )}
