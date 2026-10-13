@@ -28,9 +28,15 @@ async function processOne() {
 }
 
 function startEmailWorker() {
+  let schemaWarningShown = false;
   const timer = globalThis.setInterval(async () => {
     try { for (let i = 0; i < 10 && await processOne(); i++); }
-    catch (error) { console.error('[EmailQueue] Worker error:', error); }
+    catch (error) {
+      if (error.code === '42P01') {
+        if (!schemaWarningShown) console.warn('[EmailQueue] Email tables are missing; apply the latest database migration.');
+        schemaWarningShown = true;
+      } else console.error('[EmailQueue] Worker error:', error);
+    }
   }, 10000);
   timer.unref();
   return timer;
