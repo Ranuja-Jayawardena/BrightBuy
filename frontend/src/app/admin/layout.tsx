@@ -151,7 +151,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         )}
 
         {/* Desktop Sidebar */}
-        <aside className="hidden md:flex flex-col w-64 border-r bg-muted/20 shrink-0 p-4">
+        <aside className="hidden md:flex flex-col w-64 border-r bg-muted/20 shrink-0 p-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
           <div className="flex items-center justify-between px-3 mb-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Admin Console
