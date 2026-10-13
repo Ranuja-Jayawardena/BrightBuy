@@ -97,7 +97,7 @@ Member C generated unbranded demo product images for IDs **1–16, 22–23, 31�
 | **S3 Sync** | `s3://brightbuy-media-storage-695945476492/products/` contains folders `1/` to `40/` | Member E | Complete — all 40 product folders synced |
 | **Cache Headers** | Response includes `max-age=31536000` for client caching | Member E | Complete — verified `public, max-age=31536000, immutable` |
 | **Gallery UI** | Storefront product page toggles between primary and secondary images | Member A | ⬜ Pending |
-| **Admin UI** | Admin products table renders thumbnail preview correctly | Member B | ⬜ Pending |
+| **Admin UI** | Admin products table renders thumbnail preview correctly | Member B | Complete — verified |
 
 ---
 
