@@ -1,7 +1,7 @@
 # Fix 6.2: Database Schema Migration & S3 Seed Cutover
 
 > **Parent Group:** [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](fix6-cloud-media-storage-s3.md)  
-> **Status:** Planned  
+> **Status:** Complete  
 > **Assigned To:** Member C (DB Product Tables) & Member E (DevOps & Flyway Migrations)  
 > **Depends On:** [Fix 6.1: AWS S3 Infrastructure](fix6.1-s3-infrastructure-bucket-iam.md)  
 > **Blocks:** [Fix 6.3: Backend S3 Service](fix6.3-backend-s3-service-upload-apis.md)  
@@ -25,7 +25,7 @@ With lecturer approval for AWS S3, we are executing a complete cutover:
 ## Tasks
 
 ### 1. Flyway Migration Creation (`V26__replace_image_data_with_image_url.sql`) — Member C & E
-- [ ] Create `backend/db/migrations/V26__replace_image_data_with_image_url.sql`:
+- [x] Create `backend/db/migrations/V26__replace_image_data_with_image_url.sql`:
   ```sql
   -- V26: Replace PostgreSQL BYTEA binary image storage with AWS S3 image URLs
 
@@ -48,7 +48,7 @@ With lecturer approval for AWS S3, we are executing a complete cutover:
   ```
 
 ### 2. Update Database Seed Script (`04_products.sql`) — Member C
-- [ ] In `backend/db/seed/04_products.sql`:
+- [x] In `backend/db/seed/04_products.sql`:
   - Replace the old insert pattern:
     ```sql
     -- OLD (DEPRECATED):
@@ -65,7 +65,7 @@ With lecturer approval for AWS S3, we are executing a complete cutover:
   - This reduces `04_products.sql` file size by over 95% and accelerates database container bootstrapping.
 
 ### 3. Schema Documentation Sync — Member C
-- [ ] Update [Docs/Database/DB_Schema.md](../../Database/DB_Schema.md):
+- [x] Update [Docs/Database/DB_Schema.md](../../Database/DB_Schema.md):
   - In `Table product_images`:
     - `image_url varchar(500) [not null]`
     - Remove `image_data bytea` completely.

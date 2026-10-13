@@ -1,7 +1,7 @@
 # Fix 6.1: AWS S3 Infrastructure, Bucket Security & EC2 IAM Integration
 
 > **Parent Group:** [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](fix6-cloud-media-storage-s3.md)  
-> **Status:** Planned  
+> **Status:** Complete  
 > **Assigned To:** Member E (DevOps + Architecture)  
 > **Depends On:** —  
 > **Blocks:** Fix 6.2, Fix 6.3  
@@ -21,19 +21,19 @@
 ## Tasks (Member E)
 
 ### 1. S3 Bucket Provisioning & Access Policy
-- [ ] Create S3 bucket in `us-east-1`:
+- [x] Create S3 bucket in `us-east-1`:
   ```bash
   aws s3api create-bucket \
     --bucket brightbuy-media-storage-695945476492 \
     --region us-east-1
   ```
-- [ ] Enable default server-side encryption with Amazon S3 managed keys (SSE-S3):
+- [x] Enable default server-side encryption with Amazon S3 managed keys (SSE-S3):
   ```bash
   aws s3api put-bucket-encryption \
     --bucket brightbuy-media-storage-695945476492 \
     --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
   ```
-- [ ] Configure bucket public read policy for catalog images:
+- [x] Configure bucket public read policy for catalog images:
   ```json
   {
     "Version": "2012-10-17",
@@ -48,7 +48,7 @@
     ]
   }
   ```
-- [ ] Configure bucket CORS policy to permit direct client pre-signed uploads and frontend asset fetching:
+- [x] Configure bucket CORS policy to permit direct client pre-signed uploads and frontend asset fetching:
   ```json
   [
     {
@@ -66,13 +66,13 @@
   ```
 
 ### 2. Initial Seed Asset Upload to S3
-- [ ] Run seed migration script to extract existing seed images and upload to S3:
+- [x] Run seed migration script to extract existing seed images and upload to S3:
   ```bash
   aws s3 sync backend/db/seed/assets/ s3://brightbuy-media-storage-695945476492/products/
   ```
 
 ### 3. IAM Instance Profile & EC2 Attachment (Zero Hardcoded Credentials)
-- [ ] Create IAM trust policy document allowing EC2 instance to assume role:
+- [x] Create IAM trust policy document allowing EC2 instance to assume role:
   ```json
   {
     "Version": "2012-10-17",
@@ -85,8 +85,8 @@
     ]
   }
   ```
-- [ ] Create IAM Role: `BrightBuy-EC2-S3-Access-Role`.
-- [ ] Attach least-privilege IAM policy scoped strictly to `brightbuy-media-storage-695945476492`:
+- [x] Create IAM Role: `BrightBuy-EC2-S3-Access-Role`.
+- [x] Attach least-privilege IAM policy scoped strictly to `brightbuy-media-storage-695945476492`:
   ```json
   {
     "Version": "2012-10-17",
@@ -107,7 +107,7 @@
     ]
   }
   ```
-- [ ] Create IAM Instance Profile and attach it to live EC2 instance `i-0a19078299834fba2`:
+- [x] Create IAM Instance Profile and attach it to live EC2 instance `i-0a19078299834fba2`:
   ```bash
   aws iam create-instance-profile --instance-profile-name BrightBuy-EC2-Instance-Profile
   aws iam add-role-to-instance-profile --instance-profile-name BrightBuy-EC2-Instance-Profile --role-name BrightBuy-EC2-S3-Access-Role
@@ -115,12 +115,12 @@
   ```
 
 ### 4. Server Environment & Audit Logging
-- [ ] Update `/home/ubuntu/BrightBuy/.env.prod` on EC2:
+- [x] Update `/home/ubuntu/BrightBuy/.env.prod` on EC2:
   ```env
   AWS_REGION=us-east-1
   AWS_S3_BUCKET_NAME=brightbuy-media-storage-695945476492
   ```
-- [ ] Document all generated ARNs, bucket names, and CLI audit logs into [Docs/Deployment/aws-infrastructure.md](../../Deployment/aws-infrastructure.md).
+- [x] Document all generated ARNs, bucket names, and CLI audit logs into [Docs/Deployment/aws-infrastructure.md](../../Deployment/aws-infrastructure.md).
 
 ---
 

@@ -66,6 +66,18 @@
 | 2026-10-12 | `npm test` (local) | 6/6 test suites passed (69/69) | Verified local backend test suite against AWS `brightbuy_dev` |
 | 2026-10-12 | `aws ec2 authorize-security-group-ingress --group-id sg-0ea637458096f125b --protocol tcp --port 80 --cidr 0.0.0.0/0` | `sgr-0ab65955dc0734315` | Authorized public HTTP (port 80) for Nginx ingress |
 | 2026-10-12 | `aws ec2 authorize-security-group-ingress --group-id sg-0ea637458096f125b --protocol tcp --port 443 --cidr 0.0.0.0/0` | `sgr-048b2bcc4c0f6ca6c` | Authorized public HTTPS (port 443) for SSL ingress |
+| 2026-10-13 | `aws s3api create-bucket --bucket brightbuy-media-storage-695945476492 --region us-east-1` | `arn:aws:s3:::brightbuy-media-storage-695945476492` | Created media storage S3 bucket |
+| 2026-10-13 | `aws s3api put-bucket-encryption ...` | SSE-S3 (AES256) | Enabled default server-side encryption |
+| 2026-10-13 | `aws s3api put-public-access-block ...` | `BlockPublicPolicy: false`, `RestrictPublicBuckets: false` | Allowed public bucket policy on bucket |
+| 2026-10-13 | `aws s3api put-bucket-policy ...` | `PublicReadGetObject` on `products/*` | Allowed public read access for catalog image assets |
+| 2026-10-13 | `aws s3api put-bucket-cors ...` | CORS rules applied | Allowed GET, PUT, POST, HEAD from EC2 and localhost |
+| 2026-10-13 | `aws s3 sync backend/db/seed/assets/ ...` | 52 objects uploaded | Synced 40 product seed images + variants to S3 |
+| 2026-10-13 | `aws iam create-role --role-name BrightBuy-EC2-S3-Access-Role ...` | `arn:aws:iam::695945476492:role/BrightBuy-EC2-S3-Access-Role` (`AROA2ECMVHGGOOBLAIQCT`) | Created IAM role for EC2 instance |
+| 2026-10-13 | `aws iam put-role-policy --policy-name BrightBuy-S3-Policy ...` | Inline policy attached | Scoped permissions: PutObject, GetObject, DeleteObject, ListBucket |
+| 2026-10-13 | `aws iam create-instance-profile --instance-profile-name BrightBuy-EC2-Instance-Profile` | `AIPA2ECMVHGGOF4JN6ES2` | Created IAM instance profile |
+| 2026-10-13 | `aws iam add-role-to-instance-profile ...` | Role added to profile | Linked `BrightBuy-EC2-S3-Access-Role` to instance profile |
+| 2026-10-13 | `aws ec2 associate-iam-instance-profile --instance-id i-0a19078299834fba2 ...` | `iip-assoc-0303cab1c6ce4f7a1` | Associated instance profile with live EC2 instance |
+| 2026-10-13 | `ssh ubuntu@18.208.53.186 ...` | `.env.prod` updated | Configured `AWS_REGION` and `AWS_S3_BUCKET_NAME` on EC2 |
 
 ---
 
