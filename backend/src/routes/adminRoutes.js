@@ -4,7 +4,6 @@ const adminCategoryController = require('../controllers/adminCategoryController'
 const adminOrderController = require('../controllers/adminOrderController');
 const adminInventoryController = require('../controllers/adminInventoryController');
 const { requireAuth, requireRole, requireStaffRole } = require('../middleware/authMiddleware');
-const multipartImageUpload = require('../middleware/multipartImageUpload');
 
 const router = express.Router();
 
@@ -41,7 +40,8 @@ router.patch('/products/:id/status', requireStaffRole('catalog_manager'), adminP
 router.delete('/products/:id', requireStaffRole('catalog_manager'), adminProductController.deleteProduct);
 
 // Product images
-router.post('/products/:id/images', requireStaffRole('catalog_manager'), multipartImageUpload, adminProductController.createImage);
+router.post('/products/:id/images/presign', requireStaffRole('catalog_manager'), adminProductController.presignImage);
+router.post('/products/:id/images/confirm', requireStaffRole('catalog_manager'), adminProductController.createImage);
 router.put('/images/:id', requireStaffRole('catalog_manager'), adminProductController.updateImage);
 router.delete('/images/:id', requireStaffRole('catalog_manager'), adminProductController.deleteImage);
 

@@ -15,9 +15,13 @@ async function adjustStock(variantId, employeeId, stockQuantity, reason) {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
-    const current = await client.query('SELECT variant_id,stock_quantity FROM product_variants WHERE variant_id=$1 FOR UPDATE', [variantId]);
+    const current = await client.query('SELECT variant_id,stock_quantity,updated_at FROM product_variants WHERE variant_id=$1 FOR UPDATE', [variantId]);
     if (!current.rowCount) { await client.query('ROLLBACK'); return null; }
-    const updated = await client.query('UPDATE product_variants SET stock_quantity=$2,updated_at=CURRENT_TIMESTAMP WHERE variant_id=$1 RETURNING variant_id,stock_quantity,updated_at', [variantId, stockQuantity]);
+    if (current.rows[0].stock_quantity === stockQuantity) {
+      await client.query('COMMIT');
+      return current.rows[0];
+    }
+    const updated = await client.query('UPDATE product_variants SET stock_quantity=$2 WHERE variant_id=$1 RETURNING variant_id,stock_quantity,updated_at', [variantId, stockQuantity]);
     await client.query('INSERT INTO inventory_adjustments (variant_id,employee_id,previous_quantity,new_quantity,reason) VALUES ($1,$2,$3,$4,$5)', [variantId, employeeId, current.rows[0].stock_quantity, stockQuantity, reason]);
     await client.query('COMMIT');
     return updated.rows[0];

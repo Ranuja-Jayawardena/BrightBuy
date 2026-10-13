@@ -1,5 +1,7 @@
 # Phase 1.6: Product Schema
 
+> **Fix 6 status correction (2026-10-13):** Media schema evidence: current repository V26 replaces BYTEA with image_url, but its generic backfill needs the per-image preservation gate and actual target history is unverified. Any BYTEA schema below is historical. Proposed upload/cleanup structures are not implemented until new migrations exist; follow revised Fix 6.2 before any destructive cutover. [Active Fix 6 guidance](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md).
+
 > **Parent Phase:** [Phase 1: Project Foundation & Database](phase1-project-foundation.md)
 > **Status:** Complete
 > **Assigned To:** C
@@ -53,6 +55,8 @@ Create the core product tables (products, variants, images) and seed the 40-prod
 
 ### Implementation Decisions
 - **Binary Image Storage:** Implemented strictly using PostgreSQL `BYTEA` with base64 decoded PNG binaries (`decode('<base64>', 'base64')`) in `04_products.sql` per project constraints.
+- **Cloud Storage Migration (Lecturer Approved):** See [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) and [Fix 6.2](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md) for Flyway migration `V26` completely replacing `image_data` BYTEA with `image_url NOT NULL`.
+- **Consumer Technology Catalog Specialization:** See [Fix 7.2: Technology Product Catalog Seed](../../Fixes/Fix7-Tech-Catalog-Specialization/fix7.2-technology-product-catalog-seed.md) for replacing the 24 non-tech products (`HAP-*`, `KIT-*`, `CLN-*`, `APP-*`, `MCL-*`, `WCL-*`) in `04_products.sql` with consumer tech devices (Tablets, Displays, Peripherals, Wearables, IoT, SSDs).
 - **Constraints & Indexes:**
   - `idx_products_product_name` on `products(product_name)` for text search.
   - `idx_product_variants_product_id` on `product_variants(product_id)` with `ON DELETE CASCADE`.
@@ -60,6 +64,7 @@ Create the core product tables (products, variants, images) and seed the 40-prod
   - `idx_product_images_single_primary` as a partial unique index on `product_images(product_id) WHERE is_primary = true` ensuring strictly at most one primary image per product.
   - `idx_product_images_product_sort` on `product_images(product_id, sort_order)`.
 - **Database Schema Sync:** Added all indexes and constraint annotations into `DB_Schema.md`.
+- **Catalog timestamps (V27):** `products` and `product_variants` retain their insert defaults; PostgreSQL row-level `BEFORE UPDATE` triggers set each updated row's `updated_at` to the transaction start timestamp, including no-op updates. The backend no longer assigns those timestamps. Related-row changes do not update the parent product timestamp.
 
 ### Published SKU & Catalog Matrix (For Members A, B, and D)
 
@@ -139,3 +144,12 @@ The following 40 products and 70 variants have been seeded in `backend/db/seed/0
 |  |  |  |  | `WCL-003-GRY-L` | Dove Gray / Size L | $119.00 | 15 |
 | `WCL-004` | Breathable Flex Yoga Leggings | PeakAthletics | Women's Clothing | `WCL-004-BLK-S` | Classic Black / Size S | $48.00 | 55 |
 |  |  |  |  | `WCL-004-SGE-M` | Sage Green / Size M | $48.00 | 0 |
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.2: Catalog Timestamp Migration Verification](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+- [Fix 8.8: Manual Inventory Adjustment Audit](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

@@ -35,3 +35,10 @@
 - **Shared Error Contract Alignment:** Error handling middleware and 404 handlers standardized to `{ error: '...', message: '...', statusCode: ... }`.
 - **Automated Test Suite:** Created 3 test suites (`auth.test.js`, `middleware.test.js`, `securityHeaders.test.js`) totaling 21 passing automated tests in Jest & Supertest covering login, registration, token refresh rotation, logout, `requireAuth`, `requireRole`, rate limiting, and security headers.
 
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.11: Application & Migration Database Accounts](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

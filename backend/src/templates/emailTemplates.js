@@ -1,6 +1,7 @@
 /**
  * HTML and text email templates for BrightBuy transactional emails.
  */
+const { URL } = require('node:url');
 
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
@@ -15,6 +16,16 @@ function escapeHtml(str) {
 function formatCurrency(amount) {
   const num = Number(amount) || 0;
   return `$${num.toFixed(2)}`;
+}
+
+function publicStoreUrl(path = '') {
+  try {
+    const url = new URL(process.env.FRONTEND_URL || '');
+    if (url.protocol !== 'https:' || url.hostname === 'localhost' || url.hostname.endsWith('.local')) return null;
+    return `${url.origin}${path}`;
+  } catch {
+    return null;
+  }
 }
 
 function baseLayout({ title, previewText, contentHtml }) {
@@ -163,6 +174,7 @@ function welcomeEmail({ name, email }) {
   const displayName = name ? escapeHtml(name) : 'Valued Customer';
   const title = `Welcome to BrightBuy, ${displayName}!`;
   const previewText = `Welcome to BrightBuy! We're thrilled to have you with us.`;
+  const storeUrl = publicStoreUrl();
 
   const contentHtml = `
     <h2 style="margin-top: 0; font-size: 20px; color: #111827;">Hello ${displayName},</h2>
@@ -178,9 +190,7 @@ function welcomeEmail({ name, email }) {
         <li>Experience seamless, secure payment options</li>
       </ul>
     </div>
-    <div style="text-align: center; margin: 28px 0 12px;">
-      <a href="${escapeHtml(process.env.FRONTEND_URL || 'http://localhost:3000')}" class="btn">Start Shopping Now</a>
-    </div>
+    ${storeUrl ? `<div style="text-align: center; margin: 28px 0 12px;"><a href="${escapeHtml(storeUrl)}" class="btn">Start Shopping Now</a></div>` : ''}
     <p style="font-size: 13px; color: #9ca3af; margin-top: 24px; text-align: center;">
       If you did not register for this account, please disregard this email.
     </p>
@@ -189,7 +199,7 @@ function welcomeEmail({ name, email }) {
   return {
     subject: title,
     html: baseLayout({ title, previewText, contentHtml }),
-    text: `Hello ${displayName},\n\nThank you for registering at BrightBuy! Your account (${email}) is now active.\n\nVisit our store to start shopping: ${process.env.FRONTEND_URL || 'http://localhost:3000'}\n\n- The BrightBuy Team`,
+    text: `Hello ${displayName},\n\nThank you for registering at BrightBuy! Your account (${email}) is now active.${storeUrl ? `\n\nVisit our store to start shopping: ${storeUrl}` : ''}\n\n- The BrightBuy Team`,
   };
 }
 
@@ -206,9 +216,10 @@ function orderConfirmationEmail({
   estimatedDeliveryDays,
 }) {
   const displayName = name ? escapeHtml(name) : 'Valued Customer';
-  const title = `Order Confirmation #${orderId}`;
+  const title = `Order Received #${orderId}`;
   const previewText = `Thank you for your order #${orderId}. We have received your order and are preparing it.`;
   const formattedDate = orderDate ? new Date(orderDate).toLocaleDateString() : new Date().toLocaleDateString();
+  const orderUrl = publicStoreUrl(`/orders/${encodeURIComponent(orderId)}`);
 
   let itemsRowsHtml = '';
   let itemsRowsText = '';
@@ -243,7 +254,7 @@ function orderConfirmationEmail({
           ${escapeHtml(deliveryAddress.city_name || deliveryAddress.city || '')} ${escapeHtml(deliveryAddress.zip_code || '')}
         </p>
         <p style="margin: 10px 0 0; font-size: 13px; color: #4f46e5; font-weight: 600;">
-          Estimated delivery: ${estimatedDeliveryDays || 5-7} business days
+          Estimated delivery: ${estimatedDeliveryDays ?? '5–7'} business days
         </p>
       </div>
     `
@@ -289,15 +300,13 @@ function orderConfirmationEmail({
 
     ${addressHtml}
 
-    <div style="text-align: center; margin: 28px 0 12px;">
-      <a href="${escapeHtml(process.env.FRONTEND_URL || 'http://localhost:3000')}/orders/${orderId}" class="btn">View Order Details</a>
-    </div>
+    ${orderUrl ? `<div style="text-align: center; margin: 28px 0 12px;"><a href="${escapeHtml(orderUrl)}" class="btn">View Order Details</a></div>` : ''}
   `;
 
   return {
-    subject: `Order Confirmation #${orderId} - BrightBuy`,
+    subject: `Order Received #${orderId} - BrightBuy`,
     html: baseLayout({ title, previewText, contentHtml }),
-    text: `Thank you for your order #${orderId}!\n\nOrder Date: ${formattedDate}\n\nItems:\n${itemsRowsText}\nTotal: ${formatCurrency(totalAmount)}\n\nTrack your order at: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/orders/${orderId}\n\n- The BrightBuy Team`,
+    text: `Thank you for your order #${orderId}!\n\nOrder Date: ${formattedDate}\n\nItems:\n${itemsRowsText}\nTotal: ${formatCurrency(totalAmount)}${orderUrl ? `\n\nTrack your order at: ${orderUrl}` : ''}\n\n- The BrightBuy Team`,
   };
 }
 
@@ -316,6 +325,7 @@ function paymentConfirmationEmail({
   const title = `Payment Confirmation for Order #${orderId}`;
   const previewText = `Payment confirmed for Order #${orderId}. Total paid: ${formatCurrency(amount)}.`;
   const formattedDate = paymentDate ? new Date(paymentDate).toLocaleDateString() : new Date().toLocaleDateString();
+  const orderUrl = publicStoreUrl(`/orders/${encodeURIComponent(orderId)}`);
 
   const contentHtml = `
     <h2 style="margin-top: 0; font-size: 20px; color: #111827;">Payment Confirmed!</h2>
@@ -352,9 +362,7 @@ function paymentConfirmationEmail({
       Your order is now being prepped for dispatch. We will send you another update once your package has shipped!
     </p>
 
-    <div style="text-align: center; margin: 24px 0 12px;">
-      <a href="${escapeHtml(process.env.FRONTEND_URL || 'http://localhost:3000')}/orders/${orderId}" class="btn">View Order Status</a>
-    </div>
+    ${orderUrl ? `<div style="text-align: center; margin: 24px 0 12px;"><a href="${escapeHtml(orderUrl)}" class="btn">View Order Status</a></div>` : ''}
   `;
 
   return {
@@ -379,6 +387,7 @@ function deliveryStatusUpdateEmail({
   const title = `Delivery Update for Order #${orderId}`;
   const cleanStatus = (deliveryStatus || 'updated').replace(/_/g, ' ').toUpperCase();
   const previewText = `Delivery status for Order #${orderId} is now ${cleanStatus}.`;
+  const orderUrl = publicStoreUrl(`/orders/${encodeURIComponent(orderId)}`);
 
   const trackingHtml = trackingNumber
     ? `
@@ -406,15 +415,13 @@ function deliveryStatusUpdateEmail({
       ${estimatedDeliveryDays ? `<p style="margin: 12px 0 0; font-size: 13px; color: #6b7280;">Estimated Delivery Window: ${estimatedDeliveryDays} business days</p>` : ''}
     </div>
 
-    <div style="text-align: center; margin: 28px 0 12px;">
-      <a href="${escapeHtml(process.env.FRONTEND_URL || 'http://localhost:3000')}/orders/${orderId}" class="btn">Track Order</a>
-    </div>
+    ${orderUrl ? `<div style="text-align: center; margin: 28px 0 12px;"><a href="${escapeHtml(orderUrl)}" class="btn">Track Order</a></div>` : ''}
   `;
 
   return {
     subject: `Delivery Update: Order #${orderId} is ${cleanStatus} - BrightBuy`,
     html: baseLayout({ title, previewText, contentHtml }),
-    text: `Delivery Update for Order #${orderId}\n\nStatus: ${cleanStatus}\nDelivery ID: #${deliveryId}${trackingNumber ? `\nTracking Number: ${trackingNumber}` : ''}\n\nTrack order: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/orders/${orderId}\n\n- The BrightBuy Team`,
+    text: `Delivery Update for Order #${orderId}\n\nStatus: ${cleanStatus}\nDelivery ID: #${deliveryId}${trackingNumber ? `\nTracking Number: ${trackingNumber}` : ''}${orderUrl ? `\n\nTrack order: ${orderUrl}` : ''}\n\n- The BrightBuy Team`,
   };
 }
 

@@ -1,4 +1,4 @@
-﻿# Phase 7.4: Inventory & Employee Admin APIs
+# Phase 7.4: Inventory & Employee Admin APIs
 
 > **Parent Phase:** [Phase 7: Inventory & Admin Dashboard](phase7-inventory-admin-dashboard.md)
 > **Status:** Complete
@@ -60,3 +60,11 @@ _Record any implementation decisions, trade-offs, or deviations from the plan he
 
 Added an inventory adjustment audit table so every manual stock change retains the acting employee, previous/new quantity, and reason.
 
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.6: Concurrent Super Admin Protection](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
+- [Fix 8.8: Manual Inventory Adjustment Audit](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

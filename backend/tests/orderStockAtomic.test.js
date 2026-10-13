@@ -256,7 +256,7 @@ describe('Order Placement & Atomic Stock Deduction Logic (Unit Tests)', () => {
 
       // Verify that FOR UPDATE was called in strict ascending order: 3, then 9, then 15
       const forUpdateCalls = mockClient.query.mock.calls.filter(call =>
-        typeof call[0] === 'string' && call[0].includes('FOR UPDATE')
+        typeof call[0] === 'string' && call[0].includes('product_variants') && call[0].includes('FOR UPDATE')
       );
 
       expect(forUpdateCalls).toHaveLength(3);

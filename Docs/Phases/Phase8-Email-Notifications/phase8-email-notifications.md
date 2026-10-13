@@ -9,7 +9,7 @@
 
 ## Overview
 
-Transactional emails via Nodemailer. D sets up the email service, creates HTML templates, and connects email triggers to existing order, delivery, payment, and auth events. No new API endpoints: emails are triggered from existing backend logic.
+Transactional emails via Nodemailer. D sets up the email service, creates HTML templates, and connects email triggers to existing order, delivery, payment, and auth events. The later email extension adds database-backed retry jobs and verification/password-reset endpoints.
 
 ---
 
@@ -47,6 +47,7 @@ graph LR
 ## Key Decisions & Notes
 
 - **Cross-owner code:** 8.2 adds email calls inside endpoints owned by E (`/api/auth/register`) and C (`/api/admin/deliveries/:id/status`). D adds a single non-blocking `notificationService` call at the hook point the owner leaves, and the owner reviews the change.
+- **Post-phase email extension:** `V25__email_jobs_and_auth_tokens.sql` adds the email queue and expiring account tokens. V21 is reserved for employee roles, V22/V23 for catalog indexes, and V24 for employee active status. The extension adds `/api/auth/request-verification`, `/verify-email`, `/forgot-password`, and `/reset-password`.
 
 ---
 
@@ -55,4 +56,11 @@ graph LR
 Transactional notifications are extended by the following post-development fix item in [Docs/Fixes/overallplan.md](../../Fixes/overallplan.md):
 - **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** D updates delivery status notification email templates to conditionally render courier tracking numbers and links for courier deliveries, while displaying storefront pickup instructions for store pickup orders.
 
+## Fix 8 follow-up
 
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.4: Order Transitions & Payment Event Consistency](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
+- [Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

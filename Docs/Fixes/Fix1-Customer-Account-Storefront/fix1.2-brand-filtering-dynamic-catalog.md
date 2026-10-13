@@ -1,7 +1,7 @@
 # Fix 1.2: Dynamic Brand Filtering & Seed Catalog Alignment
 
 > **Parent Group:** [Fix 1: Customer Account & Storefront UX](fix1-customer-account-storefront.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member C (Backend Catalog & Seed Data) & Member A (Storefront Filter UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -28,9 +28,8 @@
 ## Tasks
 
 ### Backend & Seed Data — Member C
-- [ ] Add/align brands in `backend/db/seed/04_products.sql`:
-  - Ensure recognized brands (e.g. Apple, Samsung, Sony, Nike, Adidas, LG) have realistic seeded products, variants, and categories, OR update seeded brand names to match popular consumer brands.
-- [ ] Implement `GET /api/products/brands` in `backend/src/controllers/productController.js`:
+- [x] Align the displayed brands with the existing product seed by sourcing filter options from active catalog products. The seed's fictional brands retain their matching products, variants, and categories.
+- [x] Implement `GET /api/products/brands` in `backend/src/controllers/productController.js`:
   - Query:
     ```sql
     SELECT DISTINCT brand
@@ -39,14 +38,18 @@
     ORDER BY brand ASC;
     ```
   - Return `{ brands: string[] }`.
-- [ ] Expose route in `backend/src/routes/productRoutes.js`.
+- [x] Expose route in `backend/src/routes/productRoutes.js`.
 
 ### Storefront UI — Member A
-- [ ] Update `frontend/src/app/products/page.tsx`:
+- [x] Update `frontend/src/app/products/page.tsx`:
   - Remove hardcoded `BRANDS` constant.
-  - Fetch available brands dynamically from `/api/products/brands` on component mount.
+  - Fetch available brands dynamically from `/api/products/brands` on component mount (with graceful fallback to loaded catalog brands).
   - Render brand filter chips/list dynamically with count or clean labels.
   - Preserve active filter state in query params (`?brand=Apple`).
+
+**Decision:** The hardcoded popular brand names were unrelated to the seeded fictional products. The storefront now lists the distinct active product brands returned by the API. Renaming products to real manufacturers would misrepresent the demo catalog and require reseeding existing databases.
+
+> **Note on Fix 7 Specialization:** In [Fix 7: Consumer Technology Catalog Specialization](../Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md), all non-tech products are replaced with consumer tech items. Because `GET /api/products/brands` queries `DISTINCT brand FROM products WHERE is_active = true`, the brand filter will automatically reflect the updated tech brands (Lumina, Zenith, Titan, NovaTech, Sonus, etc.) without API code changes.
 
 ---
 
@@ -60,13 +63,9 @@ GET /api/products/brands
 ```json
 {
   "brands": [
-    "Adidas",
-    "Apple",
     "ApexGear",
-    "LG",
-    "Nike",
-    "Samsung",
-    "Sony"
+    "Heritage",
+    "Lumina"
   ]
 }
 ```
@@ -75,12 +74,12 @@ GET /api/products/brands
 
 ## Affected Files
 
-- `backend/db/seed/04_products.sql`
 - `backend/src/models/productModel.js`
+- `backend/src/services/productService.js`
 - `backend/src/controllers/productController.js`
 - `backend/src/routes/productRoutes.js`
 - `frontend/src/app/products/page.tsx`
-- `frontend/src/components/catalog/ProductFilterSidebar.tsx`
+- `frontend/src/services/catalogService.ts`
 
 ---
 

@@ -35,11 +35,10 @@ async function detail(orderId) {
 }
 
 async function updateStatus(orderId, status) {
-  const valid = status && ORDER_STATUSES.includes(status); if (!valid) throw error(400, 'Invalid status');
-  const current = await model.findOrderById(id(orderId, 'id')); if (!current) return null;
-  const allowed = current.status === 'pending' ? ['paid', 'cancelled'] : current.status === 'paid' ? ['shipped', 'cancelled'] : current.status === 'shipped' ? ['delivered', 'cancelled'] : [];
-  if (!allowed.includes(status)) throw error(400, 'Invalid status transition');
-  return model.updateOrderStatus(orderId, status);
+  const valid = status && ORDER_STATUSES.includes(status);
+  if (!valid) throw error(400, 'Invalid status');
+  const parsedOrderId = id(orderId, 'id');
+  return model.updateOrderStatus(parsedOrderId, status);
 }
 
 async function updateDelivery(deliveryId, body) {
@@ -77,7 +76,7 @@ async function updateDelivery(deliveryId, body) {
 
   const result = await model.updateDeliveryStatus(parsedDeliveryId, delivery_status, trackingNumber);
   if (result) await notificationService.onDeliveryStatusChanged(result);
-  return result;
+  return result || currentDelivery;
 }
 
 module.exports = {

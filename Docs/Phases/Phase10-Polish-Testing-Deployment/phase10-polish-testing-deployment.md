@@ -81,4 +81,12 @@ User testing, end-to-end integration audits, and operational feedback revealed t
 - **[Fix 4: Role Permissions & Operations](../../Fixes/Fix4-Role-Permissions-Operations/fix4-role-permissions-operations.md)** (Fixes 4.1 – 4.3: staff cart purchase restriction, Super Admin employee deactivation & V24 migration, store pickup vs courier tracking codes).
 - **[Fix 5: Analytics & Reports Visuals](../../Fixes/Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)** (Fix 5.1: real product name labels and tooltips on top performing products chart).
 
+## Fix 8 follow-up
 
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.10: Storefront & Report Regression Verification](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
+- [Fix 8.11: Application & Migration Database Accounts](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+- [Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

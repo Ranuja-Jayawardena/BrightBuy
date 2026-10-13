@@ -96,3 +96,11 @@ Response 403: { error: "Forbidden: Insufficient privileges", message: "Only supe
 5. **Frontend Progressive Disclosure:**
    - The `/admin` sidebar navigation in `admin/layout.tsx` dynamically hides tabs not permitted for the active employee's sub-role.
    - The `/admin/employees` creation modal provides a role selector dropdown for assigning roles when onboarding new staff.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.6: Concurrent Super Admin Protection](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

@@ -61,23 +61,121 @@ async function findDeliveryById(deliveryId) {
 }
 
 async function updateOrderStatus(orderId, status) {
-  const client = await db.connect();
+  const client = typeof db.connect === 'function' ? await db.connect() : null;
+  const runner = client || db;
   try {
-    await client.query('BEGIN');
-    const current = await client.query('SELECT order_id,status FROM orders WHERE order_id=$1 FOR UPDATE', [orderId]);
-    if (!current.rowCount) { await client.query('ROLLBACK'); return null; }
-    const updated = await client.query('UPDATE orders SET status=$2,updated_at=CURRENT_TIMESTAMP WHERE order_id=$1 RETURNING order_id,status,updated_at', [orderId, status]);
-    if (status === 'cancelled' && current.rows[0].status !== 'cancelled') {
-      await client.query(`UPDATE product_variants v SET stock_quantity=v.stock_quantity+oi.quantity,updated_at=CURRENT_TIMESTAMP FROM order_items oi WHERE oi.order_id=$1 AND oi.variant_id=v.variant_id`, [orderId]);
+    if (client) await client.query('BEGIN');
+    const current = await runner.query('SELECT order_id, status FROM orders WHERE order_id = $1 FOR UPDATE', [orderId]);
+    if (!current.rowCount) {
+      if (client) await client.query('ROLLBACK');
+      return null;
     }
-    await client.query('COMMIT');
+    const currentStatus = current.rows[0].status;
+
+    // Handle unchanged status deliberately as a clean no-op
+    if (currentStatus === status) {
+      if (client) await client.query('COMMIT');
+      return current.rows[0];
+    }
+
+    // Validate state machine inside transaction lock
+    const allowed = {
+      pending: ['paid', 'shipped', 'cancelled'],
+      paid: ['shipped', 'cancelled'],
+      shipped: ['delivered', 'cancelled'],
+      delivered: [],
+      cancelled: []
+    };
+
+    if (!allowed[currentStatus] || !allowed[currentStatus].includes(status)) {
+      const err = new Error(`Invalid status transition from ${currentStatus} to ${status}`);
+      err.status = 400;
+      err.code = 'INVALID_ORDER_TRANSITION';
+      throw err;
+    }
+
+    // If transitioning to cancelled, restore stock once with aggregation and ascending variant locks
+    if (status === 'cancelled' && currentStatus !== 'cancelled') {
+      // 1. Lock affected variants in ascending order to prevent deadlocks
+      const itemsRes = await runner.query(
+        `SELECT DISTINCT variant_id FROM order_items WHERE order_id = $1 ORDER BY variant_id ASC`,
+        [orderId]
+      );
+      if (itemsRes.rows.length > 0) {
+        const variantIds = itemsRes.rows.map(r => r.variant_id);
+        await runner.query(
+          `SELECT variant_id FROM product_variants WHERE variant_id = ANY($1) ORDER BY variant_id ASC FOR UPDATE OF product_variants`,
+          [variantIds]
+        );
+      }
+
+      // 2. Aggregate quantity per variant to avoid duplicate line loss in UPDATE FROM
+      await runner.query(
+        `WITH item_sums AS (
+           SELECT variant_id, SUM(quantity)::int AS qty
+           FROM order_items
+           WHERE order_id = $1
+           GROUP BY variant_id
+         )
+         UPDATE product_variants v
+         SET stock_quantity = v.stock_quantity + s.qty
+         FROM item_sums s
+         WHERE v.variant_id = s.variant_id`,
+        [orderId]
+      );
+    }
+
+    const updated = await runner.query(
+      'UPDATE orders SET status = $2, updated_at = CURRENT_TIMESTAMP WHERE order_id = $1 RETURNING order_id, status, updated_at',
+      [orderId, status]
+    );
+
+    if (client) await client.query('COMMIT');
     return updated.rows[0];
-  } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
+  } catch (error) {
+    if (client) {
+      try { await client.query('ROLLBACK'); } catch (_rollbackErr) { /* ignore rollback failure on disconnected client */ }
+    }
+    // Map trigger errors (P0001) to 400
+    if (error.code === 'P0001' || error.message.includes('Invalid order status transition')) {
+      const err = new Error(error.message);
+      err.status = 400;
+      err.code = 'INVALID_ORDER_TRANSITION';
+      throw err;
+    }
+    throw error;
+  } finally {
+    if (client) client.release();
+  }
 }
 
 async function updateDeliveryStatus(deliveryId, deliveryStatus, trackingNumber) {
-  const result = await db.query(`UPDATE deliveries SET delivery_status=$2,tracking_number=CASE WHEN $3::text IS NOT NULL THEN $3 ELSE tracking_number END,updated_at=CURRENT_TIMESTAMP WHERE delivery_id=$1 RETURNING delivery_id,order_id,delivery_mode,delivery_status,tracking_number,updated_at`, [deliveryId, deliveryStatus, trackingNumber !== undefined ? trackingNumber : null]);
-  return result.rows[0] || null;
+  try {
+    const result = await db.query(
+      `UPDATE deliveries 
+       SET delivery_status = $2,
+           tracking_number = CASE WHEN $3::text IS NOT NULL THEN $3 ELSE tracking_number END,
+           updated_at = CURRENT_TIMESTAMP 
+       WHERE delivery_id = $1 AND (delivery_status IS DISTINCT FROM $2 OR ($3::text IS NOT NULL AND tracking_number IS DISTINCT FROM $3)) 
+       RETURNING delivery_id, order_id, delivery_mode, delivery_status, tracking_number, updated_at`,
+      [deliveryId, deliveryStatus, trackingNumber !== undefined ? trackingNumber : null]
+    );
+    return result.rows[0] || null;
+  } catch (error) {
+    if (error.constraint === 'chk_deliveries_mode_status') {
+      const err = new Error('Invalid delivery status for the delivery mode');
+      err.status = 400;
+      err.code = 'INVALID_DELIVERY_STATUS';
+      throw err;
+    }
+    if (error.constraint === 'idx_deliveries_order_id_unique') {
+      const err = new Error('Delivery already exists for this order');
+      err.status = 409;
+      err.code = 'CONFLICT';
+      throw err;
+    }
+    throw error;
+  }
 }
 
 module.exports = { findOrders, findOrderById, findDeliveryById, updateOrderStatus, updateDeliveryStatus };

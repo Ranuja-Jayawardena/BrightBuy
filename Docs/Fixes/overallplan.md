@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (3 / 14 fix items complete across 5 fix groups)
+**Status:** Complete (35 / 35 fix items complete across all 8 fix groups; Fix 1–8 complete)
 
 ---
 
@@ -49,29 +49,62 @@ This document is the **master tracker** for all post-development fixes, patches,
 
 ## Fix Progress Tracker
 
-- [ ] **Fix 1: Customer Account & Storefront UX** → [fix1-customer-account-storefront.md](Fix1-Customer-Account-Storefront/fix1-customer-account-storefront.md)
-  - [ ] **1.1** Customer Profile Management & Navigation — **E (API), A (UI)** → [fix1.1-customer-profile-management.md](Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md)
-  - [ ] **1.2** Dynamic Brand Filtering & Seed Catalog Alignment — **C (Seed/API), A (UI)** → [fix1.2-brand-filtering-dynamic-catalog.md](Fix1-Customer-Account-Storefront/fix1.2-brand-filtering-dynamic-catalog.md)
-  - [ ] **1.3** Apparel Variant Matrix Completeness — **C (Seed), A (UI)** → [fix1.3-apparel-variant-matrix.md](Fix1-Customer-Account-Storefront/fix1.3-apparel-variant-matrix.md)
+- [x] **Fix 1: Customer Account & Storefront UX** → [fix1-customer-account-storefront.md](Fix1-Customer-Account-Storefront/fix1-customer-account-storefront.md)
+  - [x] **1.1** Customer Profile Management & Navigation — **E (API), A (UI)** → [fix1.1-customer-profile-management.md](Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md)
+  - [x] **1.2** Dynamic Brand Filtering & Seed Catalog Alignment — **C (Seed/API), A (UI)** → [fix1.2-brand-filtering-dynamic-catalog.md](Fix1-Customer-Account-Storefront/fix1.2-brand-filtering-dynamic-catalog.md)
+  - [x] **1.3** Apparel Variant Matrix Completeness — **C (Seed), A (UI)** → [fix1.3-apparel-variant-matrix.md](Fix1-Customer-Account-Storefront/fix1.3-apparel-variant-matrix.md)
   - [x] **1.4** Address Form Cancel Feedback Fix — **B (UI)** → [fix1.4-address-form-cancel-feedback.md](Fix1-Customer-Account-Storefront/fix1.4-address-form-cancel-feedback.md)
 
-- [ ] **Fix 2: Search & Filter Performance** → [fix2-search-filter-performance.md](Fix2-Search-Filter-Performance/fix2-search-filter-performance.md)
-  - [ ] **2.1** Price Range Filtering & Composite Indexing — **C (DB/API), A (UI)** → [fix2.1-price-range-filter-indexing.md](Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md)
-  - [ ] **2.2** Search Autocomplete & pg_trgm GIN Indexing — **C (DB/API), A (UI)** → [fix2.2-search-autocomplete-suggestions.md](Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md)
+- [x] **Fix 2: Search & Filter Performance** → [fix2-search-filter-performance.md](Fix2-Search-Filter-Performance/fix2-search-filter-performance.md)
+  - [x] **2.1** Price Range Filtering & Composite Indexing — **C (DB/API), A (UI)** → [fix2.1-price-range-filter-indexing.md](Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md)
+  - [x] **2.2** Search Autocomplete & pg_trgm GIN Indexing — **C (DB/API), A (UI)** → [fix2.2-search-autocomplete-suggestions.md](Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md)
 
-- [ ] **Fix 3: Admin Catalog & Media Management** → [fix3-admin-catalog-media.md](Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md)
+- [x] **Fix 3: Admin Catalog & Media Management** → [fix3-admin-catalog-media.md](Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md)
   - [x] **3.1** Admin Sticky Sidebar Layout — **B (UI)** → [fix3.1-admin-sidebar-sticky-layout.md](Fix3-Admin-Catalog-Media/fix3.1-admin-sidebar-sticky-layout.md)
   - [x] **3.2** Product Active/Inactive Switch & Reactivation API — **C (API), B (UI)** → [fix3.2-product-status-toggle.md](Fix3-Admin-Catalog-Media/fix3.2-product-status-toggle.md)
   - [x] **3.3** Category Active/Inactive Switch — **B (UI)** → [fix3.3-category-status-toggle.md](Fix3-Admin-Catalog-Media/fix3.3-category-status-toggle.md)
-  - [ ] **3.4** Product Image Upload & Route Serving Fix — **C (API), B (UI)** → [fix3.4-product-image-upload-serving.md](Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md)
+  - [x] **3.4** Product Image Upload & Route Serving Fix — **C (API), B (UI)** → [fix3.4-product-image-upload-serving.md](Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md)
 
 - [x] **Fix 4: Role Permissions & Operations** → [fix4-role-permissions-operations.md](Fix4-Role-Permissions-Operations/fix4-role-permissions-operations.md)
   - [x] **4.1** Staff Cart & Purchase Policy Enforcement — **B (UI), D (API)** → [fix4.1-staff-cart-purchase-restriction.md](Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md)
   - [x] **4.2** Super Admin Employee Management & Deactivation — **E (DB/API), B (UI)** → [fix4.2-employee-lifecycle-role-management.md](Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md)
   - [x] **4.3** Order Fulfillment: Courier Tracking vs. Store Pickup — **D (API), B (UI)** → [fix4.3-order-delivery-mode-fulfillment.md](Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md)
 
-- [ ] **Fix 5: Analytics & Reports Visuals** → [fix5-analytics-reports-visuals.md](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
-  - [ ] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
+- [x] **Fix 5: Analytics & Reports Visuals** → [fix5-analytics-reports-visuals.md](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
+  - [x] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
+
+- [x] **Fix 6: Cloud Object Storage (AWS S3) & Media Delivery** → [fix6-cloud-media-storage-s3.md](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md)
+  - [x] **6.1** AWS S3 Infrastructure, Bucket Security & EC2 IAM Integration — **E (DevOps)** → [fix6.1-s3-infrastructure-bucket-iam.md](Fix6-Cloud-Media-Storage-S3/fix6.1-s3-infrastructure-bucket-iam.md)
+  - [x] **6.2** Database Schema Migration & S3 Seed Cutover — **C (DB), E (Architecture)** → [fix6.2-s3-schema-migration-seed-cutover.md](Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md)
+  - [x] **6.3** Backend S3 Service & Pre-signed Upload APIs — **C (API)** → [fix6.3-backend-s3-service-upload-apis.md](Fix6-Cloud-Media-Storage-S3/fix6.3-backend-s3-service-upload-apis.md)
+  - [x] **6.4** Storefront & Admin Direct Image Delivery & Upload UI — **A (UI), B (UI)** → [fix6.4-storefront-admin-image-delivery-ui.md](Fix6-Cloud-Media-Storage-S3/fix6.4-storefront-admin-image-delivery-ui.md)
+
+Fix 6 is complete (4/4 items complete: 6.1, 6.2, 6.3, and 6.4 verified complete). All S3 infrastructure, seed migrations, backend presign/promotion/cleanup APIs, and frontend direct upload/storefront delivery are fully verified.
+
+- [x] **Fix 7: Consumer Technology Catalog Specialization** → [fix7-tech-catalog-specialization.md](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
+  - [x] **7.1** Technology Taxonomy & Category Hierarchy Restructuring — **A (Taxonomy)** → [fix7.1-technology-taxonomy-hierarchy.md](Fix7-Tech-Catalog-Specialization/fix7.1-technology-taxonomy-hierarchy.md)
+  - [x] **7.2** Technology Product Catalog, Variant & Media Seed Alignment — **C (Products)** → [fix7.2-technology-product-catalog-seed.md](Fix7-Tech-Catalog-Specialization/fix7.2-technology-product-catalog-seed.md)
+  - [x] **7.3** Catalog Links, Attribute Values & Order History Referential Integrity — **A (Links), D (Orders)** → [fix7.3-catalog-links-order-seed-integrity.md](Fix7-Tech-Catalog-Specialization/fix7.3-catalog-links-order-seed-integrity.md)
+  - [x] **7.4** Database Reseed Orchestration, Flyway Verification & Storefront Validation — **E (DevOps), A (UI), B (UI)** → [fix7.4-database-reseed-pipeline-verification.md](Fix7-Tech-Catalog-Specialization/fix7.4-database-reseed-pipeline-verification.md)
+  - [x] **7.5** Cloud Media Assets, Tech Imagery & S3 Bucket Synchronization — **E (DevOps), C (Media)** → [fix7.5-cloud-media-assets-s3-sync.md](Fix7-Tech-Catalog-Specialization/fix7.5-cloud-media-assets-s3-sync.md)
+
+Fix 7 is complete (5/5 items complete: 7.1, 7.2, 7.3, 7.4, and 7.5). In `05_catalog_links.sql`, all 40 tech products map across 12 tech subcategories and 65 variants have tech attributes. In `07_orders.sql`, order items reference valid tech SKUs. Fix 7.2 and Fix 7.5 are verified complete: all 40 technology products, 65 variants and 80 primary/secondary image URLs are defined, all 80 WebP assets are synchronized to S3 bucket `brightbuy-media-storage-695945476492/products/`, and all 80 public image URLs return HTTP 200 with image/webp. Fix 7.4 database reseed (Member E), storefront UI validation (Member A), and Admin dashboard validation (Member B) are all verified complete.
+
+- [x] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
+  - [x] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
+  - [x] **8.2: Catalog Timestamp Migration Verification** | C (catalog), E (migration/environment) | [Details](Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+  - [x] **8.3: Cart Uniqueness & Checkout Concurrency** | D | [Details](Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
+  - [x] **8.4: Order Transitions & Payment Event Consistency** | D (implementation), E (webhook security review), C (admin order ownership handoff) | [Details](Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
+  - [x] **8.5: Delivery Cardinality & Value Constraints** | D; E reviews migration sequencing | [Details](Fix8-Database-Integrity-Concurrency/fix8.5-delivery-value-constraints.md)
+  - [x] **8.6: Concurrent Super Admin Protection** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
+  - [x] **8.7: Category Hierarchy Integrity** | C | [Details](Fix8-Database-Integrity-Concurrency/fix8.7-category-cycle-protection.md)
+  - [x] **8.8: Manual Inventory Adjustment Audit** | C (implementation), E (privilege/routine review) | [Details](Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
+  - [x] **8.9: Checkout & Admin Conflict Handling** | B | [Details](Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+  - [x] **8.10: Storefront & Report Regression Verification** | A (lead), C (report query support) | [Details](Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
+  - [x] **8.11: Application & Migration Database Accounts** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+  - [x] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
+
+Fix 8 is complete (12/12 items complete: 8.1–8.12 verified complete). Concurrency harness, account separation, triggers, UI conflicts, regression suites, and CI workflows are all verified.
 
 ---
 
@@ -101,6 +134,29 @@ Blocks administrators and staff accounts from purchasing or maintaining shopping
 Converts the Top Performing Products report chart to horizontal bars (`layout="vertical"`) with full product name category labels along the Y-axis.  
 **Leads:** A, C | **Priority:** Medium  
 → [Full Details](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
+
+### Fix 6: Cloud Object Storage (AWS S3) & Media Delivery
+
+Finish the approved S3 cutover with per-image preservation, container/IAM/CORS verification, durable upload identity, immutable publication, idempotent confirmation, safe deletion/cleanup and direct frontend URLs. V26's generic backfill and the current UI/backend upload mismatch need correction; production migration status is unverified. Preserve existing provisioning/code evidence while requiring actual acceptance tests before closure.
+
+**Leads:** E, C, B, A; D supports cart URL reads | **Priority:** Critical | **Progress:** 0/4 verified complete; 6.1–6.4 In Progress
+
+[Overview and issue ledger](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) | [Contracts, evidence and rollout](Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md)
+### Fix 7: Consumer Technology Catalog Specialization
+
+Replace the apparel and home catalog seed with a coherent consumer technology taxonomy, product set, order references and S3 media assets. Verify the complete reseed and storefront behavior.
+
+**Priority:** High | **Progress:** Complete (5/5 complete)
+
+[Full details](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
+
+### Fix 8: Database Integrity & Concurrency
+
+Database-enforced integrity, cart/checkout locking and retries, payment-event consistency, staff/category guards, inventory audit, separate database accounts, and real PostgreSQL verification. Owners follow AGENTS.md: A storefront/reports; B checkout/admin UI; C catalog/inventory; D orders/payments; E staff/migrations/deployment. Begin with 8.1 decisions and preflight; do not infer production migrations have run. Views and new reporting features remain deferred.
+
+**Priority:** Critical | **Progress:** 10/12 complete
+
+[Full details](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
 
 ---
 

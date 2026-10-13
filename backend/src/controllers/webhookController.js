@@ -1,8 +1,5 @@
 const crypto = require('crypto');
-const { handlePaymentSuccess, handlePaymentFailure } = require('../services/paymentService');
-
-// In-memory set to store processed webhook IDs for idempotency
-const processedWebhooks = new Set();
+const { handlePaymentSuccess, handlePaymentFailure, handlePaymentRefund } = require('../services/paymentService');
 
 const handleLemonSqueezyWebhook = async (req, res) => {
   try {
@@ -17,7 +14,7 @@ const handleLemonSqueezyWebhook = async (req, res) => {
       return res.status(401).json({ error: 'unauthorized', message: 'Missing signature', statusCode: 401 });
     }
 
-    // Verify signature
+    // 1. Verify cryptographic signature securely
     const hmac = crypto.createHmac('sha256', secret);
     const digest = Buffer.from(hmac.update(req.body).digest('hex'), 'utf8');
     const signatureBuffer = Buffer.from(signature, 'utf8');
@@ -26,52 +23,67 @@ const handleLemonSqueezyWebhook = async (req, res) => {
       return res.status(401).json({ error: 'unauthorized', message: 'Invalid signature', statusCode: 401 });
     }
 
-    // Now it's safe to parse the JSON
+    // 2. Safe parse
     const payload = JSON.parse(req.body.toString());
-    const eventName = payload.meta.event_name;
-    const webhookId = payload.meta.webhook_id;
-
-    // Check for idempotency
-    if (processedWebhooks.has(webhookId)) {
-      console.log(`Webhook ${webhookId} already processed, skipping.`);
-      return res.status(200).json({ received: true });
-    }
+    const eventName = payload.meta?.event_name || 'unknown_event';
+    
+    // Durable event identifier from provider
+    const rawWebhookId = payload.meta?.webhook_id;
+    const eventId = rawWebhookId && String(rawWebhookId).trim() !== ''
+      ? String(rawWebhookId).trim()
+      : (payload.data?.id ? `ls_obj_${payload.data.id}_${eventName}` : crypto.createHash('sha256').update(req.body).digest('hex'));
 
     const data = payload.data;
-    const orderId = payload.meta?.custom_data?.order_id
+    const rawOrderId = payload.meta?.custom_data?.order_id
       || payload.meta?.custom?.order_id
       || data?.attributes?.custom_data?.order_id
       || data?.attributes?.first_order_item?.order_id
-      || 'unknown';
-    const transactionId = data.id;
+      || null;
+
+    const orderId = rawOrderId !== null && rawOrderId !== undefined && !isNaN(Number(rawOrderId))
+      ? parseInt(rawOrderId, 10)
+      : null;
+
+    const transactionId = data?.id ? String(data.id) : null;
+
+    if (!orderId) {
+      console.warn(`[LemonSqueezy Webhook] ${eventName} received without a valid numeric order_id:`, payload.meta);
+      return res.status(200).json({ received: true, warning: 'missing_order_id' });
+    }
 
     if (eventName === 'order_created') {
-      const status = data.attributes.status;
+      const status = data?.attributes?.status;
       if (status === 'paid') {
-        const amount = data.attributes.total;
+        const amount = data?.attributes?.total;
         await handlePaymentSuccess({
+          event_id: eventId,
+          event_name: eventName,
           order_id: orderId,
           transaction_id: transactionId,
           amount,
           raw_event: payload
         });
       } else {
-         // handle failure or other status
-         await handlePaymentFailure({
+        await handlePaymentFailure({
+          event_id: eventId,
+          event_name: eventName,
           order_id: orderId,
           transaction_id: transactionId,
           reason: `Status is ${status}`,
           raw_event: payload
         });
       }
-    }
-
-    // Mark as processed
-    processedWebhooks.add(webhookId);
-    
-    // Simple cleanup to avoid memory leak in this basic implementation
-    if (processedWebhooks.size > 1000) {
-      processedWebhooks.clear();
+    } else if (eventName === 'order_refunded') {
+      console.log(`[LemonSqueezy Webhook] Order ${orderId} refunded, transaction ${transactionId}`);
+      await handlePaymentRefund({
+        event_id: eventId,
+        event_name: eventName,
+        order_id: orderId,
+        transaction_id: transactionId,
+        raw_event: payload
+      });
+    } else {
+      console.log(`[LemonSqueezy Webhook] Unhandled event type: ${eventName}`);
     }
 
     return res.status(200).json({ received: true });

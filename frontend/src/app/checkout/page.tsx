@@ -21,6 +21,7 @@ import {
   X
 } from 'lucide-react';
 import { apiFetch } from '@/services/api';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -33,6 +34,14 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cod'>('card');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // D3 Request Identity Contract: generate and preserve checkout idempotency key across retries
+  const [idempotencyKey, setIdempotencyKey] = useState<string>(() => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return `chk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  });
 
   useEffect(() => {
     fetchAddresses();
@@ -58,6 +67,7 @@ export default function CheckoutPage() {
   }, [deliveryMode, selectedAddress, cities]);
 
   const handlePlaceOrder = async () => {
+    if (isPlacingOrder) return;
     if (items.length === 0) {
       setError("Your cart is empty. Please add items before checking out.");
       return;
@@ -71,7 +81,7 @@ export default function CheckoutPage() {
     setError(null);
 
     try {
-      // 1. Create the Order
+      // 1. Create the Order with preserved request identity
       const payload: { delivery_mode: string; address_id?: number } = {
         delivery_mode: deliveryMode
       };
@@ -81,19 +91,40 @@ export default function CheckoutPage() {
 
       const res = await apiFetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': idempotencyKey
+        },
         body: JSON.stringify(payload)
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to place order');
+        // Refetch authoritative cart state on conflict or stock validation failure
+        if (res.status === 409 || res.status === 400) {
+          await useCartStore.getState().fetchCart();
+          // Generate a fresh idempotency key for the next attempt after cart reload
+          const nextKey = typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `chk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+          setIdempotencyKey(nextKey);
+        }
+        throw new Error(data.message || data.error || 'Failed to place order');
       }
 
-      // Order placed successfully!
+      // Order placed or replayed successfully!
       useCartStore.getState().clearCart();
-      const orderId = data.order.order_id;
+      const orderId = data.order?.order_id;
+      if (!orderId) {
+        throw new Error('Order was confirmed but no order identifier was returned.');
+      }
+
+      // Refresh key for any subsequent new cart session
+      const freshKey = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `chk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      setIdempotencyKey(freshKey);
 
       // 2. Create the Payment Session
       const paymentRes = await apiFetch('/api/payments/create-session', {
@@ -105,10 +136,10 @@ export default function CheckoutPage() {
         })
       });
       
-      const paymentData = await paymentRes.json();
+      const paymentData = await paymentRes.json().catch(() => ({}));
       
       if (!paymentRes.ok) {
-        throw new Error(paymentData.error || 'Order placed but failed to initialize payment');
+        throw new Error(paymentData.message || paymentData.error || 'Order placed but failed to initialize payment');
       }
 
       // 3. Handle Redirect based on payment mode
@@ -119,7 +150,7 @@ export default function CheckoutPage() {
       }
 
     } catch (err: any) {
-      setError(err.message);
+      setError(sanitizeConflictError(err));
       setIsPlacingOrder(false);
     }
   };

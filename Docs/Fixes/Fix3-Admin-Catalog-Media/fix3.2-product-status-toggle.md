@@ -88,3 +88,12 @@ Cookie: access_token=...
 1. Deactivating an active product marks it inactive and removes it from the public storefront catalog.
 2. Toggling an inactive product back to active reactivates it immediately and restores it to the public catalog.
 3. The admin products table displays a responsive toggle switch with immediate visual feedback.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.2: Catalog Timestamp Migration Verification](../Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+- [Fix 8.8: Manual Inventory Adjustment Audit](../Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

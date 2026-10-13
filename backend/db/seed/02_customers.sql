@@ -2,11 +2,11 @@
 
 -- Customer Users
 INSERT INTO users (email, password_hash, role) VALUES
-('alice@example.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC', 'customer'),
-('bob@example.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC', 'customer'),
-('charlie@example.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC', 'customer'),
-('diana@example.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC', 'customer'),
-('eve@example.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjGQiqwSBC', 'customer');
+('alice@example.com', '$2b$10$mDQ54ZzvBIgQDwro.yyEUuhwE6Fw1Kke7hhiV/baPgW4IIWNC0zai', 'customer'),
+('bob@example.com', '$2b$10$mDQ54ZzvBIgQDwro.yyEUuhwE6Fw1Kke7hhiV/baPgW4IIWNC0zai', 'customer'),
+('charlie@example.com', '$2b$10$mDQ54ZzvBIgQDwro.yyEUuhwE6Fw1Kke7hhiV/baPgW4IIWNC0zai', 'customer'),
+('diana@example.com', '$2b$10$mDQ54ZzvBIgQDwro.yyEUuhwE6Fw1Kke7hhiV/baPgW4IIWNC0zai', 'customer'),
+('eve@example.com', '$2b$10$mDQ54ZzvBIgQDwro.yyEUuhwE6Fw1Kke7hhiV/baPgW4IIWNC0zai', 'customer');
 
 -- Customers Profiles
 INSERT INTO customers (user_id, first_name, last_name, phone) VALUES

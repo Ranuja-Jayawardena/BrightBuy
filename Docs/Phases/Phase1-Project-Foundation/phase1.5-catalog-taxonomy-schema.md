@@ -57,4 +57,12 @@ Create the tables that classify and describe products (categories, product-categ
 - **Categories Published:** Electronics, Smartphones, Laptops, Audio, Home Appliances, Kitchen, Cleaning, Apparel, Men's Clothing, Women's Clothing.
 - **Attributes Published:** Color, Storage, RAM, Size, Material.
 - **Dependencies Update:** Indexes `idx_categories_parent_id` and `idx_product_categories_category_id`, plus `ON DELETE CASCADE` behaviors added to `DB_Schema.md`.
+- **Consumer Technology Specialization:** See [Fix 7.1: Technology Taxonomy Hierarchy](../../Fixes/Fix7-Tech-Catalog-Specialization/fix7.1-technology-taxonomy-hierarchy.md) and [Fix 7.3: Catalog Links Integrity](../../Fixes/Fix7-Tech-Catalog-Specialization/fix7.3-catalog-links-order-seed-integrity.md) for the restructuring of `03_taxonomy.sql` and `05_catalog_links.sql` to exclusively support consumer technology categories and attributes.
 
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.7: Category Hierarchy Integrity](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.7-category-cycle-protection.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

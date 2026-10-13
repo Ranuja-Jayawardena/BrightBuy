@@ -1,4 +1,4 @@
-﻿# Phase 7.3: Order & Delivery Admin APIs
+# Phase 7.3: Order & Delivery Admin APIs
 
 > **Parent Phase:** [Phase 7: Inventory & Admin Dashboard](phase7-inventory-admin-dashboard.md)
 > **Status:** Complete
@@ -56,3 +56,11 @@ _Record any implementation decisions, trade-offs, or deviations from the plan he
 
 Implemented with parameterized PostgreSQL queries. Customer filtering accepts email, first/last name, or customer ID; delivery updates support pending, processing, shipped, out_for_delivery, delivered, and cancelled.
 
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.4: Order Transitions & Payment Event Consistency](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
+- [Fix 8.5: Delivery Cardinality & Value Constraints](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.5-delivery-value-constraints.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
