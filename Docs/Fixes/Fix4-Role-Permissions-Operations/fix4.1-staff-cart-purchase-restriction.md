@@ -1,7 +1,7 @@
 # Fix 4.1: Staff Cart & Purchase Policy Enforcement
 
 > **Parent Group:** [Fix 4: Role Permissions & Operations](fix4-role-permissions-operations.md)
-> **Status:** Not Started
+> **Status:** In Progress
 > **Assigned To:** Member B (Frontend Cart UI & Navbar) & Member D (Backend Cart API)
 > **Depends On:** —
 > **Blocks:** —
@@ -45,7 +45,7 @@ In `frontend/src/app/products/[id]/page.tsx`:
 ## Tasks
 
 ### Backend — Member D
-- [ ] In `backend/src/controllers/cartController.js`:
+- [x] In `backend/src/controllers/cartController.js`:
   - Verify all cart endpoints (`GET /api/cart`, `POST /api/cart/items`, `PUT /api/cart/items/:id`, `DELETE /api/cart/items/:id`) enforce customer-only access and return 403 Forbidden for staff accounts.
 
 ### Frontend — Member B
