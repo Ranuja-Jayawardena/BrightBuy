@@ -197,7 +197,7 @@ const handlePaymentSuccess = async ({
     return { processed: true, status: 'paid' };
   } catch (error) {
     if (client) {
-      try { await client.query('ROLLBACK'); } catch (_) {}
+      try { await client.query('ROLLBACK'); } catch (_rollbackErr) { /* ignore rollback failure on disconnected client */ }
     }
     console.error('[PaymentService] Error handling payment success:', error);
     throw error;
@@ -308,7 +308,7 @@ const handlePaymentFailure = async ({
     return { processed: true, status: 'failed' };
   } catch (error) {
     if (client) {
-      try { await client.query('ROLLBACK'); } catch (_) {}
+      try { await client.query('ROLLBACK'); } catch (_rollbackErr) { /* ignore rollback failure on disconnected client */ }
     }
     console.error('[PaymentService] Error handling payment failure:', error);
     throw error;
@@ -377,7 +377,7 @@ const handlePaymentRefund = async ({
     return { processed: true, event: 'order_refunded' };
   } catch (error) {
     if (client) {
-      try { await client.query('ROLLBACK'); } catch (_) {}
+      try { await client.query('ROLLBACK'); } catch (_rollbackErr) { /* ignore rollback failure on disconnected client */ }
     }
     console.error('[PaymentService] Error handling payment refund:', error);
     throw error;

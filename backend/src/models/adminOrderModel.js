@@ -134,7 +134,7 @@ async function updateOrderStatus(orderId, status) {
     return updated.rows[0];
   } catch (error) {
     if (client) {
-      try { await client.query('ROLLBACK'); } catch (_) {}
+      try { await client.query('ROLLBACK'); } catch (_rollbackErr) { /* ignore rollback failure on disconnected client */ }
     }
     // Map trigger errors (P0001) to 400
     if (error.code === 'P0001' || error.message.includes('Invalid order status transition')) {
