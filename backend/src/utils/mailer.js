@@ -24,8 +24,8 @@ function getTransporter() {
       },
     });
   } else {
-    // In dev/test when credentials are not supplied, use stream/json mock transport
-    console.warn('[Mailer] SMTP_USER or SMTP_PASS not set. Using test fallback transport.');
+    // Test mode may use a mock transport; other environments must retry after SMTP is configured.
+    if (process.env.NODE_ENV !== 'test') throw new Error('SMTP_USER and SMTP_PASS must be configured');
     transporter = nodemailer.createTransport({
       jsonTransport: true,
     });
@@ -73,7 +73,7 @@ async function sendEmail(toOrOptions, subject, html, text) {
     };
 
     const info = await activeTransporter.sendMail(mailOptions);
-    console.log(`[Mailer] Email sent successfully to ${to} (Subject: "${subj}") [ID: ${info.messageId || 'mock'}]`);
+    console.log(`[Mailer] Email sent (Subject: "${subj}") [ID: ${info.messageId || 'mock'}]`);
     return {
       success: true,
       messageId: info.messageId || 'mock-id',

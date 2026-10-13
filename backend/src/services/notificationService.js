@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { sendEmail } = require('../utils/mailer');
+const { enqueueEmail } = require('./emailQueue');
 const {
   welcomeEmail,
   orderConfirmationEmail,
@@ -24,7 +24,7 @@ async function sendWelcome({ email, firstName, lastName }) {
 
     const name = [firstName, lastName].filter(Boolean).join(' ') || undefined;
     const { subject, html, text } = welcomeEmail({ name, email });
-    return await sendEmail(email, subject, html, text);
+    return await enqueueEmail(email, subject, html, text, `welcome:${email}`);
   } catch (error) {
     console.error('[NotificationService] sendWelcome failed:', error.message || error);
     return { success: false, error: error.message || String(error) };
@@ -126,7 +126,7 @@ async function sendOrderConfirmation(orderIdOrData) {
       estimatedDeliveryDays,
     });
 
-    return await sendEmail(customerEmail, subject, html, text);
+    return await enqueueEmail(customerEmail, subject, html, text, `order:${orderId}`);
   } catch (error) {
     console.error('[NotificationService] sendOrderConfirmation failed:', error.message || error);
     return { success: false, error: error.message || String(error) };
@@ -193,7 +193,7 @@ async function sendPaymentConfirmation(params = {}) {
       paymentDate,
     });
 
-    return await sendEmail(customerEmail, subject, html, text);
+    return await enqueueEmail(customerEmail, subject, html, text, `payment:${orderId}`);
   } catch (error) {
     console.error('[NotificationService] sendPaymentConfirmation failed:', error.message || error);
     return { success: false, error: error.message || String(error) };
@@ -223,7 +223,7 @@ async function sendDeliveryStatusUpdate(deliveryOrId) {
     }
 
     const deliveryRes = await db.query(`
-      SELECT d.delivery_id, d.order_id, d.delivery_status, d.tracking_number, d.estimated_delivery_days,
+      SELECT d.delivery_id, d.order_id, d.delivery_status, d.tracking_number, d.estimated_delivery_days, d.updated_at,
              u.email, c.first_name, c.last_name
       FROM deliveries d
       JOIN orders o ON o.order_id = d.order_id
@@ -251,7 +251,7 @@ async function sendDeliveryStatusUpdate(deliveryOrId) {
       estimatedDeliveryDays: row.estimated_delivery_days,
     });
 
-    return await sendEmail(email, subject, html, text);
+    return await enqueueEmail(email, subject, html, text, `delivery:${row.delivery_id}:${row.delivery_status}:${row.updated_at || ''}`);
   } catch (error) {
     console.error('[NotificationService] sendDeliveryStatusUpdate failed:', error.message || error);
     return { success: false, error: error.message || String(error) };

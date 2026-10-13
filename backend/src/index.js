@@ -124,6 +124,7 @@ app.use((err, req, res, _next) => {
 const HOST = process.env.HOST || '0.0.0.0';
 
 if (process.env.NODE_ENV !== 'test') {
+  require('./services/emailQueue').startEmailWorker();
   app.listen(PORT, HOST, () => {
     console.log(`Backend server running on http://${HOST}:${PORT}`);
   });
