@@ -70,11 +70,12 @@ async function deleteProduct(req, res, next) {
 
 async function createImage(req, res, next) {
   try {
-    const result = await adminProductService.createImage(parseId(req.params.id), req.body);
+    const result = await adminProductService.createImage(parseId(req.params.id), req.body, req.user?.user_id);
     if (!result) {
       return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
     }
-    res.status(201).json(result);
+    const statusCode = result.isReplay ? 200 : 201;
+    res.status(statusCode).json(result);
   } catch (error) {
     next(error);
   }
@@ -82,7 +83,7 @@ async function createImage(req, res, next) {
 
 async function presignImage(req, res, next) {
   try {
-    const result = await adminProductService.presignImage(parseId(req.params.id), req.body);
+    const result = await adminProductService.presignImage(parseId(req.params.id), req.body, req.user?.user_id);
     if (!result) return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
     res.status(200).json(result);
   } catch (error) {

@@ -11,7 +11,8 @@
     "test:product": "node --test test/product-validation.test.js",
     "test:s3": "node --test test/s3-infrastructure.test.js",
     "test:staff-protection": "node --test test/super-admin-protection.test.js",
-    "test:catalog-timestamp": "node --test test/catalog-timestamp-integration.test.js"
+    "test:catalog-timestamp": "node --test test/catalog-timestamp-integration.test.js",
+    "test:media-concurrency": "node --test test/s3-media-concurrency.test.js"
   },
   "jest": {
     "testMatch": [

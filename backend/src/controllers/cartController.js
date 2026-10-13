@@ -142,8 +142,8 @@ const addItem = async (req, res) => {
         res.status(201).json({ message: 'Item added to cart', cart_item });
     } catch (error) {
         if (client) {
-            try { await client.query('ROLLBACK'); } catch (_) {}
-            try { client.release(); } catch (_) {}
+            try { await client.query('ROLLBACK'); } catch { /* ignore */ }
+            try { client.release(); } catch { /* ignore */ }
             client = null;
         }
         if (error.code === '23505') {
@@ -247,8 +247,8 @@ const updateItemQuantity = async (req, res) => {
         res.json({ message: 'Quantity updated', cart_item: updatedItem });
     } catch (error) {
         if (client) {
-            try { await client.query('ROLLBACK'); } catch (_) {}
-            try { client.release(); } catch (_) {}
+            try { await client.query('ROLLBACK'); } catch { /* ignore */ }
+            try { client.release(); } catch { /* ignore */ }
             client = null;
         }
         console.error('Error in updateItemQuantity:', error);
@@ -316,8 +316,8 @@ const removeItem = async (req, res) => {
         res.json({ message: 'Item removed from cart' });
     } catch (error) {
         if (client) {
-            try { await client.query('ROLLBACK'); } catch (_) {}
-            try { client.release(); } catch (_) {}
+            try { await client.query('ROLLBACK'); } catch { /* ignore */ }
+            try { client.release(); } catch { /* ignore */ }
             client = null;
         }
         console.error('Error in removeItem:', error);

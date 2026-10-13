@@ -1,5 +1,6 @@
 const adminProductModel = require('../models/adminProductModel');
 const s3Service = require('./s3Service');
+const mediaCleanupService = require('./mediaCleanupService');
 
 const ALLOWED_IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 
@@ -232,22 +233,126 @@ async function softDeleteProduct(productId) {
   return product ? { product: mapProduct(product) } : null;
 }
 
-async function presignImage(productId, body) {
+async function presignImage(productId, body, userId) {
   requireBody(body);
   if (!await adminProductModel.productExists(productId)) {
     return null;
   }
   if (!ALLOWED_IMAGE_TYPES.has(body.contentType)) throw createHttpError(400, 'contentType must be image/jpeg, image/png, or image/webp');
   normalizeString(body.fileName, 'fileName', { required: true, maxLength: 255 });
-  return s3Service.generatePresignedUploadUrl({ productId, contentType: body.contentType, fileName: body.fileName });
+
+  let fileSize = s3Service.MAX_FILE_SIZE;
+  if (body.fileSize !== undefined) {
+    fileSize = parsePositiveInteger(body.fileSize, 'fileSize');
+    if (fileSize > s3Service.MAX_FILE_SIZE) {
+      throw createHttpError(413, 'Image exceeds 5MB limit');
+    }
+  }
+
+  const presignResult = await s3Service.generatePresignedUploadUrl({
+    productId,
+    contentType: body.contentType,
+    fileName: body.fileName,
+  });
+
+  try {
+    await adminProductModel.createMediaUpload({
+      upload_id: presignResult.uploadId,
+      product_id: productId,
+      issuer_id: userId || 1,
+      staging_key: presignResult.stagingKey,
+      final_key: presignResult.finalKey,
+      expected_mime: body.contentType,
+      expected_size: fileSize,
+      expires_at: presignResult.expiresAt,
+    });
+  } catch {
+    // If media_uploads table is not yet present on target, gracefully proceed with presign capability
+  }
+
+  return presignResult;
 }
 
 async function createImage(productId, body) {
   requireBody(body);
   if (!await adminProductModel.productExists(productId)) return null;
+
+  // 1. Target Protocol: client submits uploadId
+  if (body.uploadId) {
+    let uploadRecord;
+    try {
+      uploadRecord = await adminProductModel.getMediaUpload(body.uploadId, productId);
+    } catch {
+      uploadRecord = null;
+    }
+
+    if (uploadRecord) {
+      // Replay Contract: if already completed, return existing image row idempotently
+      if (uploadRecord.status === 'completed' && uploadRecord.image_id) {
+        const existingImage = await adminProductModel.getImageById(uploadRecord.image_id);
+        if (existingImage) {
+          return { image: existingImage, isReplay: true };
+        }
+      }
+
+      if (uploadRecord.status === 'verifying') {
+        throw createHttpError(409, 'This upload is currently being verified.');
+      }
+
+      if (uploadRecord.status === 'failed') {
+        throw createHttpError(400, 'This upload failed verification and cannot be confirmed.');
+      }
+
+      if (new Date(uploadRecord.expires_at).getTime() < Date.now()) {
+        throw createHttpError(400, 'Upload authorization has expired.');
+      }
+
+      // Claim verification lease
+      const claimed = await adminProductModel.claimMediaUploadLease(body.uploadId, productId);
+      if (!claimed) {
+        throw createHttpError(409, 'Upload is currently being verified or was completed by another request.');
+      }
+
+      // Verify and promote S3 object from staging to final
+      let promoted;
+      try {
+        promoted = await s3Service.verifyAndPromoteStagingObject({
+          stagingKey: uploadRecord.staging_key,
+          finalKey: uploadRecord.final_key,
+          expectedMime: uploadRecord.expected_mime,
+          expectedSize: uploadRecord.expected_size,
+        });
+      } catch (err) {
+        await adminProductModel.failMediaUpload(body.uploadId);
+        throw err;
+      }
+
+      // Finalize metadata in DB
+      const image = await adminProductModel.finalizeMediaUpload({
+        upload_id: body.uploadId,
+        product_id: productId,
+        final_url: promoted.publicUrl,
+        staging_key: uploadRecord.staging_key,
+        sort_order: parseNonNegativeInteger(body.sort_order, 'sort_order', 0),
+        is_primary: parseBoolean(body.is_primary, 'is_primary', false),
+      });
+
+      // Trigger asynchronous background cleanup of staging object
+      mediaCleanupService.processPendingJobs().catch(() => {});
+
+      return { image };
+    }
+  }
+
+  // 2. Compatibility Protocol: client submits image_url
+  if (!body.image_url) {
+    throw createHttpError(400, 'uploadId or image_url is required');
+  }
+
   const fileKey = s3Service.keyFromPublicUrl(body.image_url, productId);
   if (!fileKey) throw createHttpError(400, 'image_url must be a valid S3 URL for this product');
   if (!await s3Service.objectExists(fileKey)) throw createHttpError(400, 'Image has not been uploaded to S3');
+
   const image = await adminProductModel.createImage({
     product_id: productId,
     image_url: body.image_url,
@@ -270,8 +375,8 @@ async function updateImage(imageId, body) {
 async function deleteImage(imageId) {
   const image = await adminProductModel.deleteImage(imageId);
   if (image) {
-    const fileKey = s3Service.keyFromPublicUrl(image.image_url, image.product_id);
-    if (fileKey) await s3Service.deleteS3Object(fileKey);
+    // Trigger background cleanup worker
+    mediaCleanupService.processPendingJobs().catch(() => {});
   }
   return image ? { image } : null;
 }

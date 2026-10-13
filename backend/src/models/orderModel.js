@@ -209,17 +209,21 @@ const createOrder = async (customer_id, address_id, delivery_mode, idempotency_k
                 if (client && typeof client.query === 'function') {
                     await client.query('ROLLBACK');
                 }
-            } catch (_) {}
+            } catch {
+                /* ignore rollback error */
+            }
 
             try {
                 if (client && typeof client.release === 'function') {
                     client.release();
                 }
-            } catch (_) {}
+            } catch {
+                /* ignore release error */
+            }
 
             // Bounded retry for transient serialization errors or deadlocks
             if ((e.code === '40P01' || e.code === '40001') && attempt < maxRetries) {
-                await new Promise(res => setTimeout(res, 25 * attempt + Math.floor(Math.random() * 25)));
+                await new Promise(res => global.setTimeout(res, 25 * attempt + Math.floor(Math.random() * 25)));
                 continue;
             }
             throw e;
@@ -228,7 +232,9 @@ const createOrder = async (customer_id, address_id, delivery_mode, idempotency_k
                 if (client && typeof client.release === 'function') {
                     client.release();
                 }
-            } catch (_) {}
+            } catch {
+                /* ignore release error */
+            }
         }
     }
 };

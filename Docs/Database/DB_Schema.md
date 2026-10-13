@@ -107,6 +107,44 @@ Table product_images {
   }
 }
 
+Table media_uploads {
+  upload_id uuid [pk, note: 'V36 server-issued upload identity for presigned staging PUT']
+  product_id int [ref: > products.product_id, delete: cascade, not null]
+  issuer_id int [ref: > users.user_id, not null]
+  staging_key varchar(500) [not null, note: 'uploads/{productId}/{uploadId}.{ext}']
+  final_key varchar(500) [not null, note: 'products/{productId}/{uploadId}.{ext}']
+  expected_mime varchar(50) [not null]
+  expected_size int [not null]
+  status varchar(20) [not null, default: 'pending', note: 'pending | verifying | completed | failed']
+  image_id int [ref: > product_images.image_id]
+  expires_at timestamp [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (product_id, status) [name: 'idx_media_uploads_product_status']
+    (expires_at) [name: 'idx_media_uploads_expiry', note: 'WHERE status = pending']
+    (final_key) [unique, name: 'idx_media_uploads_final_key', note: 'WHERE status = completed']
+  }
+}
+
+Table media_cleanup_jobs {
+  job_id serial [pk, note: 'V36 durable queue for asynchronous retryable S3 deletions']
+  s3_key varchar(500) [not null]
+  reason varchar(50) [not null, note: 'image_deletion | staging_cleanup | abandoned_upload']
+  status varchar(20) [not null, default: 'pending', note: 'pending | processing | completed | failed']
+  attempts int [not null, default: 0]
+  max_attempts int [not null, default: 5]
+  next_retry_at timestamp [not null, default: `now()`]
+  last_error text
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (status, next_retry_at) [name: 'idx_media_cleanup_pending', note: 'WHERE status IN (pending, failed)']
+  }
+}
+
 Table product_variants {
   variant_id serial [pk]
   product_id int [ref: > products.product_id, delete: cascade, not null]

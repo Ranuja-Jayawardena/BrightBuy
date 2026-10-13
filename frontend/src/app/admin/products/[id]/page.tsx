@@ -111,6 +111,7 @@ export default function EditProductPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [stagedPublicUrl, setStagedPublicUrl] = useState<string | null>(null);
+  const [stagedUploadId, setStagedUploadId] = useState<string | null>(null);
   const [updatingImageId, setUpdatingImageId] = useState<number | null>(null);
   const [imageToDelete, setImageToDelete] = useState<ImageType | null>(null);
   const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
@@ -148,6 +149,7 @@ export default function EditProductPage() {
     setUploadError(null);
     setSelectedFile(null);
     setStagedPublicUrl(null);
+    setStagedUploadId(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -240,6 +242,7 @@ export default function EditProductPage() {
       setUploadError('Invalid format: Please select a JPEG, PNG, or WebP image.');
       setSelectedFile(null);
       setStagedPublicUrl(null);
+      setStagedUploadId(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
@@ -249,6 +252,7 @@ export default function EditProductPage() {
       setUploadError('Selected file is empty (0 bytes).');
       setSelectedFile(null);
       setStagedPublicUrl(null);
+      setStagedUploadId(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
@@ -258,12 +262,14 @@ export default function EditProductPage() {
       setUploadError('File size exceeds the 5MB limit.');
       setSelectedFile(null);
       setStagedPublicUrl(null);
+      setStagedUploadId(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
     setSelectedFile(file);
     setStagedPublicUrl(null);
+    setStagedUploadId(null);
     setUploadError(null);
     executeUpload(file);
   };
@@ -282,6 +288,7 @@ export default function EditProductPage() {
         body: JSON.stringify({
           contentType: file.type,
           fileName: file.name,
+          fileSize: file.size,
         }),
       });
 
@@ -290,8 +297,9 @@ export default function EditProductPage() {
         throw new Error(d.message || d.error || 'Failed to authorize S3 upload');
       }
 
-      const { uploadUrl, publicUrl } = await presignRes.json();
-      setStagedPublicUrl(publicUrl);
+      const { uploadId, uploadUrl, publicUrl, requiredHeaders } = await presignRes.json();
+      setStagedUploadId(uploadId || null);
+      setStagedPublicUrl(publicUrl || null);
 
       // 2. Upload file directly to S3 with real-time progress indicator
       setUploadStage('uploading');
@@ -300,7 +308,8 @@ export default function EditProductPage() {
         const xhr = new XMLHttpRequest();
         activeXhrRef.current = xhr;
         xhr.open('PUT', uploadUrl);
-        xhr.setRequestHeader('Content-Type', file.type);
+        const headerContentType = requiredHeaders?.['Content-Type'] || file.type;
+        xhr.setRequestHeader('Content-Type', headerContentType);
         xhr.upload.onprogress = (evt) => {
           if (evt.lengthComputable) {
             const percent = Math.round((evt.loaded / evt.total) * 100);
@@ -328,7 +337,7 @@ export default function EditProductPage() {
       });
 
       // 3. Confirm image record creation in catalog database
-      await confirmUploadedImage(publicUrl);
+      await confirmUploadedImage(uploadId, publicUrl);
     } catch (err: unknown) {
       setUploadStage('error');
       const sanitized = sanitizeMediaError(err, 'Failed to upload image to cloud storage');
@@ -336,23 +345,34 @@ export default function EditProductPage() {
     }
   };
 
-  const confirmUploadedImage = async (publicUrl: string) => {
+  const confirmUploadedImage = async (uploadId?: string | null, publicUrl?: string | null) => {
     try {
       setUploadStage('confirming');
       setUploadStatus('Registering image in catalog database...');
       setUploadError(null);
 
+      const targetUploadId = uploadId || stagedUploadId;
+      const targetPublicUrl = publicUrl || stagedPublicUrl;
+
       const sortOrder = product?.images?.length || 0;
       const isPrimary = !product?.images || product.images.length === 0;
+
+      const confirmPayload: Record<string, unknown> = {
+        sort_order: sortOrder,
+        is_primary: isPrimary,
+      };
+
+      if (targetUploadId) {
+        confirmPayload.uploadId = targetUploadId;
+      }
+      if (targetPublicUrl) {
+        confirmPayload.image_url = targetPublicUrl;
+      }
 
       const confirmRes = await apiFetch(`/api/admin/products/${productId}/images/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image_url: publicUrl,
-          sort_order: sortOrder,
-          is_primary: isPrimary,
-        }),
+        body: JSON.stringify(confirmPayload),
       });
 
       if (!confirmRes.ok) {
@@ -364,6 +384,7 @@ export default function EditProductPage() {
       setUploadStatus('Image registered successfully!');
       setSelectedFile(null);
       setStagedPublicUrl(null);
+      setStagedUploadId(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -757,17 +778,17 @@ export default function EditProductPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-red-900 dark:text-red-200">
-                    {stagedPublicUrl ? 'Registration Failed' : 'Upload Failed'}
+                    {stagedUploadId || stagedPublicUrl ? 'Registration Failed' : 'Upload Failed'}
                   </p>
                   <p className="text-xs text-red-700 dark:text-red-300 max-w-sm mx-auto">
                     {uploadError || 'An error occurred during image processing.'}
                   </p>
                 </div>
                 <div className="flex items-center justify-center gap-2 pt-1">
-                  {stagedPublicUrl ? (
+                  {stagedUploadId || stagedPublicUrl ? (
                     <Button 
                       size="sm" 
-                      onClick={() => confirmUploadedImage(stagedPublicUrl)}
+                      onClick={() => confirmUploadedImage(stagedUploadId, stagedPublicUrl)}
                       className="gap-1.5 text-xs shadow-xs"
                     >
                       <RefreshCw className="w-3.5 h-3.5" /> Retry Registration
