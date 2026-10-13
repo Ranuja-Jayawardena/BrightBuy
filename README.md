@@ -24,6 +24,8 @@ BrightBuy is a full-stack retail and e-commerce platform designed to support cus
 
 Transactional email is queued in PostgreSQL and retried by the backend worker up to five times. Apply migration V25 before starting the updated backend. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and a verified `EMAIL_FROM` in `backend/.env`; without credentials, jobs eventually fail and need manual requeue after SMTP is configured. Account verification and password reset links use `FRONTEND_URL` and expire after 24 hours and 1 hour respectively. Verification is currently informational and does not prevent login.
 
+For email links sent to customers, configure `FRONTEND_URL` as a public HTTPS origin. Transactional welcome, order, payment, and delivery emails omit storefront links while it points to localhost or a non-HTTPS URL. SMTP acceptance does not guarantee inbox placement; check the recipient's spam warning and SPF/DKIM/DMARC results when messages are filtered.
+
 ### Strict Architectural Guidelines
 1. **NO ORMs or Query Builders:** Pure, raw parameterized SQL with `pg` driver only.
 2. **NO Third-party Auth Services:** Custom JWT implementation with refresh token rotation.
