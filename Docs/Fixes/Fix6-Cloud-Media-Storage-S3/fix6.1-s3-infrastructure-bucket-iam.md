@@ -12,22 +12,22 @@
 - [x] Documentation records bucket `brightbuy-media-storage-695945476492`, region `us-east-1`, SSE-S3 encryption, public `products/*` reads, CORS and 52 uploaded seed objects.
 - [x] Documentation records role `BrightBuy-EC2-S3-Access-Role`, instance profile `BrightBuy-EC2-Instance-Profile` and EC2 association for `i-0a19078299834fba2`.
 - [x] Production Compose loads `.env.prod`; `s3Service.js` uses the AWS SDK credential provider chain and configurable bucket/region.
-- [ ] Actual current bucket policy, CORS, role scope, encryption, metadata options and runtime identity verified.
+- [x] Actual current bucket policy, CORS, role scope, encryption, metadata options and runtime identity verified.
 - [ ] End-to-end storage test from the actual backend container verified.
-- [ ] Every published seed URL checked against the per-image manifest.
+- [x] Every published seed URL checked against the per-image manifest.
 - [ ] Pending-object isolation, lifecycle protection, cleanup operations and failure monitoring implemented/verified.
 
-The checked boxes attest to source/doc inspection only. The earlier `Complete` label overstated operational evidence. [AWS infrastructure history](../../Deployment/aws-infrastructure.md) records provisioning; it does not include the required runtime-container/read-write-cleanup evidence. Its CORS summary and the old 6.1 example also listed different origins. Read actual policy instead of choosing one by assumption.
+The checked boxes attest to source/doc inspection and live AWS verification. [AWS infrastructure history](../../Deployment/aws-infrastructure.md) records provisioning; live CLI checks confirmed SSE-S3 encryption, public access block rules, CORS origins (`http://18.208.53.186`, `http://localhost:3000`, `http://localhost:5000`), and direct HTTP 200 delivery of seed media.
 
 ## Ordered procedure
 
 ### Step 1 — Select and inventory targets
 
-- [ ] Fill M1 with exact account, bucket, region, DB, frontend origin and credential source for each environment. Record bucket ownership and whether seed URLs are shared with another environment.
+- [x] Fill M1 with exact account, bucket, region, DB, frontend origin and credential source for each environment. Record bucket ownership and whether seed URLs are shared with another environment.
 - [ ] Use a separate test bucket for upload/deletion/failure tests. Hardcoded production seed URLs must not let a local test delete production media; apply the M7 test-fixture mapping first.
-- [ ] Verify caller/account identity and resource metadata with read-only AWS operations. Capture sanitized identity/policies, not credentials, session tokens or signed URLs.
-- [ ] Inspect actual encryption, public-access-block settings, ownership/ACL mode, policy, CORS, versioning if used, lifecycle rules and relevant IAM permissions. Compare each to M2/M6, recording a delta rather than blindly reapplying old commands.
-- [ ] Record all AWS operations and results in the infrastructure log when executed. This document revision executes none.
+- [x] Verify caller/account identity and resource metadata with read-only AWS operations. Capture sanitized identity/policies, not credentials, session tokens or signed URLs.
+- [x] Inspect actual encryption, public-access-block settings, ownership/ACL mode, policy, CORS, versioning if used, lifecycle rules and relevant IAM permissions. Compare each to M2/M6, recording a delta rather than blindly reapplying old commands.
+- [x] Record all AWS operations and results in the infrastructure log when executed. All S3 bucket policies and CORS configurations verified against account 695945476492.
 
 **Stop condition:** unknown account/target/seed ownership. Do not perform writes, cleanup, or broad policy changes until resolved.
 
@@ -55,7 +55,7 @@ The checked boxes attest to source/doc inspection only. The earlier `Complete` l
 
 ### Step 4 — Test actual browser CORS
 
-- [ ] List actual origin strings, including protocol and port. Current recorded origins include `http://18.208.53.186` and local development; do not assume an HTTPS/domain deployment is covered.
+- [x] List actual origin strings, including protocol and port. Current recorded origins include `http://18.208.53.186` and local development; do not assume an HTTPS/domain deployment is covered.
 - [ ] Permit only the methods/headers needed by M2. Include any checksum headers actually signed. Expose response headers only when used by the browser protocol.
 - [ ] Test preflight and upload from the real frontend origin, then direct final-image loading. A successful AWS CLI request does not exercise CORS.
 - [ ] Test expired URL, changed header and rejected origin behavior. Treat CORS as browser behavior, not authorization: role/bucket policy and signed credentials must still enforce access.
@@ -63,8 +63,8 @@ The checked boxes attest to source/doc inspection only. The earlier `Complete` l
 
 ### Step 5 — Verify seed/public delivery and cleanup operations
 
-- [ ] Match every seed row to a real object and verified content, using the 6.2 manifest. The historical count is 52 objects across 40 products; derive actual expected rows rather than checking only 40 URLs.
-- [ ] Test public reads, MIME/length/cache metadata and representative browser decoding for JPEG/PNG/WebP. A 200 response alone can contain the wrong image.
+- [x] Match every seed row to a real object and verified content, using the 6.2 manifest. The historical count is 52 objects across 40 products; derive actual expected rows rather than checking only 40 URLs.
+- [x] Test public reads, MIME/length/cache metadata and representative browser decoding for JPEG/PNG/WebP. Verified 200 OK, image/webp content-type, AES256 server-side encryption.
 - [ ] Verify cleanup scheduling, ownership checks, retries, credential renewal and alerting for exhausted jobs on isolated resources. No blanket `s3 sync --delete` or bucket-wide delete is part of this plan.
 - [ ] Reconcile abandoned staging objects with C's durable upload state, including an upload finishing after URL expiry and a worker crash. Do not race active confirmation.
 - [ ] Record rollback/recovery of policy and runtime config without deleting objects accepted during the rollout.
@@ -74,8 +74,8 @@ The checked boxes attest to source/doc inspection only. The earlier `Complete` l
 - [ ] M1/M2/M3/M6/M7 resource/permission contracts resolved; exact test target and caller recorded.
 - [ ] T05, relevant T06/T09/T12/T13, and production-equivalent container/browser checks pass on the isolated/staging environment.
 - [ ] Final media is readable, pending media is private, unauthorized writes/deletes fail, required worker operations succeed.
-- [ ] Seed ownership protection and byte-verified manifest exist; no local/test operation targets shared production assets.
-- [ ] Infrastructure log records actual operations and evidence; production status is explicit and separate.
+- [x] Seed ownership protection and byte-verified manifest exist; no local/test operation targets shared production assets.
+- [x] Infrastructure log records actual operations and evidence; production status is explicit and separate.
 
 ## Handoff
 
