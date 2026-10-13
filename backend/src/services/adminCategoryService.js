@@ -51,10 +51,12 @@ async function ensureParentExists(parentCategoryId, categoryId) {
   if (categoryId) {
     const result = await db.query(`
       WITH RECURSIVE ancestors AS (
-        SELECT category_id, parent_category_id FROM categories WHERE category_id = $1
+        SELECT category_id, parent_category_id, ARRAY[category_id] AS visited
+        FROM categories WHERE category_id = $1
         UNION ALL
-        SELECT c.category_id, c.parent_category_id
+        SELECT c.category_id, c.parent_category_id, a.visited || c.category_id
         FROM categories c JOIN ancestors a ON c.category_id = a.parent_category_id
+        WHERE NOT c.category_id = ANY(a.visited)
       )
       SELECT category_id FROM ancestors WHERE category_id = $2
     `, [parentCategoryId, categoryId]);
