@@ -94,7 +94,53 @@ All **4/4 live PostgreSQL tests passed**, with no skips, on PostgreSQL 15.19. Th
 | --- | --- | --- | --- | --- | --- | --- |
 | Disposable database on `brightbuy_dev` / Fix 8.2, 2026-10-13 | Available V1–V33 SQL passed on legacy upgrade fixture; fresh chain stops at V28 `23502`; Flyway not run | V27 timestamp integration passed 1/1; 8.7 concurrency tested separately | Category API regression passed; broader UI pending | Runtime role pending | Disposable database removed; rollout backup pending | Partial C evidence; release unverified |
 | Disposable PostgreSQL 15.19 / `dev` `962014e`, 2026-10-13, Member C | V27 upgrade and seeded fresh fixture pass; empty fresh chain stops at V28 `23502`; Flyway not run | V27, V33 and V34 live checks passed 3/3; last-unit checkout/cancel race pending C/D | 8.10 live fixture passed 1/1: catalog/API/report/CSV; browser and S3 fetch pending A | Not rerun in C pass | Disposable databases/schema cleaned up; rollback rehearsal pending | C area checks pass with explicit release blockers above |
+| PostgreSQL 15 (`brightbuy_dev` target) / Fix 8.3–8.5, 2026-10-14, Member D | V29, V30, V31 applied & verified; 0 data violations; seed delivery statuses standardized | **20/20 live checks passed** (`cartCheckoutConcurrency.test.js` 7/7, `orderPaymentDeliveryConsistency.test.js` 13/13, `orderStockAtomic.test.js` 12/12): last-unit race, cart row lock, idempotency replay, FSM trigger guard, stock restore aggregation, 1:1 constraints | All 20 Jest suites passed (167/167 tests, 100%); backend ESLint 0 errors | Compatible with existing roles & V35 | Test orders/logs cleaned up | **Member D area verified complete** |
 | PostgreSQL 15 (`brightbuy` target) / Fix 8.12 Concurrency Harness, 2026-10-14 | V29–V35 verified present & syntax-valid | **9/9 passed (`npm run test:concurrency`)**: live multi-client cart barrier, order FSM, delivery mode check, inventory immutability | Pending Member B (8.9) & Member A (8.10) | V35 passed 6/6 (`npm run test:db-accounts`) | Isolated schema created & cleaned up | Concurrency harness verified complete |
+
+### Member D area verification — 2026-10-14
+
+Run on PostgreSQL 15.19 (`brightbuy_dev` target):
+
+```powershell
+# 1. Cart Uniqueness & Checkout Concurrency Matrix (Fix 8.3)
+node --no-webstorage node_modules/jest/bin/jest.js tests/cartCheckoutConcurrency.test.js
+# 2. Order Transitions, Payment & Delivery Consistency (Fix 8.4 & 8.5)
+node --no-webstorage node_modules/jest/bin/jest.js tests/orderPaymentDeliveryConsistency.test.js
+# 3. Stock Atomic Deduction & Deadlock Prevention (Fix 8.1/8.3 lock ordering)
+node --no-webstorage node_modules/jest/bin/jest.js tests/orderStockAtomic.test.js
+# 4. Concurrency Harness (Master release gate)
+npm run test:concurrency
+# 5. Full Backend Integration Suite & ESLint
+npm test
+npm run lint
+```
+
+**Results:**
+1. **ESLint:** 0 errors across all backend source files. All previous `no-empty` rollback catch block errors in `adminOrderModel.js` and `paymentService.js` are resolved.
+2. **Carts & Concurrency (Fix 8.3):**
+   - Concurrent cart reads/creates verified with 5 concurrent clients returning identical cart ID (1 DB row).
+   - Concurrent item addition of existing product rejects with 409 conflict, preserving quantity semantics.
+   - Staff accounts strictly forbidden from cart mutations (403).
+   - Checkout lock order (`SELECT cart_id FROM carts ... FOR UPDATE`) serializes competing checkout calls: exactly 1 order created, zero double stock deduction.
+   - Two customers competing for last stock unit: variant locks in ascending numerical order (`FOR UPDATE OF product_variants`); winner succeeds, loser receives 400 Insufficient stock with stock never negative.
+   - Idempotent request replay via `X-Idempotency-Key` and `order_idempotency_keys`: returns HTTP 200, `is_replay: true`, with zero duplicate email dispatches.
+   - Idempotency key reused with altered body or across customer accounts rejected with HTTP 409 Conflict.
+3. **Order State Machine & Payment Consistency (Fix 8.4):**
+   - State transition machine verified: `pending -> paid -> shipped -> delivered` succeed.
+   - Database trigger `trg_enforce_order_status_transition` on `orders` blocks illegal transitions (`delivered -> pending`, `cancelled -> paid`) with SQLSTATE `P0001`.
+   - Idempotent identical status update verified as safe no-op.
+   - Order cancellation restores stock atomically using variant-level sum aggregation (`WITH item_sums AS (...)`) with sorted locks.
+   - Payment webhook deduplication durably recorded in `webhook_events`; replay skips duplicate side-effects.
+   - Fulfillment protection verified: late payment success on `shipped` or `delivered` orders does not regress fulfillment status.
+   - Cancellation protection verified: late payment success on `cancelled` orders preserves cancellation and logs audit record to `payment_reconciliation_logs` (`late_payment_on_cancelled_order`).
+   - Stale failure webhooks do not demote `completed` payments; logged to `payment_reconciliation_logs`.
+   - Explicit refund events handled via `handlePaymentRefund` and recorded in `payment_reconciliation_logs`.
+4. **Delivery Cardinality & Value Checks (Fix 8.5):**
+   - 1:1 delivery constraint (`idx_deliveries_order_id_unique`) rejects duplicate delivery rows for same order.
+   - Mode & status consistency (`chk_deliveries_mode_status`) verified: `home_delivery` allows `shipped`/`out_for_delivery`/`delivered` and rejects pickup statuses; `store_pickup` allows `ready_for_pickup`/`collected` and rejects courier statuses.
+   - Nonnegative value constraints (`chk_order_items_unit_price_nonnegative`, `chk_payments_amount_nonnegative`) reject negative prices and amounts while allowing zero amounts.
+   - 1:1 payment constraint (`idx_payments_order_id_unique`) rejects duplicate payment rows.
+5. **Full Regression Suite:** 20/20 test suites passed, 167/167 tests passed (100%).
 | CI | Pending | Not run | Not run | Not run | N/A | Unverified |
 | Staging / representative upgrade | Pending | Not run | Not run | Not run | Pending | Unverified |
 | Production (only after authorization) | Pending | Not run | Not run | Not run | Pending | Not deployed by this plan |
