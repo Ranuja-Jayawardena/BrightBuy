@@ -46,7 +46,7 @@ Previously, the demo catalog contained mixed merchandise across Home Appliances 
 | # | Fix Item | Assigned | Depends On | Priority | Status |
 |---|----------|----------|------------|----------|--------|
 | 7.1 | [Technology Taxonomy & Category Hierarchy Restructuring](fix7.1-technology-taxonomy-hierarchy.md) | **A** (Taxonomy & Navigation) | — | High | Complete |
-| 7.2 | [Technology Product Catalog, Variant & Media Seed Alignment](fix7.2-technology-product-catalog-seed.md) | **C** (Products & Variants) | 7.1 | High | Planned |
+| 7.2 | [Technology Product Catalog, Variant & Media Seed Alignment](fix7.2-technology-product-catalog-seed.md) | **C** (Products & Variants) | 7.1 | High | In Progress — SQL and SKU matrix updated; S3 verification pending |
 | 7.3 | [Catalog Links, Attribute Values & Order History Referential Integrity](fix7.3-catalog-links-order-seed-integrity.md) | **A** (Catalog Links), **D** (Order Seeds) | 7.1, 7.2 | High | Planned |
 | 7.4 | [Database Reseed Orchestration, Flyway Verification & Storefront Validation](fix7.4-database-reseed-pipeline-verification.md) | **E** (DevOps), **A** (Storefront), **B** (Admin) | 7.1, 7.2, 7.3, 7.5 | High | Planned |
 | 7.5 | [Cloud Media Assets, Tech Imagery & S3 Bucket Synchronization](fix7.5-cloud-media-assets-s3-sync.md) | **E** (Cloud/DevOps), **C** (Media Assets) | 7.2 | High | Planned |
