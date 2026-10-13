@@ -57,6 +57,56 @@ const createSession = async (req, res) => {
             let checkout_url = 'https://checkout.lemonsqueezy.com/test-url'; // Fallback for testing without env vars
 
             if (process.env.LEMON_SQUEEZY_API_KEY && process.env.LEMON_SQUEEZY_STORE_ID && process.env.LEMON_SQUEEZY_VARIANT_ID) {
+                // Fetch customer details to prefill Lemon Squeezy checkout if available
+                let customerEmail = undefined;
+                let customerName = undefined;
+                try {
+                    const userRes = await db.query(
+                        'SELECT u.email, c.first_name, c.last_name FROM users u JOIN customers c ON c.user_id = u.user_id WHERE c.customer_id = $1',
+                        [customer_id]
+                    );
+                    if (userRes.rows.length > 0) {
+                        customerEmail = userRes.rows[0].email;
+                        customerName = [userRes.rows[0].first_name, userRes.rows[0].last_name].filter(Boolean).join(' ') || undefined;
+                    }
+                } catch (_) {}
+
+                const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+                const redirectUrl = `${frontendBaseUrl.replace(/\/+$/, '')}/checkout/return?order_id=${oid}`;
+
+                const checkoutPayload = {
+                    data: {
+                        type: "checkouts",
+                        attributes: {
+                            custom_price: Math.round(Number(order.total_amount) * 100),
+                            product_options: {
+                                redirect_url: redirectUrl
+                            },
+                            checkout_data: {
+                                email: customerEmail,
+                                name: customerName,
+                                custom: {
+                                    order_id: oid.toString()
+                                }
+                            }
+                        },
+                        relationships: {
+                            store: {
+                                data: {
+                                    type: "stores",
+                                    id: String(process.env.LEMON_SQUEEZY_STORE_ID)
+                                }
+                            },
+                            variant: {
+                                data: {
+                                    type: "variants",
+                                    id: String(process.env.LEMON_SQUEEZY_VARIANT_ID)
+                                }
+                            }
+                        }
+                    }
+                };
+
                 const lsResponse = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
                     method: 'POST',
                     headers: {
@@ -64,32 +114,7 @@ const createSession = async (req, res) => {
                         'Content-Type': 'application/vnd.api+json',
                         'Authorization': `Bearer ${process.env.LEMON_SQUEEZY_API_KEY}`
                     },
-                    body: JSON.stringify({
-                        data: {
-                            type: "checkouts",
-                            attributes: {
-                                checkout_data: {
-                                    custom: {
-                                        order_id: oid.toString()
-                                    }
-                                }
-                            },
-                            relationships: {
-                                store: {
-                                    data: {
-                                        type: "stores",
-                                        id: process.env.LEMON_SQUEEZY_STORE_ID
-                                    }
-                                },
-                                variant: {
-                                    data: {
-                                        type: "variants",
-                                        id: process.env.LEMON_SQUEEZY_VARIANT_ID
-                                    }
-                                }
-                            }
-                        }
-                    })
+                    body: JSON.stringify(checkoutPayload)
                 });
 
                 const lsResult = await lsResponse.json();
@@ -97,7 +122,12 @@ const createSession = async (req, res) => {
                     checkout_url = lsResult.data.attributes.url;
                 } else {
                     console.error('Lemon Squeezy API Error:', lsResult);
-                    return res.status(502).json({ error: 'bad_gateway', message: 'Failed to create payment session with Lemon Squeezy', statusCode: 502 });
+                    return res.status(502).json({
+                        error: 'bad_gateway',
+                        message: 'Failed to create payment session with Lemon Squeezy',
+                        details: lsResult.errors || lsResult.message,
+                        statusCode: 502
+                    });
                 }
             }
 
