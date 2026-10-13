@@ -11,6 +11,7 @@ export interface ProductSummary {
   brand: string;
   base_sku: string;
   primary_image_id?: number | null;
+  primary_image_url?: string | null;
   min_price: number;
   max_price: number;
   variant_count: number;
@@ -35,6 +36,7 @@ export interface GetCategoriesResponse {
 
 export interface ProductImage {
   image_id: number;
+  image_url?: string | null;
   sort_order: number;
   is_primary: boolean;
 }

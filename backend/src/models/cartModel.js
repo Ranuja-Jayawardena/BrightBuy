@@ -21,6 +21,7 @@ const getCartItems = async (cart_id) => {
             pv.variant_name, 
             p.product_name,
             (SELECT image_id FROM product_images WHERE product_id = p.product_id AND is_primary = true LIMIT 1) as primary_image_id,
+            (SELECT image_url FROM product_images WHERE product_id = p.product_id AND is_primary = true LIMIT 1) as primary_image_url,
             pv.price, 
             ci.quantity, 
             (pv.price * ci.quantity) AS subtotal, 

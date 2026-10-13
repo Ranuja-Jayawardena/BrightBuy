@@ -249,8 +249,15 @@ export default function ProductDetailPage() {
             {selectedImageId ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img 
-                src={`/api/images/${selectedImageId}`} 
+                src={
+                  product.images?.find(img => img.image_id === selectedImageId)?.image_url ||
+                  `/api/images/${selectedImageId}`
+                } 
                 alt={product.product_name}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/placeholder-product.svg';
+                }}
                 className="object-cover w-full h-full"
               />
             ) : (
@@ -270,8 +277,12 @@ export default function ProductDetailPage() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
-                    src={`/api/images/${img.image_id}`} 
+                    src={img.image_url || `/api/images/${img.image_id}`} 
                     alt="Thumbnail"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = '/placeholder-product.svg';
+                    }}
                     className="object-cover w-full h-full bg-muted"
                   />
                 </button>

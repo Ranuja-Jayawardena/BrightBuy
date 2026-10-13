@@ -37,7 +37,8 @@ const getCart = async (req, res) => {
                 ...item,
                 price,
                 subtotal,
-                primary_image_id: item.primary_image_id || null
+                primary_image_id: item.primary_image_id || null,
+                primary_image_url: item.primary_image_url || null
             };
         });
 
