@@ -14,6 +14,7 @@ module.exports = [
         module: 'readonly',
         Buffer: 'readonly',
         fetch: 'readonly',
+        URL: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
       },
