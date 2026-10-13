@@ -60,7 +60,7 @@ These are the observed baseline, not proof that production runs this revision:
 | `DELETE /api/admin/images/:id` | Deletes DB row then attempts S3 delete | M6/M8 define accepted deletion versus asynchronous cleanup, repeat request result and durable retry behavior |
 | `GET /api/images/:id`, `/api/products/images/:id` | Legacy routes use image controller; canonical route redirects 302 to stored URL, or structured 400/404 | Preserve both routes with redirect tests; no old binary ETag expectation |
 | Catalog/admin reads | Product queries/services expose `primary_image_url`; image detail exposes `image_url` | A/B add frontend types and consume these fields while preserving IDs |
-| Cart read | `cartModel.js` returns `primary_image_id` only | D publishes additive `primary_image_url: string \| null`; B/A coordinate cart type/store consumers |
+| Cart read | `cartModel.js` returns `primary_image_id` and `primary_image_url` | D published and verified additive `primary_image_url: string \| null`; B/A consume in cart UI with placeholder fallback |
 
 Admin routes apply `requireAuth`, `requireRole('admin')`, and `requireStaffRole('catalog_manager')`; inspect the middleware's super-admin allowance. Do not replace this with a generic staff check or enable inventory-only roles to upload. Use existing HttpOnly-cookie authentication examples, not a new Bearer-token flow. Recheck authorization on confirm and delete; a signed S3 URL does not grant application privileges.
 

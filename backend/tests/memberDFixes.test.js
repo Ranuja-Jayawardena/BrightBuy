@@ -375,4 +375,99 @@ describe('Member D Fixes: Fix 4.1 (Cart Staff Guard) & Fix 4.3 (Order Delivery M
       });
     });
   });
+
+  describe('Fix 6.3: Cart Read Contract with primary_image_url (Member D)', () => {
+    const customerToken = signAccessToken({ user_id: 1, role: 'customer' });
+
+    beforeEach(() => {
+      db.query.mockImplementation((sql) => {
+        if (sql.includes('FROM customers')) {
+          return Promise.resolve({
+            rows: [{ customer_id: 10 }],
+          });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+    });
+
+    it('returns primary_image_url as string and preserves all item fields when primary image exists', async () => {
+      cartModel.getOrCreateCart.mockResolvedValueOnce(50);
+      cartModel.getCartItems.mockResolvedValueOnce([
+        {
+          cart_item_id: 101,
+          variant_id: 201,
+          variant_sku: 'LAP-001-16GB-SLV',
+          variant_name: '16GB RAM / Silver',
+          product_name: 'Pro Laptop 15',
+          primary_image_id: 12,
+          primary_image_url: 'https://brightbuy-media-storage-695945476492.s3.us-east-1.amazonaws.com/products/1/primary.webp',
+          price: '1299.99',
+          quantity: 2,
+          subtotal: '2599.98',
+          stock_quantity: 15,
+        },
+      ]);
+
+      const res = await request(app)
+        .get('/api/cart')
+        .set('Cookie', [`access_token=${customerToken}`])
+        .set('x-skip-rate-limit', 'true');
+
+      expect(res.status).toBe(200);
+      expect(res.body.cart).toBeDefined();
+      expect(res.body.cart.cart_id).toBe(50);
+      expect(res.body.cart.total).toBe(2599.98);
+      expect(res.body.cart.items).toHaveLength(1);
+
+      const item = res.body.cart.items[0];
+      expect(item.cart_item_id).toBe(101);
+      expect(item.variant_id).toBe(201);
+      expect(item.variant_sku).toBe('LAP-001-16GB-SLV');
+      expect(item.variant_name).toBe('16GB RAM / Silver');
+      expect(item.product_name).toBe('Pro Laptop 15');
+      expect(item.price).toBe(1299.99);
+      expect(item.quantity).toBe(2);
+      expect(item.subtotal).toBe(2599.98);
+      expect(item.stock_quantity).toBe(15);
+      expect(item.primary_image_id).toBe(12);
+      expect(item.primary_image_url).toBe(
+        'https://brightbuy-media-storage-695945476492.s3.us-east-1.amazonaws.com/products/1/primary.webp'
+      );
+    });
+
+    it('returns primary_image_url as null and primary_image_id as null when product has no primary image', async () => {
+      cartModel.getOrCreateCart.mockResolvedValueOnce(50);
+      cartModel.getCartItems.mockResolvedValueOnce([
+        {
+          cart_item_id: 102,
+          variant_id: 202,
+          variant_sku: 'ACC-001-BLK',
+          variant_name: 'Black',
+          product_name: 'USB-C Cable',
+          primary_image_id: null,
+          primary_image_url: null,
+          price: '19.99',
+          quantity: 1,
+          subtotal: '19.99',
+          stock_quantity: 50,
+        },
+      ]);
+
+      const res = await request(app)
+        .get('/api/cart')
+        .set('Cookie', [`access_token=${customerToken}`])
+        .set('x-skip-rate-limit', 'true');
+
+      expect(res.status).toBe(200);
+      expect(res.body.cart).toBeDefined();
+      expect(res.body.cart.total).toBe(19.99);
+      expect(res.body.cart.items).toHaveLength(1);
+
+      const item = res.body.cart.items[0];
+      expect(item.primary_image_id).toBeNull();
+      expect(item.primary_image_url).toBeNull();
+      expect(item.price).toBe(19.99);
+      expect(item.quantity).toBe(1);
+    });
+  });
 });

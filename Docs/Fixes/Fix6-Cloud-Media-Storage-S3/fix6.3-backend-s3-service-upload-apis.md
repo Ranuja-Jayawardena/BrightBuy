@@ -122,7 +122,7 @@ A representative proposed conflict body is `{ "error": "upload_conflict", "messa
 ## Step 6 — Complete read contracts and compatibility tests
 
 - [ ] Product/admin list: `primary_image_url: string | null`; product/admin detail images: `image_url: string`; preserve existing `primary_image_id`/`image_id` fields.
-- [ ] D adds cart `primary_image_url: string | null`, preserving item IDs, quantities, prices and purchase rules. No checkout-concurrency rewrite belongs in this handoff.
+- [x] D adds cart `primary_image_url: string | null`, preserving item IDs, quantities, prices and purchase rules. No checkout-concurrency rewrite belongs in this handoff. Verified via `cartModel.js`, `cartController.js`, and `tests/memberDFixes.test.js` (15 passing tests).
 - [ ] Preserve `GET /api/images/:id` and `/api/products/images/:id` with 302 and canonical stored URL; invalid ID 400 and missing/deleted row 404. Validate new writes/migrated URLs so redirects cannot point to arbitrary attacker-selected hosts.
 - [ ] Define caching for immutable final objects and avoid permanently caching mutable legacy ID redirects. If CDN support is chosen later, update canonical key extraction/deletion together; do not accept arbitrary URL hosts.
 - [x] Replace stale `test/product-validation.test.js` BYTEA helper tests with URL/redirect/service assertions. The test now verifies canonical product-owned S3 URL parsing; redirect behavior remains covered by `tests/imageRouteAlias.test.js`.
@@ -132,7 +132,7 @@ A representative proposed conflict body is `{ "error": "upload_conflict", "messa
 
 - [ ] T06–T13/T15 pass, including malformed inputs, unauthorized roles, source overwrite, simultaneous primary writes and restart recovery.
 - [ ] Backend tests, `test:product` and changed-file lint pass. Full backend lint passed on merged dev at `99fdeb2` (0 errors / 5 warnings); retain that dated evidence and recheck after implementation. The obsolete standalone image test still fails and blocks its gate.
-- [ ] Current successful response fields and both read routes preserved; cart URL contract verified with D/B/A.
+- [x] Current successful response fields and both read routes preserved; cart URL contract verified with D/B/A.
 - [ ] Upload/cleanup schema and actual deployment grants documented; exact migration versions allocated.
 - [ ] B receives frozen request/response/error examples, expiry/retry/deletion semantics and passing integration evidence. A receives URL fields/fallback expectations.
 - [ ] F6 issues closed only with evidence in the companion; production verification remains separate.
