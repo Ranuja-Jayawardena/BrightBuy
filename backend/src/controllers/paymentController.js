@@ -43,28 +43,31 @@ const createSession = async (req, res) => {
             return res.status(400).json({ error: 'invalid_order_status', message: 'Order is not pending payment', statusCode: 400 });
         }
 
+        // Check if payment is already completed
+        const existingPayment = await db.query(
+            'SELECT payment_id, payment_status FROM payments WHERE order_id = $1',
+            [oid]
+        );
+        if (existingPayment.rows.length > 0 && existingPayment.rows[0].payment_status === 'completed') {
+            return res.status(400).json({ error: 'already_paid', message: 'Order has already been paid', statusCode: 400 });
+        }
+
         const upsertPayment = async (method, status) => {
-            const existingPayment = await db.query(
-                'SELECT payment_id FROM payments WHERE order_id = $1 ORDER BY payment_id DESC LIMIT 1',
-                [oid]
-            );
-            if (existingPayment.rows.length > 0) {
-                const pid = existingPayment.rows[0].payment_id;
-                await db.query(
-                    `UPDATE payments 
-                     SET payment_method = $1, payment_status = $2, amount = $3, updated_at = NOW() 
-                     WHERE payment_id = $4`,
-                    [method, status, order.total_amount, pid]
-                );
-                return pid;
-            } else {
-                const insertResult = await db.query(
-                    `INSERT INTO payments (order_id, payment_method, payment_status, amount)
-                     VALUES ($1, $2, $3, $4) RETURNING payment_id`,
-                    [oid, method, status, order.total_amount]
-                );
-                return insertResult.rows[0].payment_id;
-            }
+            const query = `
+                INSERT INTO payments (order_id, payment_method, payment_status, amount)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (order_id) DO UPDATE
+                SET payment_method = EXCLUDED.payment_method,
+                    payment_status = CASE 
+                        WHEN payments.payment_status = 'completed' THEN 'completed' 
+                        ELSE EXCLUDED.payment_status 
+                    END,
+                    amount = EXCLUDED.amount,
+                    updated_at = NOW()
+                RETURNING payment_id, payment_status
+            `;
+            const result = await db.query(query, [oid, method, status, order.total_amount]);
+            return result.rows[0].payment_id;
         };
 
         if (payment_method === 'cod') {
@@ -173,6 +176,12 @@ const createSession = async (req, res) => {
                         statusCode: 502
                     });
                 }
+            }
+
+            // Re-verify order state post-network call before upserting payment
+            const currentOrder = await db.query('SELECT order_id, status, total_amount FROM orders WHERE order_id = $1', [oid]);
+            if (!currentOrder || !currentOrder.rows || currentOrder.rows.length === 0 || currentOrder.rows[0].status !== 'pending') {
+                return res.status(400).json({ error: 'invalid_order_status', message: 'Order is no longer pending payment', statusCode: 400 });
             }
 
             const payment_id = await upsertPayment('card', 'pending');

@@ -94,7 +94,22 @@ const createOrder = async (req, res) => {
             if (error.constraint === 'uq_order_idempotency_customer_key') {
                 return res.status(409).json({ error: 'conflict', message: 'Concurrent request with same idempotency key in progress', statusCode: 409 });
             }
+            if (error.constraint === 'idx_deliveries_order_id_unique') {
+                return res.status(409).json({ error: 'conflict', message: 'Delivery already exists for this order', statusCode: 409 });
+            }
+            if (error.constraint === 'idx_payments_order_id_unique') {
+                return res.status(409).json({ error: 'conflict', message: 'Payment already exists for this order', statusCode: 409 });
+            }
             return res.status(409).json({ error: 'conflict', message: 'Resource conflict occurred', statusCode: 409 });
+        }
+        if (error.code === '23514') {
+            if (error.constraint === 'chk_deliveries_mode_status') {
+                return res.status(400).json({ error: 'invalid_delivery_status', message: 'Invalid delivery status for delivery mode', statusCode: 400 });
+            }
+            if (error.constraint === 'chk_order_items_unit_price_nonnegative' || error.constraint === 'chk_payments_amount_nonnegative') {
+                return res.status(400).json({ error: 'invalid_amount', message: 'Negative amounts or prices are not allowed', statusCode: 400 });
+            }
+            return res.status(400).json({ error: 'constraint_violation', message: 'Database check constraint violation', statusCode: 400 });
         }
         if (error.message && error.message.startsWith('Cart is empty')) {
             return res.status(400).json({ error: 'cart_empty', message: error.message, statusCode: 400 });

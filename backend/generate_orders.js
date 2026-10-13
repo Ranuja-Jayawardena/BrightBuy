@@ -93,13 +93,13 @@ INSERT INTO orders (customer_id, order_date, status, total_amount) VALUES (
 );
 `;
 
+    const deliveryMode = Math.random() > 0.5 ? 'home_delivery' : 'store_pickup';
+
     // Deliveries
     let deliveryStatus = 'pending';
-    if (status === 'shipped') deliveryStatus = 'in_transit';
-    if (status === 'delivered') deliveryStatus = 'delivered';
+    if (status === 'shipped') deliveryStatus = deliveryMode === 'store_pickup' ? 'ready_for_pickup' : 'shipped';
+    if (status === 'delivered') deliveryStatus = deliveryMode === 'store_pickup' ? 'collected' : 'delivered';
     if (status === 'cancelled') deliveryStatus = 'cancelled';
-    
-    const deliveryMode = Math.random() > 0.5 ? 'home_delivery' : 'store_pickup';
     
     deliveriesSql += `INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, delivery_city_id, delivery_zip_code, delivery_status) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET ${numOrders - i}),

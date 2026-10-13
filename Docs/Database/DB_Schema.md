@@ -197,7 +197,7 @@ Table order_items {
   order_id int [ref: > orders.order_id, not null]
   variant_id int [ref: > product_variants.variant_id, not null]
   quantity int [not null, note: 'CHECK quantity > 0']
-  unit_price decimal(10,2) [not null]
+  unit_price decimal(10,2) [not null, note: 'CHECK unit_price >= 0 (V31: chk_order_items_unit_price_nonnegative)']
 
   indexes {
     order_id
@@ -220,13 +220,14 @@ Table payments {
   order_id int [ref: > orders.order_id, not null]
   payment_method varchar(20) [not null, note: 'CHECK payment_method IN (card, cod)']
   payment_status varchar(20) [not null, default: 'pending', note: 'CHECK payment_status IN (pending, cod_pending, completed, failed)']
-  amount decimal(10,2) [not null]
+  amount decimal(10,2) [not null, note: 'CHECK amount >= 0 (V31: chk_payments_amount_nonnegative)']
   transaction_id varchar(100)
   payment_date timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
 
   indexes {
-    order_id
+    order_id [unique, name: 'idx_payments_order_id_unique', note: 'V30: Enforces 1:1 payment per order (D1)']
+    transaction_id [unique, name: 'idx_payments_transaction_id_unique', note: 'V30: Non-null unique provider transaction index']
   }
 }
 
@@ -240,12 +241,44 @@ Table deliveries {
   delivery_zip_code varchar(10) [not null]
   estimated_delivery_days int
   tracking_number varchar(100)
-  delivery_status varchar(30) [not null, default: 'pending']
+  delivery_status varchar(30) [not null, default: 'pending', note: 'CHECK chk_deliveries_mode_status (V31: mode/status union consistency)']
   updated_at timestamp [default: `now()`]
+
+  indexes {
+    order_id [unique, name: 'idx_deliveries_order_id_unique', note: 'V31: Enforces 1:1 delivery per order (D4)']
+  }
+}
+
+Table webhook_events {
+  event_id varchar(255) [pk]
+  event_name varchar(100) [not null]
+  order_id int [ref: > orders.order_id]
+  transaction_id varchar(100)
+  processed_at timestamp [default: `now()`]
+  payload jsonb
 
   indexes {
     order_id
   }
+  note: 'Introduced in V30: Durable webhook deduplication store.'
+}
+
+Table payment_reconciliation_logs {
+  log_id serial [pk]
+  order_id int [ref: > orders.order_id]
+  event_id varchar(255)
+  event_name varchar(100)
+  transaction_id varchar(100)
+  discrepancy_type varchar(100) [not null]
+  expected_value text
+  received_value text
+  payload jsonb
+  created_at timestamp [default: `now()`]
+
+  indexes {
+    order_id
+  }
+  note: 'Introduced in V30: Durable audit log for late money, amount discrepancies, and refunds.'
 }
 
 Table refresh_tokens {

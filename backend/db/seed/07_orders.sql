@@ -960,7 +960,7 @@ INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, deliver
     '123 Random St',
     (SELECT city_id FROM cities WHERE city_name = 'El Paso'),
     '70000',
-    'in_transit'
+    'shipped'
 );
 INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, delivery_city_id, delivery_zip_code, delivery_status) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 30),
@@ -992,7 +992,7 @@ INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, deliver
     '123 Random St',
     (SELECT city_id FROM cities WHERE city_name = 'Fort Worth'),
     '70000',
-    'delivered'
+    'collected'
 );
 INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, delivery_city_id, delivery_zip_code, delivery_status) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 26),
@@ -1048,7 +1048,7 @@ INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, deliver
     '123 Random St',
     (SELECT city_id FROM cities WHERE city_name = 'El Paso'),
     '70000',
-    'delivered'
+    'collected'
 );
 INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, delivery_city_id, delivery_zip_code, delivery_status) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 19),
@@ -1072,7 +1072,7 @@ INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, deliver
     '123 Random St',
     (SELECT city_id FROM cities WHERE city_name = 'Austin'),
     '70000',
-    'delivered'
+    'collected'
 );
 INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, delivery_city_id, delivery_zip_code, delivery_status) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 16),
@@ -1152,7 +1152,7 @@ INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, deliver
     '123 Random St',
     (SELECT city_id FROM cities WHERE city_name = 'Austin'),
     '70000',
-    'in_transit'
+    'shipped'
 );
 INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, delivery_city_id, delivery_zip_code, delivery_status) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 6),
@@ -1208,6 +1208,6 @@ INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, deliver
     '123 Random St',
     (SELECT city_id FROM cities WHERE city_name = 'Fort Worth'),
     '70000',
-    'in_transit'
+    'shipped'
 );
 
