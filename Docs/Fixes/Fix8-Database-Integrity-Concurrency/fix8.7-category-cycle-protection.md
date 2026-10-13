@@ -1,11 +1,11 @@
-# Fix 7.7: Category Hierarchy Integrity
+# Fix 8.7: Category Hierarchy Integrity
 
-> **Parent:** [Fix 7](fix7-database-integrity-concurrency.md)
+> **Parent:** [Fix 8](fix8-database-integrity-concurrency.md)
 > **Status:** Not Started
 > **Assigned To:** C
 > **Priority:** Medium
-> **Depends On:** [7.1](fix7.1-contracts-preflight.md) D7/D8
-> **Blocks:** 7.9 category UI checks, 7.10, 7.11, 7.12
+> **Depends On:** [8.1](fix8.1-contracts-preflight.md) D7/D8
+> **Blocks:** 8.9 category UI checks, 8.10, 8.11, 8.12
 
 ## Baseline and ownership
 

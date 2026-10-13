@@ -1,11 +1,11 @@
-# Fix 7.10: Storefront & Report Regression Verification
+# Fix 8.10: Storefront & Report Regression Verification
 
 > **Assigned To:** A (lead), C (report query support)
 > **Status:** Not Started
 > **Priority:** High
-> **Depends On:** 7.2–7.5 and 7.7–7.9 for final integration; record the actual Fix 6 baseline first
-> **Blocks:** 7.12 release acceptance
-> **Navigation:** [Fix 7 overview](fix7-database-integrity-concurrency.md) | [Contracts](fix7.1-contracts-preflight.md)
+> **Depends On:** 8.2–8.5 and 8.7–8.9 for final integration; record the actual Fix 6 baseline first
+> **Blocks:** 8.12 release acceptance
+> **Navigation:** [Fix 8 overview](fix8-database-integrity-concurrency.md) | [Contracts](fix8.1-contracts-preflight.md)
 
 ## Purpose and boundaries
 
@@ -21,11 +21,11 @@ Inspect frontend/src/services/catalogService.ts, reportService.ts, types/catalog
 
 - [ ] Capture baseline response shapes and representative results using an isolated fixture with known prices, quantities, categories, and order statuses. Record the revision and migration version.
 - [ ] Preserve listing pagination, category navigation, brand/price filtering, autocomplete, active-product filtering, variant selection, and out-of-stock behavior.
-- [ ] Verify category moves accepted by 7.7 remain navigable and rejected moves do not leave stale UI trees. Coordinate error/refetch behavior with B rather than duplicating admin UI work.
+- [ ] Verify category moves accepted by 8.7 remain navigable and rejected moves do not leave stale UI trees. Coordinate error/refetch behavior with B rather than duplicating admin UI work.
 - [ ] Verify checkout and manual stock adjustment update subsequent product reads. Coordinate cart-store ownership and refresh behavior with B. Do not promise live stock accuracy between requests.
 - [ ] Record whether Fix 6.4 has actually delivered direct URL rendering; it was Not Started in the revised 2026-10-13 baseline. After integration, verify permanent S3 URLs, primary-image fallback, existing IDs/API fields and legacy redirect compatibility. Do not claim an unimplemented baseline was preserved or reintroduce database image binaries/backend image proxying.
 - [ ] Compare sales, inventory, customer, top-product, and CSV output before and after the change using the same fixture. Verify date filters, authorization, empty results, number formatting, and chart labels.
-- [ ] C confirms the reportable order-state definition against D2 in 7.1. If payment/refund semantics change report meaning, record the approved definition and expected totals before updating SQL.
+- [ ] C confirms the reportable order-state definition against D2 in 8.1. If payment/refund semantics change report meaning, record the approved definition and expected totals before updating SQL.
 - [ ] Include products assigned to multiple categories when checking aggregates. Distinguish an existing join/double-counting defect from a new regression and document any separate follow-up.
 - [ ] C checks representative query plans when a changed constraint, index, or join could affect search/report performance. Retain existing price and pg_trgm indexes unless measured evidence supports a separately documented change.
 - [ ] Record browser checks and frontend lint/build results. Mock data is suitable for UI preparation, but final acceptance uses the migrated backend and database.

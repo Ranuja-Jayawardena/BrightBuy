@@ -1,11 +1,11 @@
-# Fix 7.4: Order Transitions & Payment Event Consistency
+# Fix 8.4: Order Transitions & Payment Event Consistency
 
-> **Parent:** [Fix 7](fix7-database-integrity-concurrency.md)
+> **Parent:** [Fix 8](fix8-database-integrity-concurrency.md)
 > **Status:** Not Started
 > **Assigned To:** D (implementation), E (webhook security review), C (admin order ownership handoff)
 > **Priority:** Critical
-> **Depends On:** [7.1](fix7.1-contracts-preflight.md) D1/D2/D8; [7.3](fix7.3-cart-checkout-concurrency.md) shared lock contract
-> **Blocks:** 7.5 financial/writer constraints, 7.9, 7.10, 7.11, 7.12
+> **Depends On:** [8.1](fix8.1-contracts-preflight.md) D1/D2/D8; [8.3](fix8.3-cart-checkout-concurrency.md) shared lock contract
+> **Blocks:** 8.5 financial/writer constraints, 8.9, 8.10, 8.11, 8.12
 
 ## Read and preserve
 

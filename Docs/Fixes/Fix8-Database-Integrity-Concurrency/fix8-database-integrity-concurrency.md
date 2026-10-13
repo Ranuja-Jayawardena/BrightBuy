@@ -1,4 +1,4 @@
-# Fix 7: Database Integrity & Concurrency
+# Fix 8: Database Integrity & Concurrency
 
 > **Status:** In Progress (0 / 12 fix items complete; V27 code exists, database verification pending)
 > **Members:** A (storefront/reports), B (checkout/admin UI), C (catalog/inventory), D (cart/orders/payments), E (auth/database infrastructure)
@@ -23,7 +23,7 @@ Verified during planning:
 - Staff counts and category ancestry checks happen outside a database-wide serialization protocol.
 - Dedicated inventory adjustment writes history; variant editing also changes stock without that history.
 - CI starts PostgreSQL but its current workflow has no Flyway migration step. Production Compose has no migration service; current CD rebuilds containers without an explicit migration step. Do not infer migrations run because the app starts.
-- The 2026-10-13 Fix 6 documentation revision reconciles its trackers to 0/4 verified complete (6.1–6.3 In Progress, 6.4 Not Started). Provisioning/code evidence is preserved in the [Fix 6 issue ledger](../Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md); target migration and S3 integration evidence remain pending. Verify that actual baseline in 7.1.
+- The 2026-10-13 Fix 6 documentation revision reconciles its trackers to 0/4 verified complete (6.1–6.3 In Progress, 6.4 Not Started). Provisioning/code evidence is preserved in the [Fix 6 issue ledger](../Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md); target migration and S3 integration evidence remain pending. Verify that actual baseline in 8.1.
 
 These are source-code findings, not results from a live concurrency exercise. The existing orderStockAtomic Jest suite mocks pg.
 
@@ -31,18 +31,18 @@ These are source-code findings, not results from a live concurrency exercise. Th
 
 | Item | Assigned | Depends on | Status |
 | --- | --- | --- | --- |
-| [7.1: Contracts, Data Preflight & Migration Coordination](fix7.1-contracts-preflight.md) | E (lead), D (payments/cart), C (catalog) | Existing phase/fix baseline | Not Started |
-| [7.2: Catalog Timestamp Migration Verification](fix7.2-catalog-timestamp-verification.md) | C (lead), E (migration verification) | 7.1 environment/migration audit | In Progress |
-| [7.3: Cart Uniqueness & Checkout Concurrency](fix7.3-cart-checkout-concurrency.md) | D | 7.1 cart/API contract | Not Started |
-| [7.4: Order Transitions & Payment Event Consistency](fix7.4-order-payment-consistency.md) | D (lead), E (webhook infrastructure review), C (admin handoff) | 7.1 payment decisions; 7.3 lock contract | Not Started |
-| [7.5: Delivery Cardinality & Value Constraints](fix7.5-delivery-value-constraints.md) | D (lead), E (migration review) | 7.1 delivery decisions; 7.4 writer compatibility | Not Started |
-| [7.6: Concurrent Super Admin Protection](fix7.6-super-admin-protection.md) | E | 7.1 staff contract | Not Started |
-| [7.7: Category Hierarchy Integrity](fix7.7-category-cycle-protection.md) | C | 7.1 category contract | Not Started |
-| [7.8: Manual Inventory Adjustment Audit](fix7.8-inventory-audit.md) | C (lead), E (permissions review) | 7.1 audit decision; 7.2 timestamp baseline; 7.3/7.4 lock contract | Not Started |
-| [7.9: Checkout & Admin Conflict Handling](fix7.9-checkout-admin-ui.md) | B | 7.3–7.8 API handoffs; mock work after 7.1 | Not Started |
-| [7.10: Storefront & Report Regression Verification](fix7.10-storefront-report-regression.md) | A (lead), C (report query support) | 7.2–7.5, 7.7–7.9; actual Fix 6 baseline | Not Started |
-| [7.11: Application & Migration Database Accounts](fix7.11-database-account-separation.md) | E | 7.1 privilege audit; 7.2–7.8 final database objects | Not Started |
-| [7.12: PostgreSQL Integration Tests & Controlled Rollout](fix7.12-integration-rollout.md) | E (lead), A/B/C/D (area verification) | 7.1–7.11; test-harness preparation may start after 7.1 | Not Started |
+| [8.1: Contracts, Data Preflight & Migration Coordination](fix8.1-contracts-preflight.md) | E (lead), D (payments/cart), C (catalog) | Existing phase/fix baseline | Not Started |
+| [8.2: Catalog Timestamp Migration Verification](fix8.2-catalog-timestamp-verification.md) | C (lead), E (migration verification) | 8.1 environment/migration audit | In Progress |
+| [8.3: Cart Uniqueness & Checkout Concurrency](fix8.3-cart-checkout-concurrency.md) | D | 8.1 cart/API contract | Not Started |
+| [8.4: Order Transitions & Payment Event Consistency](fix8.4-order-payment-consistency.md) | D (lead), E (webhook infrastructure review), C (admin handoff) | 8.1 payment decisions; 8.3 lock contract | Not Started |
+| [8.5: Delivery Cardinality & Value Constraints](fix8.5-delivery-value-constraints.md) | D (lead), E (migration review) | 8.1 delivery decisions; 8.4 writer compatibility | Not Started |
+| [8.6: Concurrent Super Admin Protection](fix8.6-super-admin-protection.md) | E | 8.1 staff contract | Not Started |
+| [8.7: Category Hierarchy Integrity](fix8.7-category-cycle-protection.md) | C | 8.1 category contract | Not Started |
+| [8.8: Manual Inventory Adjustment Audit](fix8.8-inventory-audit.md) | C (lead), E (permissions review) | 8.1 audit decision; 8.2 timestamp baseline; 8.3/8.4 lock contract | Not Started |
+| [8.9: Checkout & Admin Conflict Handling](fix8.9-checkout-admin-ui.md) | B | 8.3–8.8 API handoffs; mock work after 8.1 | Not Started |
+| [8.10: Storefront & Report Regression Verification](fix8.10-storefront-report-regression.md) | A (lead), C (report query support) | 8.2–8.5, 8.7–8.9; actual Fix 6 baseline | Not Started |
+| [8.11: Application & Migration Database Accounts](fix8.11-database-account-separation.md) | E | 8.1 privilege audit; 8.2–8.8 final database objects | Not Started |
+| [8.12: PostgreSQL Integration Tests & Controlled Rollout](fix8.12-integration-rollout.md) | E (lead), A/B/C/D (area verification) | 8.1–8.11; test-harness preparation may start after 8.1 | Not Started |
 
 A owns customer catalog and report regression, not checkout implementation. B owns checkout and admin UI. C owns catalog/category/inventory writes. D owns cart/order/payment writes, including the order portions of adminOrderModel and adminOrderService for this fix, coordinated with their original owner C. E owns staff protection, Flyway coordination, grants, CI, and deployment.
 
@@ -50,8 +50,8 @@ Shared files require explicit handoff: C owns inventory functions and E owns emp
 
 ## Shared implementation contracts
 
-1. Read 7.1 and resolve its relevant decision rows before dependent code. Facts, proposed defaults, and unresolved decisions must remain visibly distinct.
-2. Keep existing route URLs, successful response fields, customer ownership filters, staff purchase prohibition, HttpOnly authentication, and COD/store-pickup flows. Any API addition must be recorded in 7.1 and handed to B/A before implementation.
+1. Read 8.1 and resolve its relevant decision rows before dependent code. Facts, proposed defaults, and unresolved decisions must remain visibly distinct.
+2. Keep existing route URLs, successful response fields, customer ownership filters, staff purchase prohibition, HttpOnly authentication, and COD/store-pickup flows. Any API addition must be recorded in 8.1 and handed to B/A before implementation.
 3. All statements in a transaction use the same checked-out pg client. Roll back on failure and release it. Do not substitute pool.query halfway through a transaction.
 4. Define one consistent lock order across checkout, cancellation, inventory, and payment. Preserve sorted variant acquisition; investigate the current join lock on products too. Neither local JavaScript mutexes nor disabled buttons protect multiple backend processes.
 5. Every side effect has one owner. Keep stock restoration in one operation, and ensure replays produce neither duplicate deductions nor duplicate notification jobs.
@@ -62,7 +62,7 @@ Shared files require explicit handoff: C owns inventory functions and E owns emp
 
 ## Migration coordination
 
-V27 is already occupied by catalog timestamps. E records the current highest version in 7.1 before allocating the next free versions. Do not assume V28 remains available, create duplicate versions across branches, or rewrite applied migrations.
+V27 is already occupied by catalog timestamps. E records the current highest version in 8.1 before allocating the next free versions. Do not assume V28 remains available, create duplicate versions across branches, or rewrite applied migrations.
 
 Migration owners: D for cart/order/payment/delivery constraints; C for catalog/inventory; E for staff guards and role setup. E reviews ordering and object ownership. Use forward migrations, named constraints, and a preflight that fails clearly on conflicting existing data. No silent deletion or arbitrary selection of duplicate financial records.
 
@@ -84,7 +84,7 @@ Views, materialized views, window-function reports, per-employee PostgreSQL role
 ## Completion gate
 
 - [ ] All twelve items have evidence and checked acceptance criteria.
-- [ ] Remaining business decisions are resolved in 7.1; optional views remain explicitly deferred.
+- [ ] Remaining business decisions are resolved in 8.1; optional views remain explicitly deferred.
 - [ ] Fresh-database and existing-data upgrades both pass, including real concurrency cases.
 - [ ] Backend, frontend, schema, and migration versions have a compatible rollout and rollback sequence.
 - [ ] A–E handoffs, schema notes, both overall trackers, and related phase/fix links reflect actual outcomes.

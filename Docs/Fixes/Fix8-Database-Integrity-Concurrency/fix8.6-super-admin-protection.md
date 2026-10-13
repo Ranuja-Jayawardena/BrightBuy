@@ -1,11 +1,11 @@
-# Fix 7.6: Concurrent Super Admin Protection
+# Fix 8.6: Concurrent Super Admin Protection
 
-> **Parent:** [Fix 7](fix7-database-integrity-concurrency.md)
+> **Parent:** [Fix 8](fix8-database-integrity-concurrency.md)
 > **Status:** Not Started
 > **Assigned To:** E
 > **Priority:** High
-> **Depends On:** [7.1](fix7.1-contracts-preflight.md) D6/D8 and migration ledger
-> **Blocks:** 7.9, 7.11, 7.12
+> **Depends On:** [8.1](fix8.1-contracts-preflight.md) D6/D8 and migration ledger
+> **Blocks:** 8.9, 8.11, 8.12
 
 ## Baseline and references
 

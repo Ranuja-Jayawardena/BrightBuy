@@ -1,11 +1,11 @@
-# Fix 7.5: Delivery Cardinality & Value Constraints
+# Fix 8.5: Delivery Cardinality & Value Constraints
 
-> **Parent:** [Fix 7](fix7-database-integrity-concurrency.md)
+> **Parent:** [Fix 8](fix8-database-integrity-concurrency.md)
 > **Status:** Not Started
 > **Assigned To:** D; E reviews migration sequencing
 > **Priority:** High
-> **Depends On:** [7.1](fix7.1-contracts-preflight.md) D1/D4/D8; [7.4](fix7.4-order-payment-consistency.md) writer compatibility
-> **Blocks:** 7.9, 7.10, 7.11, 7.12
+> **Depends On:** [8.1](fix8.1-contracts-preflight.md) D1/D4/D8; [8.4](fix8.4-order-payment-consistency.md) writer compatibility
+> **Blocks:** 8.9, 8.10, 8.11, 8.12
 
 ## Scope and references
 

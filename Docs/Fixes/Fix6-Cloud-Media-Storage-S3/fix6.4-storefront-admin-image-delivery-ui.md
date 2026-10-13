@@ -1,7 +1,7 @@
 # Fix 6.4: Admin Upload & Storefront/Cart Image Delivery
 
 > **Parent:** [Fix 6](fix6-cloud-media-storage-s3.md)
-> **Status:** Not Started — existing upload UI is incompatible with the current backend
+> **Status:** In Progress — direct upload and URL rendering code is present; revised acceptance evidence is pending
 > **Owners:** B (admin upload/gallery/cart), A (storefront); C supplies catalog APIs, D supplies cart URLs
 > **Depends on:** [Companion](fix6-contracts-verification-rollout.md) M2/M3/M5/M8 for mocks; 6.1–6.3 evidence for final integration
 > **Blocks:** Fix 6 completion and media release
@@ -11,11 +11,11 @@
 
 - [x] Existing gallery has primary badges, reorder controls, deletion confirmation and an upload spinner; preserve these behaviors.
 - [x] Source inspection confirms product-card/detail/cart/admin image rendering currently uses `/api/images/:id`.
-- [ ] Presign → direct storage upload → safe confirm protocol implemented in the browser.
-- [ ] Catalog/admin/cart types and rendering consume permanent URL fields.
+- [x] Presign → direct storage upload → confirm flow implemented in the browser; retry and binding safety remain open.
+- [x] Catalog/admin/cart types and rendering consume permanent URL fields.
 - [ ] Actual browser CORS, retry, conflict, fallback and role flows verified.
 
-**Needs correction:** `handleImageUpload` creates FormData and posts to `/api/admin/products/${productId}/images`, which is absent from the current backend router. The old instruction to show percentage progress with plain fetch also omitted how to obtain upload-byte progress. Use a transport with real upload progress (for example XMLHttpRequest) or explicitly agree to phase-only feedback; never invent percentage values. The old wildcard `**.amazonaws.com` remote-image example was unnecessarily broad and is superseded by the exact-host rule below.
+**Code update:** The merged admin editor now calls presign, uploads with XMLHttpRequest progress, and calls confirm. Storefront and cart consume URL fields with placeholder fallbacks. Confirm identity, replay safety, browser CORS, and the revised release gates still need verification. The old wildcard `**.amazonaws.com` remote-image example was unnecessarily broad and is superseded by the exact-host rule below.
 
 ## Read and inspect first
 

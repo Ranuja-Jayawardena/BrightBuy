@@ -1,15 +1,15 @@
-# Fix 7.12: PostgreSQL Integration Tests & Controlled Rollout
+# Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout
 
 > **Assigned To:** E (lead), A/B/C/D (area verification)
 > **Status:** Not Started
 > **Priority:** Critical
-> **Depends On:** 7.1–7.11 for release; isolated harness preparation can start after 7.1
-> **Blocks:** Fix 7 completion and production rollout
-> **Navigation:** [Fix 7 overview](fix7-database-integrity-concurrency.md) | [Preflight/decision ledger](fix7.1-contracts-preflight.md)
+> **Depends On:** 8.1–8.11 for release; isolated harness preparation can start after 8.1
+> **Blocks:** Fix 8 completion and production rollout
+> **Navigation:** [Fix 8 overview](fix8-database-integrity-concurrency.md) | [Preflight/decision ledger](fix8.1-contracts-preflight.md)
 
 ## Verified gap
 
-Current CI starts PostgreSQL 15 but does not explicitly run Flyway. Existing orderStockAtomic Jest tests mock pg. Current production Compose has no migration service, and current CD rebuilds/starts containers without an explicit migration stage. None of these establish that a target database has V27 or future Fix 7 migrations.
+Current CI starts PostgreSQL 15 but does not explicitly run Flyway. Existing orderStockAtomic Jest tests mock pg. Current production Compose has no migration service, and current CD rebuilds/starts containers without an explicit migration stage. None of these establish that a target database has V27 or future Fix 8 migrations.
 
 Read [migration verification](../../Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md), [order tests](../../Phases/Phase10-Polish-Testing-Deployment/phase10.4-order-backend-validation-tests.md), [production deployment](../../Phases/Phase10-Polish-Testing-Deployment/phase10.6-production-deployment.md), [email integration](../../Phases/Phase8-Email-Notifications/phase8.2-email-triggers-integration.md), and [S3 cutover](../Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md).
 
@@ -46,7 +46,7 @@ For retryable deadlocks/serialization failures, test bounded retries of the whol
 
 ## Migration and data gates
 
-- [ ] Run the 7.1 preflight on the intended upgrade dataset: duplicates, invalid values, status inconsistencies, category cycles, staff counts, and manual-audit limitations.
+- [ ] Run the 8.1 preflight on the intended upgrade dataset: duplicates, invalid values, status inconsistencies, category cycles, staff counts, and manual-audit limitations.
 - [ ] Stop on conflicting data. Produce a reviewed correction plan with affected records and consequences; do not arbitrarily merge/delete carts, payments, deliveries, or financial history.
 - [ ] Allocate migration numbers from the current ledger; validate Flyway history/checksums and the exact application revision. No rewriting applied migrations or Flyway repair/clean to suppress failures.
 - [ ] Measure migration locking and duration on representative data. Document an explicit maintenance window if compatible online enforcement cannot be demonstrated.
@@ -60,7 +60,7 @@ For retryable deadlocks/serialization failures, test bounded retries of the whol
 4. Apply V27 before starting backend code that no longer assigns catalog updated_at. Verify the trigger definitions and a controlled write on the actual target.
 5. Deploy the agreed cart/payment protocol and corresponding UI in the documented compatibility order. Explicitly handle old clients and in-flight provider callbacks; disabling all callbacks is not a substitute for durable event handling.
 6. Apply enforcement migrations only once all writers and existing data satisfy their contracts. Verify order guards, uniqueness, and concurrency controls.
-7. Provision/grant the 7.11 accounts, verify workflows, then switch runtime connections and confirm the active role.
+7. Provision/grant the 8.11 accounts, verify workflows, then switch runtime connections and confirm the active role.
 8. Run smoke tests for login, catalog/images, checkout/COD, sandbox card events, admin inventory/staff/delivery, reports, and email-job behavior.
 9. Monitor constraint failures, deadlocks, retry exhaustion, callback failures, and reconciliation backlog with identifiers that do not expose secrets/personal data.
 10. Record actual target results and update trackers only after acceptance.
@@ -69,7 +69,7 @@ The final runbook must contain executable commands validated against this reposi
 
 ## Failure and rollback
 
-Stop release if migrations, role permissions, callback handling, or invariants fail. Record the last successful step. Prefer a compatible application rollback while retaining safe additive schema. Do not drop durable checkout/event identity or audit history to restore an old binary. Old webhook code may be incompatible with order guards, and old code may require privileges removed in 7.11: prove the fallback combination before using it.
+Stop release if migrations, role permissions, callback handling, or invariants fail. Record the last successful step. Prefer a compatible application rollback while retaining safe additive schema. Do not drop durable checkout/event identity or audit history to restore an old binary. Old webhook code may be incompatible with order guards, and old code may require privileges removed in 8.11: prove the fallback combination before using it.
 
 A migration rollback may require a forward corrective migration or controlled restore. Define recovery point, possible writes since backup, and reconciliation before restoring. Never silently lose paid orders or accepted events. Do not disable database guards while the deployed backend relies on them.
 

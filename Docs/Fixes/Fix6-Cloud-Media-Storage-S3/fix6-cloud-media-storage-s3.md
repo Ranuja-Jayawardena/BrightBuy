@@ -35,9 +35,9 @@ Former 6.1/6.2/6.3 completion claims are reopened, not erased. Infrastructure cr
 | [6.1: S3 infrastructure, credentials & operational verification](fix6.1-s3-infrastructure-bucket-iam.md) | E | In Progress — infrastructure recorded; verification/protection pending | Read-only baseline can start now; policy changes follow resolved contracts |
 | [6.2: Lossless schema, existing-image and seed cutover](fix6.2-s3-schema-migration-seed-cutover.md) | C + E | In Progress — V26/seed code present; unsafe general backfill needs correction | Target history, verified per-image manifest and rollback gate before cutover |
 | [6.3: Backend upload, confirmation, delivery & deletion](fix6.3-backend-s3-service-upload-apis.md) | C; E reviews storage/worker operations | In Progress — code present; lifecycle/test gaps | Resolve applicable contracts; isolated implementation may precede production cutover |
-| [6.4: Admin upload and storefront/cart delivery](fix6.4-storefront-admin-image-delivery-ui.md) | B + A; C/D provide reads | Not Started — old upload call is incompatible with backend | Mock UI after frozen contract; final acceptance needs 6.1–6.3 evidence |
+| [6.4: Admin upload and storefront/cart delivery](fix6.4-storefront-admin-image-delivery-ui.md) | B + A; C/D provide reads | In Progress — direct upload and URL rendering code present; acceptance evidence pending | Verify contract, retry, browser and role flows; final acceptance needs 6.1–6.3 evidence |
 
-There are still four fix items. The companion contains shared gates, not a fifth item. Do not make Fix 6 wait for all of Fix 7: share migration allocation, lock order, role grants and release evidence where relevant. E allocates new versions jointly with [Fix 7.1](../Fix7-Database-Integrity-Concurrency/fix7.1-contracts-preflight.md). The merged tree has two V27 files; resolve F6-12 before any Flyway validation/migration or default Compose startup, then record the actual timestamp-migration version.
+There are still four fix items. The companion contains shared gates, not a fifth item. Do not make Fix 6 wait for all of Fix 8: share migration allocation, lock order, role grants and release evidence where relevant. E allocates new versions jointly with [Fix 8.1](../Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md). The merged tree has two V27 files; resolve F6-12 before any Flyway validation/migration or default Compose startup, then record the actual timestamp-migration version.
 
 ## Current evidence and correction ledger
 
@@ -45,14 +45,14 @@ Source paths are relative to the repository root. Keep issue IDs when closing th
 
 | ID | Classification and observed state | Required correction / proof | Owner / item | Closure |
 | --- | --- | --- | --- | --- |
-| F6-01 | Needs correction: admin product editor sends FormData to `/products/:id/images`; `adminRoutes.js` exposes only `/images/presign` and `/images/confirm` | Browser completes approved direct-upload protocol; no call to removed multipart route | B/C / 6.4, 6.3 | Open |
+| F6-01 | Code present: admin product editor now calls presign, direct PUT and confirm; browser integration and approved contract remain unverified | Browser completes approved direct-upload protocol; no call to removed multipart route | B/C / 6.4, 6.3 | Open |
 | F6-02 | Needs correction: V26 assigns one `primary.webp` or `secondary.webp` per product, then drops bytes | Per-image verified mapping; multiple secondary and nonseed images survive | C/E / 6.2 | Open |
 | F6-03 | Recorded, unverified: AWS log records provisioning and 52 seed objects; no runtime-container storage test or V26 target history is attached | Verify named environments and migration history | E / 6.1, 6.2 | Open |
 | F6-04 | Needs correction: confirm accepts an existing canonical product URL; no durable upload identity or one-object/one-row enforcement | Issued upload binding, idempotent confirmation, duplicate-reference prevention | C / 6.3 | Open |
 | F6-05 | Needs correction: DB row is deleted before S3 delete; storage failure loses retry source, shared URLs can break surviving rows | Durable cleanup, reference checks and restart-safe retries; protect shared seed assets | C/E / 6.3 | Open |
 | F6-06 | Not implemented: declared MIME and object existence checks alone; no explicit byte limit, content verification, expiry cleanup or overwrite protection | Frozen validation and object-lifecycle contract with failure tests | C/E / 6.1, 6.3 | Open |
 | F6-07 | Needs correction: primary-image writes lack a common product lock; concurrent writes can conflict on the unique index | Serialize all image mutations per product; retain unique index and map expected conflicts | C / 6.3 | Open |
-| F6-08 | Not implemented: UI uses legacy routes; frontend catalog types omit URLs; cart SQL exposes only `primary_image_id` | Add/consume URL fields, preserve IDs and tested redirect compatibility | A/B/C/D / 6.3, 6.4 | Open |
+| F6-08 | Code present: frontend consumes URL fields and cart SQL exposes `primary_image_url`; integrated delivery and redirect compatibility remain unverified | Add/consume URL fields, preserve IDs and tested redirect compatibility | A/B/C/D / 6.3, 6.4 | Open |
 | F6-09 | Needs correction: product validation still calls removed byte-image helpers. The earlier paymentController lint errors are resolved on merged dev | Update obsolete media tests; retain the passing lint check as evidence, not an open lint defect | C / 6.3 | Open for product test; lint portion closed: 2026-10-13, 0 errors / 5 warnings |
 | F6-10 | Not implemented: production Compose/CD has no migration stage; CD is independent of CI success | Tested migration/app ordering and CI-gated deployment; V26/V27 target verification | E / shared rollout | Open |
 | F6-11 | Documentation discrepancy: overview marked 6.3 complete while master tracker did not | This revision consistently reopens Fix 6 with evidence distinctions | E / docs | Closed: 2026-10-13, documentation only |
@@ -81,7 +81,7 @@ This ledger does not assert that data has already been lost, production has a pa
 - PostgreSQL and S3 have no shared transaction. Persist recoverable state for every partial operation and make cleanup retries safe.
 - Retain the partial unique primary-image index. It enforces at most one primary; requiring one is a separate M5 choice.
 - Soft deactivation does not delete media. Hard deletion, seed reuse and scripts need explicit cleanup ownership.
-- Coordinate media migrations/grants with V27 and Fix 7. No duplicate versions, silent reseeding, applied-file rewrites, or Flyway repair/clean shortcuts.
+- Coordinate media migrations/grants with V27 and Fix 8. No duplicate versions, silent reseeding, applied-file rewrites, or Flyway repair/clean shortcuts.
 
 ## Completion gate
 
@@ -95,4 +95,4 @@ This ledger does not assert that data has already been lost, production has a pa
 
 ## References
 
-[Schema](../../Database/DB_Schema.md), [AWS inventory](../../Deployment/aws-infrastructure.md), [project rules](../../../.agents/AGENTS.md), [SRS](../../SRS/srs.md), [tech stack](../../tech%20stack/tech%20stack.md), [Phase 1 tooling](../../Phases/Phase1-Project-Foundation/phase1.2-database-tooling.md), [Phase 4 image endpoint](../../Phases/Phase4-Product-Catalog-Browsing/phase4.2-image-serving-endpoint.md), [Phase 7 catalog APIs](../../Phases/Phase7-Inventory-Admin-Dashboard/phase7.1-product-variant-image-admin-apis.md), [Phase 10 deployment](../../Phases/Phase10-Polish-Testing-Deployment/phase10.6-production-deployment.md), [Fix 3.4 history](../Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md), [Fix 7](../Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md).
+[Schema](../../Database/DB_Schema.md), [AWS inventory](../../Deployment/aws-infrastructure.md), [project rules](../../../.agents/AGENTS.md), [SRS](../../SRS/srs.md), [tech stack](../../tech%20stack/tech%20stack.md), [Phase 1 tooling](../../Phases/Phase1-Project-Foundation/phase1.2-database-tooling.md), [Phase 4 image endpoint](../../Phases/Phase4-Product-Catalog-Browsing/phase4.2-image-serving-endpoint.md), [Phase 7 catalog APIs](../../Phases/Phase7-Inventory-Admin-Dashboard/phase7.1-product-variant-image-admin-apis.md), [Phase 10 deployment](../../Phases/Phase10-Polish-Testing-Deployment/phase10.6-production-deployment.md), [Fix 3.4 history](../Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md), [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md).

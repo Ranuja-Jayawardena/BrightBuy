@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (14 / 30 fix items complete across 7 fix groups; Fix 6 reopened for verified acceptance)
+**Status:** In Progress (14 / 35 fix items complete across 8 fix groups; Fix 6 reopened for verified acceptance)
 
 ---
 
@@ -79,23 +79,30 @@ This document is the **master tracker** for all post-development fixes, patches,
   - [ ] **6.3** Backend S3 Service & Pre-signed Upload APIs — **C (API)** → [fix6.3-backend-s3-service-upload-apis.md](Fix6-Cloud-Media-Storage-S3/fix6.3-backend-s3-service-upload-apis.md)
   - [ ] **6.4** Storefront & Admin Direct Image Delivery & Upload UI — **A (UI), B (UI)** → [fix6.4-storefront-admin-image-delivery-ui.md](Fix6-Cloud-Media-Storage-S3/fix6.4-storefront-admin-image-delivery-ui.md)
 
-Fix 6 has **0/4 items verified complete under the revised gates**. 6.1–6.3 are In Progress: provisioning or code exists, but operational evidence and known corrections remain. 6.4 is Not Started and its old multipart upload call is incompatible with the backend. Earlier completion claims are retained as historical evidence in the [overview issue ledger](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md); they do not close the new gates. Start with the [shared contracts, verification and rollout guide](Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md). This documentation revision implements no code or deployment changes. Recheck on merged dev `99fdeb2`: backend lint passes (0 errors / 5 warnings), the obsolete product image test still fails, and two V27 migrations block Flyway until F6-12 is resolved against target history.
+Fix 6 has **0/4 items verified complete under the revised gates**. 6.1–6.4 are In Progress: provisioning or code exists, but operational evidence and known corrections remain. The direct-upload and URL-rendering code is present; browser and lifecycle acceptance remain unverified. Earlier completion claims are retained as historical evidence in the [overview issue ledger](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md); they do not close the new gates. Start with the [shared contracts, verification and rollout guide](Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md). Recheck on merged dev `99fdeb2`: backend lint passes (0 errors / 5 warnings), the obsolete product image test still fails, and two V27 migrations block Flyway until F6-12 is resolved against target history.
 
-- [ ] **Fix 7: Database Integrity & Concurrency** | [Overview](Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md)
-  - [ ] **7.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix7-Database-Integrity-Concurrency/fix7.1-contracts-preflight.md)
-  - [ ] **7.2: Catalog Timestamp Migration Verification** | C (catalog), E (migration/environment) | [Details](Fix7-Database-Integrity-Concurrency/fix7.2-catalog-timestamp-verification.md)
-  - [ ] **7.3: Cart Uniqueness & Checkout Concurrency** | D | [Details](Fix7-Database-Integrity-Concurrency/fix7.3-cart-checkout-concurrency.md)
-  - [ ] **7.4: Order Transitions & Payment Event Consistency** | D (implementation), E (webhook security review), C (admin order ownership handoff) | [Details](Fix7-Database-Integrity-Concurrency/fix7.4-order-payment-consistency.md)
-  - [ ] **7.5: Delivery Cardinality & Value Constraints** | D; E reviews migration sequencing | [Details](Fix7-Database-Integrity-Concurrency/fix7.5-delivery-value-constraints.md)
-  - [ ] **7.6: Concurrent Super Admin Protection** | E | [Details](Fix7-Database-Integrity-Concurrency/fix7.6-super-admin-protection.md)
-  - [ ] **7.7: Category Hierarchy Integrity** | C | [Details](Fix7-Database-Integrity-Concurrency/fix7.7-category-cycle-protection.md)
-  - [ ] **7.8: Manual Inventory Adjustment Audit** | C (implementation), E (privilege/routine review) | [Details](Fix7-Database-Integrity-Concurrency/fix7.8-inventory-audit.md)
-  - [ ] **7.9: Checkout & Admin Conflict Handling** | B | [Details](Fix7-Database-Integrity-Concurrency/fix7.9-checkout-admin-ui.md)
-  - [ ] **7.10: Storefront & Report Regression Verification** | A (lead), C (report query support) | [Details](Fix7-Database-Integrity-Concurrency/fix7.10-storefront-report-regression.md)
-  - [ ] **7.11: Application & Migration Database Accounts** | E | [Details](Fix7-Database-Integrity-Concurrency/fix7.11-database-account-separation.md)
-  - [ ] **7.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix7-Database-Integrity-Concurrency/fix7.12-integration-rollout.md)
+- [ ] **Fix 7: Consumer Technology Catalog Specialization** → [fix7-tech-catalog-specialization.md](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
+  - [ ] **7.1** Technology Taxonomy & Category Hierarchy Restructuring — **A (Taxonomy)** → [fix7.1-technology-taxonomy-hierarchy.md](Fix7-Tech-Catalog-Specialization/fix7.1-technology-taxonomy-hierarchy.md)
+  - [ ] **7.2** Technology Product Catalog, Variant & Media Seed Alignment — **C (Products)** → [fix7.2-technology-product-catalog-seed.md](Fix7-Tech-Catalog-Specialization/fix7.2-technology-product-catalog-seed.md)
+  - [ ] **7.3** Catalog Links, Attribute Values & Order History Referential Integrity — **A (Links), D (Orders)** → [fix7.3-catalog-links-order-seed-integrity.md](Fix7-Tech-Catalog-Specialization/fix7.3-catalog-links-order-seed-integrity.md)
+  - [ ] **7.4** Database Reseed Orchestration, Flyway Verification & Storefront Validation — **E (DevOps), A (UI), B (UI)** → [fix7.4-database-reseed-pipeline-verification.md](Fix7-Tech-Catalog-Specialization/fix7.4-database-reseed-pipeline-verification.md)
+  - [ ] **7.5** Cloud Media Assets, Tech Imagery & S3 Bucket Synchronization — **E (DevOps), C (Media)** → [fix7.5-cloud-media-assets-s3-sync.md](Fix7-Tech-Catalog-Specialization/fix7.5-cloud-media-assets-s3-sync.md)
 
-Fix 7 has 0/12 items complete. Item 7.2 is In Progress because V27/backend timestamp edits already exist; actual database verification is pending. All other items are Not Started.
+- [ ] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
+  - [ ] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
+  - [ ] **8.2: Catalog Timestamp Migration Verification** | C (catalog), E (migration/environment) | [Details](Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+  - [ ] **8.3: Cart Uniqueness & Checkout Concurrency** | D | [Details](Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
+  - [ ] **8.4: Order Transitions & Payment Event Consistency** | D (implementation), E (webhook security review), C (admin order ownership handoff) | [Details](Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
+  - [ ] **8.5: Delivery Cardinality & Value Constraints** | D; E reviews migration sequencing | [Details](Fix8-Database-Integrity-Concurrency/fix8.5-delivery-value-constraints.md)
+  - [ ] **8.6: Concurrent Super Admin Protection** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
+  - [ ] **8.7: Category Hierarchy Integrity** | C | [Details](Fix8-Database-Integrity-Concurrency/fix8.7-category-cycle-protection.md)
+  - [ ] **8.8: Manual Inventory Adjustment Audit** | C (implementation), E (privilege/routine review) | [Details](Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
+  - [ ] **8.9: Checkout & Admin Conflict Handling** | B | [Details](Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+  - [ ] **8.10: Storefront & Report Regression Verification** | A (lead), C (report query support) | [Details](Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
+  - [ ] **8.11: Application & Migration Database Accounts** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+  - [ ] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
+
+Fix 8 has 0/12 items complete. Item 8.2 is In Progress because V27/backend timestamp edits already exist; actual database verification is pending. All other items are Not Started.
 
 ---
 
@@ -130,16 +137,24 @@ Converts the Top Performing Products report chart to horizontal bars (`layout="v
 
 Finish the approved S3 cutover with per-image preservation, container/IAM/CORS verification, durable upload identity, immutable publication, idempotent confirmation, safe deletion/cleanup and direct frontend URLs. V26's generic backfill and the current UI/backend upload mismatch need correction; production migration status is unverified. Preserve existing provisioning/code evidence while requiring actual acceptance tests before closure.
 
-**Leads:** E, C, B, A; D supports cart URL reads | **Priority:** Critical | **Progress:** 0/4 verified complete; 6.1–6.3 In Progress, 6.4 Not Started
+**Leads:** E, C, B, A; D supports cart URL reads | **Priority:** Critical | **Progress:** 0/4 verified complete; 6.1–6.4 In Progress
 
 [Overview and issue ledger](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) | [Contracts, evidence and rollout](Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md)
-### Fix 7: Database Integrity & Concurrency
+### Fix 7: Consumer Technology Catalog Specialization
 
-Database-enforced integrity, cart/checkout locking and retries, payment-event consistency, staff/category guards, inventory audit, separate database accounts, and real PostgreSQL verification. Owners follow AGENTS.md: A storefront/reports; B checkout/admin UI; C catalog/inventory; D orders/payments; E staff/migrations/deployment. Begin with 7.1 decisions and preflight; do not infer production migrations have run. Views and new reporting features remain deferred.
+Replace the apparel and home catalog seed with a coherent consumer technology taxonomy, product set, order references and S3 media assets. Verify the complete reseed and storefront behavior.
+
+**Priority:** High | **Progress:** 0/5 complete
+
+[Full details](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
+
+### Fix 8: Database Integrity & Concurrency
+
+Database-enforced integrity, cart/checkout locking and retries, payment-event consistency, staff/category guards, inventory audit, separate database accounts, and real PostgreSQL verification. Owners follow AGENTS.md: A storefront/reports; B checkout/admin UI; C catalog/inventory; D orders/payments; E staff/migrations/deployment. Begin with 8.1 decisions and preflight; do not infer production migrations have run. Views and new reporting features remain deferred.
 
 **Priority:** Critical | **Progress:** 0/12 complete
 
-[Full details](Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md)
+[Full details](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
 
 ---
 

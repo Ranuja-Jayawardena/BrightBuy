@@ -53,11 +53,11 @@ graph LR
   - **Env files:** the README told users to create `frontend/.env.local`, but compose requires `frontend/.env`, so the README now says `.env`. `backend/.env.example` DB credentials now match the compose defaults (`postgres`/`postgres`/`brightbuy`, host port `5433`).
   - README now covers DB reset, viewing logs, and common errors, as 2.3 requires.
 
-## Fix 7 follow-up
+## Fix 8 follow-up
 
-Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
 
-- [Fix 7.11: Application & Migration Database Accounts](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.11-database-account-separation.md)
-- [Fix 7.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.12-integration-rollout.md)
+- [Fix 8.11: Application & Migration Database Accounts](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+- [Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
 
-Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

@@ -1,11 +1,11 @@
-# Fix 7.8: Manual Inventory Adjustment Audit
+# Fix 8.8: Manual Inventory Adjustment Audit
 
-> **Parent:** [Fix 7](fix7-database-integrity-concurrency.md)
+> **Parent:** [Fix 8](fix8-database-integrity-concurrency.md)
 > **Status:** Not Started
 > **Assigned To:** C (implementation), E (privilege/routine review)
 > **Priority:** High, conditional on the audit scope
-> **Depends On:** [7.1](fix7.1-contracts-preflight.md) D5/D8; [7.2](fix7.2-catalog-timestamp-verification.md); 7.3/7.4 lock contract
-> **Blocks:** 7.9 inventory UI, 7.10 reporting checks, 7.11 grants, 7.12
+> **Depends On:** [8.1](fix8.1-contracts-preflight.md) D5/D8; [8.2](fix8.2-catalog-timestamp-verification.md); 8.3/8.4 lock contract
+> **Blocks:** 8.9 inventory UI, 8.10 reporting checks, 8.11 grants, 8.12
 
 ## Decision boundary and evidence
 
@@ -26,7 +26,7 @@ D5 must decide whether every manual change to existing stock is audited, whether
 - [ ] Define immutability under the runtime account if required: prevent editing/deleting existing adjustment records while allowing inserts/reads. Correction entries need a documented policy, not mutation of past entries.
 - [ ] V27 sets variant updated_at. Do not restore explicit timestamp assignments or update stock a second time from an audit trigger.
 - [ ] Retain existing historical records without fabricating missing provenance. Document the cutover point at which the stronger guarantee begins.
-- [ ] Coordinate any DB routine/grants with E's 7.11 account plan and avoid unsafe SECURITY DEFINER/search-path behavior.
+- [ ] Coordinate any DB routine/grants with E's 8.11 account plan and avoid unsafe SECURITY DEFINER/search-path behavior.
 
 ## Acceptance
 

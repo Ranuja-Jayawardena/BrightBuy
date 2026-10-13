@@ -1,11 +1,11 @@
-# Fix 7.11: Application & Migration Database Accounts
+# Fix 8.11: Application & Migration Database Accounts
 
 > **Assigned To:** E
 > **Status:** Not Started
 > **Priority:** High
-> **Depends On:** 7.1 D9 privilege audit; final database objects from 7.2–7.8
-> **Blocks:** 7.12 deployment acceptance
-> **Navigation:** [Fix 7 overview](fix7-database-integrity-concurrency.md) | [Contracts](fix7.1-contracts-preflight.md)
+> **Depends On:** 8.1 D9 privilege audit; final database objects from 8.2–8.8
+> **Blocks:** 8.12 deployment acceptance
+> **Navigation:** [Fix 8 overview](fix8-database-integrity-concurrency.md) | [Contracts](fix8.1-contracts-preflight.md)
 
 ## Current behavior and objective
 
@@ -21,14 +21,14 @@ Read [database tooling](../../Phases/Phase1-Project-Foundation/phase1.2-database
 - [ ] Define bootstrap/provisioning, migration, seed, and runtime identities and how each gets credentials in development, CI, staging, and production. A migration login need not be a cluster superuser; isolate elevated extension/role provisioning where needed.
 - [ ] Define ownership of existing and future tables, sequences, functions, triggers, schemas, and Flyway history. Do not assume granting table privileges transfers ownership.
 - [ ] Record runtime privileges per object, including sequence usage and routine execution where actually needed. Restrict schema creation and DDL, and inspect privileges inherited through PUBLIC or other role memberships.
-- [ ] If 7.8 uses a controlled stock routine, prove that its intended callers cannot bypass the audit through base-table writes. Review SECURITY DEFINER ownership/search_path and EXECUTE permissions if that mechanism is chosen.
+- [ ] If 8.8 uses a controlled stock routine, prove that its intended callers cannot bypass the audit through base-table writes. Review SECURITY DEFINER ownership/search_path and EXECUTE permissions if that mechanism is chosen.
 - [ ] Define default privileges for the actual role creating future objects, not merely for the account executing a GRANT command.
 - [ ] Decide seed execution privileges independently. Do not give the runtime account destructive seed/reset powers to make setup convenient.
 - [ ] Document credentials distribution/rotation and pool restart sequence without including secrets. A reporting login is optional and requires an actual separate reporting client.
 
 ## Implementation sequence
 
-1. Rehearse role provisioning and grants on an isolated database containing all Fix 7 migrations.
+1. Rehearse role provisioning and grants on an isolated database containing all Fix 8 migrations.
 2. Verify fresh bootstrap and upgrade of a persistent existing database separately. Do not delete a persistent volume to avoid handling existing ownership.
 3. Apply grants to existing objects and future-object defaults; test before switching runtime credentials.
 4. Run migrations using the migration identity and application flows using the runtime identity. Confirm trigger execution and any function dependencies under the restricted account.
@@ -55,4 +55,4 @@ Read [database tooling](../../Phases/Phase1-Project-Foundation/phase1.2-database
 - [ ] Both fresh and existing-volume tests pass; all backend workflows run with the restricted role.
 - [ ] Runtime cannot perform schema DDL or escalate through inherited ownership/membership.
 - [ ] No credentials appear in source, test output, or docs.
-- [ ] 7.12 includes the exact target-specific switch and fallback procedure. A temporary fallback must be reviewed, not an automatic return to a superuser account.
+- [ ] 8.12 includes the exact target-specific switch and fallback procedure. A temporary fallback must be reviewed, not an automatic return to a superuser account.

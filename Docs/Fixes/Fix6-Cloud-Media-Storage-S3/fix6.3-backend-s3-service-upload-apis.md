@@ -107,7 +107,7 @@ A representative proposed conflict body is `{ "error": "upload_conflict", "messa
 - [ ] Confirm, primary changes, reorder, delete and any hard product-delete path use the same product gate before image/upload rows. For an image-only request, resolve product ID, then lock product and re-read the image under that gate before mutation.
 - [ ] Recompute preserved fields from the locked row. The current unlocked read can cause a sort-only request to overwrite a concurrent primary change.
 - [ ] Retain `idx_product_images_single_primary`; lock serialization prevents avoidable races and the constraint remains the final invariant. Map known named conflicts, not all SQL errors, to the frozen API response.
-- [ ] Coordinate product-before-image order with Fix 7's stock/product joins. Use bounded whole-transaction retries where selected; never retry S3 side effects blindly inside an aborted SQL transaction.
+- [ ] Coordinate product-before-image order with Fix 8's stock/product joins. Use bounded whole-transaction retries where selected; never retry S3 side effects blindly inside an aborted SQL transaction.
 - [ ] Preserve at-most-one-primary and the M5 deletion/no-primary policy. Soft deactivation/reactivation leaves objects intact.
 
 ## Step 5 — Make deletion and cleanup recoverable

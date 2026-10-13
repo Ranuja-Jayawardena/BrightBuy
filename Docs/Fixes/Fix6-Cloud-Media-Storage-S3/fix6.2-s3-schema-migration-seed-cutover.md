@@ -83,7 +83,7 @@ FROM product_images GROUP BY image_url HAVING count(*) > 1;
 - [ ] Preflight current duplicate/shared URLs before enforcing uniqueness. Keep multiple metadata rows if legitimate and choose a reference model, or repair them through reviewed mapping; never arbitrarily drop rows.
 - [ ] Preserve the existing primary-image partial unique index, product FK, IDs and metadata. Add named constraints for known API conflict mapping.
 - [ ] Update [DB_Schema.md](../../Database/DB_Schema.md) when schema implementation occurs, marking actual versus proposed objects. Never document proposed columns as already deployed.
-- [ ] Coordinate grants/worker access with [Fix 7.11](../Fix7-Database-Integrity-Concurrency/fix7.11-database-account-separation.md), without making all of Fix 7 a prerequisite for isolated media tests.
+- [ ] Coordinate grants/worker access with [Fix 8.11](../Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md), without making all of Fix 8 a prerequisite for isolated media tests.
 
 ## Acceptance and evidence
 

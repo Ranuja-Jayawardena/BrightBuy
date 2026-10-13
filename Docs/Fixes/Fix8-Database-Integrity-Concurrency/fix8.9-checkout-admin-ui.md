@@ -1,11 +1,11 @@
-# Fix 7.9: Checkout & Admin Conflict Handling
+# Fix 8.9: Checkout & Admin Conflict Handling
 
-> **Parent:** [Fix 7](fix7-database-integrity-concurrency.md)
+> **Parent:** [Fix 8](fix8-database-integrity-concurrency.md)
 > **Status:** Not Started
 > **Assigned To:** B
 > **Priority:** High
-> **Depends On:** 7.1 D3/D8 for mocks; actual 7.3–7.8 API handoffs for integration
-> **Blocks:** 7.10 combined regression, 7.12
+> **Depends On:** 8.1 D3/D8 for mocks; actual 8.3–8.8 API handoffs for integration
+> **Blocks:** 8.10 combined regression, 8.12
 
 ## Read and preserve
 
@@ -37,4 +37,4 @@ Files: frontend/src/app/cart/page.tsx; checkout/page.tsx, checkout/return/page.t
 
 ## Definition of Done
 
-All backend contract handoffs are consumed, browser scenarios and frontend checks pass, and A receives any shared storefront/store changes for 7.10.
+All backend contract handoffs are consumed, browser scenarios and frontend checks pass, and A receives any shared storefront/store changes for 8.10.

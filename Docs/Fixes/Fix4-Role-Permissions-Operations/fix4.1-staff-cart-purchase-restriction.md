@@ -73,11 +73,11 @@ In `frontend/src/app/products/[id]/page.tsx`:
 2. Clicking "Add to Cart" while authenticated as staff displays the explanatory modal dialog and prevents request dispatch.
 3. Attempting to directly load `/cart` as staff blocks checkout actions.
 
-## Fix 7 follow-up
+## Fix 8 follow-up
 
-Database integrity and concurrency work is tracked separately in [Fix 7](../Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
 
-- [Fix 7.3: Cart Uniqueness & Checkout Concurrency](../Fix7-Database-Integrity-Concurrency/fix7.3-cart-checkout-concurrency.md)
-- [Fix 7.9: Checkout & Admin Conflict Handling](../Fix7-Database-Integrity-Concurrency/fix7.9-checkout-admin-ui.md)
+- [Fix 8.3: Cart Uniqueness & Checkout Concurrency](../Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
+- [Fix 8.9: Checkout & Admin Conflict Handling](../Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
 
-Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

@@ -1,14 +1,14 @@
 # Database Improvements: Discussion
 
 > **Status:** V27 and the backend timestamp edits exist in the working tree; application to a real database is unverified. Other items remain planned work.
-> **Implementation plan:** [Fix 7: Database Integrity & Concurrency](../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md) assigns the work, dependencies, decision gates, tests, and rollout. Use that plan for execution; this file preserves the discussion and rationale.
+> **Implementation plan:** [Fix 8: Database Integrity & Concurrency](../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md) assigns the work, dependencies, decision gates, tests, and rollout. Use that plan for execution; this file preserves the discussion and rationale.
 > **Database:** PostgreSQL, with schema changes managed through Flyway migrations.
 
 ## Code prepared: catalog `updated_at` triggers
 
 Flyway migration `V27__set_catalog_updated_at_on_update.sql` adds `BEFORE UPDATE` triggers to `products` and `product_variants`. PostgreSQL sets `NEW.updated_at` to the current transaction timestamp on every update, including direct SQL updates. The backend no longer assigns `updated_at` in its updates to these two tables. Their existing column defaults still supply the timestamp on insert.
 
-The timestamp describes a change to that specific row. Updating a variant, product image, category assignment, or variant attribute does not update the parent `products.updated_at`. A no-op `UPDATE` still sets the row's timestamp to `CURRENT_TIMESTAMP`, matching the prior explicit-update behavior. Because this is the transaction start timestamp, multiple updates in one transaction can have the same value; it does not necessarily advance on every statement. Real database verification is tracked in [Fix 7.2](../Fixes/Fix7-Database-Integrity-Concurrency/fix7.2-catalog-timestamp-verification.md).
+The timestamp describes a change to that specific row. Updating a variant, product image, category assignment, or variant attribute does not update the parent `products.updated_at`. A no-op `UPDATE` still sets the row's timestamp to `CURRENT_TIMESTAMP`, matching the prior explicit-update behavior. Because this is the transaction start timestamp, multiple updates in one transaction can have the same value; it does not necessarily advance on every statement. Real database verification is tracked in [Fix 8.2](../Fixes/Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md).
 
 ## Highest-priority database rules
 
@@ -139,7 +139,7 @@ Use a `BEFORE INSERT OR UPDATE OF parent_category_id` row trigger on `categories
 
 ## Suggested implementation order
 
-This was the discussion order. The [Fix 7 dependency map](../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md) now governs implementation and includes compatibility checks before enforcement. Views remain deferred.
+This was the discussion order. The [Fix 8 dependency map](../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md) now governs implementation and includes compatibility checks before enforcement. Views remain deferred.
 
 1. Agree on the order/payment state policy, fix late success and failure events, then add the order transition guard.
 2. Prevent concurrent checkout of the same cart and coordinate cart edits with checkout. Decide how a retry of the same request is identified.

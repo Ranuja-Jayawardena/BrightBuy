@@ -16,10 +16,14 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="flex flex-col bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
         {/* Image / Image Placeholder */}
         <div className="aspect-square bg-slate-50 relative overflow-hidden flex items-center justify-center p-6">
-          {product.primary_image_id ? (
+          {(product.primary_image_url || product.primary_image_id) ? (
             <img
-              src={`/api/images/${product.primary_image_id}`}
+              src={product.primary_image_url || `/api/images/${product.primary_image_id}`}
               alt={product.product_name}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = '/placeholder-product.svg';
+              }}
               className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
             />
           ) : (

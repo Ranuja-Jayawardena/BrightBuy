@@ -45,10 +45,10 @@ _Record any implementation decisions, trade-offs, or deviations from the plan he
 - **[Fix 2.2: Search Autocomplete & GIN Trigram Indexing](../../Fixes/Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md):** Introduces interactive search suggestion dropdown.
 - **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Fixes 404 image serving bug so catalog product cards display product thumbnails reliably.
 
-## Fix 7 follow-up
+## Fix 8 follow-up
 
-Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
 
-- [Fix 7.10: Storefront & Report Regression Verification](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.10-storefront-report-regression.md)
+- [Fix 8.10: Storefront & Report Regression Verification](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
 
-Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

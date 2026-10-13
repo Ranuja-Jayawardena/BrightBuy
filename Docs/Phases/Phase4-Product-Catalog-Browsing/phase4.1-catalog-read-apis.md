@@ -82,10 +82,10 @@ Response 200: {
 - **Image Metadata Decoupling:** `GET /api/products/:id` selects strictly `image_id, sort_order, is_primary` metadata without querying `BYTEA` `image_data`.
 - **Architecture Layers:** Clean separation into `models/` (raw SQL queries), `services/` (business logic & response contract mapping), `controllers/` (Express HTTP route handlers), and `routes/`. Mounted under `/api/products` and `/api/categories` in `index.js`.
 
-## Fix 7 follow-up
+## Fix 8 follow-up
 
-Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
 
-- [Fix 7.10: Storefront & Report Regression Verification](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.10-storefront-report-regression.md)
+- [Fix 8.10: Storefront & Report Regression Verification](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
 
-Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

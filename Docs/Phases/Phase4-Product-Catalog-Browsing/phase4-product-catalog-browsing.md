@@ -66,11 +66,12 @@ This storefront catalog experience is enhanced by the following post-development
 - **[Fix 2.2: Search Autocomplete & GIN Trigram Indexing](../../Fixes/Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md):** Introduces `GET /api/products/search/suggestions` with debounced instant dropdown and `V23` trigram GIN index.
 - **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Resolves `/api/images/:id` 404 route mount mismatch so product thumbnails and detail galleries render seamlessly.
 - **[Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md):** Lecturer-approved transition to AWS S3. Upgrades image delivery to direct S3 object links, dropping the legacy `image_data` binary column with direct pre-signed URL uploads.
+- **[Fix 7: Consumer Technology Catalog Specialization](../../Fixes/Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md):** Restructures catalog taxonomy and seeds so the storefront exclusively offers consumer technology items (laptops, phones, earbuds, smart wearables, PC peripherals).
 
-## Fix 7 follow-up
+## Fix 8 follow-up
 
-Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
 
-- [Fix 7.10: Storefront & Report Regression Verification](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.10-storefront-report-regression.md)
+- [Fix 8.10: Storefront & Report Regression Verification](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
 
-Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

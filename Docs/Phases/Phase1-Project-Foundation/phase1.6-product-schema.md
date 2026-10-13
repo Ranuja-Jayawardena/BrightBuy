@@ -56,6 +56,7 @@ Create the core product tables (products, variants, images) and seed the 40-prod
 ### Implementation Decisions
 - **Binary Image Storage:** Implemented strictly using PostgreSQL `BYTEA` with base64 decoded PNG binaries (`decode('<base64>', 'base64')`) in `04_products.sql` per project constraints.
 - **Cloud Storage Migration (Lecturer Approved):** See [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) and [Fix 6.2](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md) for Flyway migration `V26` completely replacing `image_data` BYTEA with `image_url NOT NULL`.
+- **Consumer Technology Catalog Specialization:** See [Fix 7.2: Technology Product Catalog Seed](../../Fixes/Fix7-Tech-Catalog-Specialization/fix7.2-technology-product-catalog-seed.md) for replacing the 24 non-tech products (`HAP-*`, `KIT-*`, `CLN-*`, `APP-*`, `MCL-*`, `WCL-*`) in `04_products.sql` with consumer tech devices (Tablets, Displays, Peripherals, Wearables, IoT, SSDs).
 - **Constraints & Indexes:**
   - `idx_products_product_name` on `products(product_name)` for text search.
   - `idx_product_variants_product_id` on `product_variants(product_id)` with `ON DELETE CASCADE`.
@@ -144,11 +145,11 @@ The following 40 products and 70 variants have been seeded in `backend/db/seed/0
 | `WCL-004` | Breathable Flex Yoga Leggings | PeakAthletics | Women's Clothing | `WCL-004-BLK-S` | Classic Black / Size S | $48.00 | 55 |
 |  |  |  |  | `WCL-004-SGE-M` | Sage Green / Size M | $48.00 | 0 |
 
-## Fix 7 follow-up
+## Fix 8 follow-up
 
-Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
 
-- [Fix 7.2: Catalog Timestamp Migration Verification](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.2-catalog-timestamp-verification.md)
-- [Fix 7.8: Manual Inventory Adjustment Audit](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.8-inventory-audit.md)
+- [Fix 8.2: Catalog Timestamp Migration Verification](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+- [Fix 8.8: Manual Inventory Adjustment Audit](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
 
-Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

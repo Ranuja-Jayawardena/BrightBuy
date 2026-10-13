@@ -1,11 +1,11 @@
-# Fix 7.2: Catalog Timestamp Migration Verification
+# Fix 8.2: Catalog Timestamp Migration Verification
 
-> **Parent:** [Fix 7](fix7-database-integrity-concurrency.md)
+> **Parent:** [Fix 8](fix8-database-integrity-concurrency.md)
 > **Status:** In Progress (existing code; real database validation pending)
 > **Assigned To:** C (catalog), E (migration/environment)
 > **Priority:** High
-> **Depends On:** [7.1 environment and migration audit](fix7.1-contracts-preflight.md)
-> **Blocks:** 7.8 catalog/audit integration, 7.10, 7.11, 7.12
+> **Depends On:** [8.1 environment and migration audit](fix8.1-contracts-preflight.md)
+> **Blocks:** 8.8 catalog/audit integration, 8.10, 8.11, 8.12
 
 ## Existing implementation to preserve
 
@@ -38,5 +38,5 @@ Do not create a duplicate migration/function, rewrite an applied V27, or extend 
 - [ ] Real PostgreSQL assertions above pass with target/version and command evidence.
 - [ ] No product/variant backend update still depends on manually assigning updated_at.
 - [ ] Schema/phase docs state row-only and transaction-time behavior accurately.
-- [ ] 7.12 has the mandatory migration-before-backend ordering and a compatible application rollback plan.
+- [ ] 8.12 has the mandatory migration-before-backend ordering and a compatible application rollback plan.
 

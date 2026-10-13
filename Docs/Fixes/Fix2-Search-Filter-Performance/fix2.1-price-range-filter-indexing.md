@@ -122,10 +122,10 @@ GET /api/products?min_price=50&max_price=250&page=1&limit=12
 
 The API includes products only when at least one active variant falls within the requested range. Product card min/max prices and variant counts are calculated from those matching variants. The storefront controls remain assigned to Member A. The migration file is ready but has not been applied to a database in this checkout.
 
-## Fix 7 follow-up
+## Fix 8 follow-up
 
-Database integrity and concurrency work is tracked separately in [Fix 7](../Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
 
-- [Fix 7.10: Storefront & Report Regression Verification](../Fix7-Database-Integrity-Concurrency/fix7.10-storefront-report-regression.md)
+- [Fix 8.10: Storefront & Report Regression Verification](../Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
 
-Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

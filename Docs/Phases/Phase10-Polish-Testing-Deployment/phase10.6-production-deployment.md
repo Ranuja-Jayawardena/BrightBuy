@@ -1,6 +1,6 @@
 # Phase 10.6: Production Deployment
 
-> **Fix 6 status correction (2026-10-13):** Current media release gap: reviewed production Compose/CD has no explicit Flyway stage and CD runs independently of CI success. Historical deployment completion below does not verify V26/V27, S3 container credentials or safe media rollout. Use the Fix 6 release/evidence guide together with Fix 7.12 before deploying the changed application. [Active Fix 6 guidance](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md).
+> **Fix 6 status correction (2026-10-13):** Current media release gap: reviewed production Compose/CD has no explicit Flyway stage and CD runs independently of CI success. Historical deployment completion below does not verify V26/V27, S3 container credentials or safe media rollout. Use the Fix 6 release/evidence guide together with Fix 8.12 before deploying the changed application. [Active Fix 6 guidance](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md).
 
 > **Parent Phase:** [Phase 10: Polish, Testing & Deployment](phase10-polish-testing-deployment.md)
 > **Status:** Complete
@@ -131,11 +131,11 @@ All AWS infrastructure provisioning (EC2 instances, security groups, key pairs, 
   - **Application Runtime Secrets (EC2 Host `.env.prod`):** Stored directly on the EC2 host at `/home/ubuntu/BrightBuy/.env.prod` with `chmod 600`. Because `.env*` is in `.gitignore`, production credentials never leave the AWS boundary, never enter GitHub actions/logs, and are never overwritten during automated `git pull` updates.
 - **AWS CLI-first provisioning:** All AWS infrastructure (EC2, security groups, key pairs, Elastic IPs) is created and managed via the AWS CLI, not the web console. This makes the setup fully scriptable, reproducible, and agent-executable.
 
-## Fix 7 follow-up
+## Fix 8 follow-up
 
-Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
 
-- [Fix 7.11: Application & Migration Database Accounts](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.11-database-account-separation.md)
-- [Fix 7.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.12-integration-rollout.md)
+- [Fix 8.11: Application & Migration Database Accounts](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+- [Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
 
-Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
