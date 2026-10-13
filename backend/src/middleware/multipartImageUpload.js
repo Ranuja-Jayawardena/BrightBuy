@@ -7,37 +7,37 @@ function createError(status, message) {
 }
 
 function parseMultipartBody(buffer, boundary) {
-  const body = buffer.toString('latin1');
-  const delimiter = `--${boundary}`;
-  const parts = body.split(delimiter).slice(1, -1);
+  const delimiter = Buffer.from(`--${boundary}`);
+  const nextDelimiter = Buffer.from(`\r\n--${boundary}`);
+  const headerSeparator = Buffer.from('\r\n\r\n');
   const fields = {};
   let file = null;
+  let cursor = buffer.indexOf(delimiter);
+  if (cursor === -1) throw createError(400, 'Malformed multipart body');
 
-  for (const part of parts) {
-    const trimmed = part.replace(/^\r\n/, '').replace(/\r\n$/, '');
-    const separatorIndex = trimmed.indexOf('\r\n\r\n');
-    if (separatorIndex === -1) {
-      continue;
-    }
-
-    const rawHeaders = trimmed.slice(0, separatorIndex);
-    const content = trimmed.slice(separatorIndex + 4);
+  while (cursor < buffer.length) {
+    cursor += delimiter.length;
+    if (buffer.toString('ascii', cursor, cursor + 2) === '--') break;
+    if (buffer.toString('ascii', cursor, cursor + 2) !== '\r\n') throw createError(400, 'Malformed multipart body');
+    cursor += 2;
+    const separatorIndex = buffer.indexOf(headerSeparator, cursor);
+    if (separatorIndex === -1) throw createError(400, 'Malformed multipart headers');
+    const rawHeaders = buffer.toString('latin1', cursor, separatorIndex);
+    const contentStart = separatorIndex + headerSeparator.length;
+    const nextPart = buffer.indexOf(nextDelimiter, contentStart);
+    if (nextPart === -1) throw createError(400, 'Malformed multipart body');
+    const content = buffer.subarray(contentStart, nextPart);
     const nameMatch = rawHeaders.match(/name="([^"]+)"/i);
-    if (!nameMatch) {
-      continue;
+    if (nameMatch) {
+      const fieldName = nameMatch[1];
+      const filenameMatch = rawHeaders.match(/filename="([^"]*)"/i);
+      if (filenameMatch) {
+        file = { fieldname: fieldName, originalname: filenameMatch[1], buffer: Buffer.from(content) };
+      } else {
+        fields[fieldName] = content.toString('utf8');
+      }
     }
-
-    const fieldName = nameMatch[1];
-    const filenameMatch = rawHeaders.match(/filename="([^"]*)"/i);
-    if (filenameMatch) {
-      file = {
-        fieldname: fieldName,
-        originalname: filenameMatch[1],
-        buffer: Buffer.from(content, 'latin1'),
-      };
-    } else {
-      fields[fieldName] = content;
-    }
+    cursor = nextPart + 2;
   }
 
   return { fields, file };
@@ -64,7 +64,9 @@ function multipartImageUpload(req, res, next) {
 
   req.on('end', () => {
     try {
-      const { fields, file } = parseMultipartBody(Buffer.concat(chunks), boundaryMatch[1]);
+      const boundary = boundaryMatch[1].trim().replace(/^["']|["']$/g, '');
+      if (!boundary) throw createError(400, 'Invalid multipart boundary');
+      const { fields, file } = parseMultipartBody(Buffer.concat(chunks), boundary);
       req.body = fields;
       req.file = file;
       next();
