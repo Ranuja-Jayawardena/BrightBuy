@@ -246,6 +246,7 @@ export default function AdminReportsOverviewPage() {
           <ReportBarChart
             data={topProducts}
             xKey="product_name"
+            layout="vertical"
             bars={[
               { key: 'total_revenue', name: 'Revenue ($)', fill: '#10b981' },
             ]}
