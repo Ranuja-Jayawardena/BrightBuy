@@ -144,7 +144,7 @@ Finish the approved S3 cutover with per-image preservation, container/IAM/CORS v
 
 Replace the apparel and home catalog seed with a coherent consumer technology taxonomy, product set, order references and S3 media assets. Verify the complete reseed and storefront behavior.
 
-**Priority:** High | **Progress:** 0/5 complete
+**Priority:** High | **Progress:** 1/5 complete (7.1 Complete; 7.2–7.5 Planned)
 
 [Full details](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
 
