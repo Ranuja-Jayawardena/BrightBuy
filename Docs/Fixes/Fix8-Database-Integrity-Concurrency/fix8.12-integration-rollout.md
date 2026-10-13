@@ -1,7 +1,7 @@
 # Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout
 
 > **Assigned To:** E (lead), A/B/C/D (area verification)
-> **Status:** In Progress — Concurrency integration test harness scaffolded and verified against live PostgreSQL 15 (9/9 tests pass); release gate pending Member B (8.9) and Member A (8.10) UI/regression sign-off
+> **Status:** In Progress — concurrency harness and Member C area checks passed on isolated PostgreSQL 15; fresh migration, CI, UI and rollout gates remain
 > **Priority:** Critical
 > **Depends On:** 8.1–8.11 for release; isolated harness preparation can start after 8.1
 > **Blocks:** Fix 8 completion and production rollout
@@ -75,9 +75,25 @@ A migration rollback may require a forward corrective migration or controlled re
 
 ## Evidence ledger (fill with actual results)
 
+### Member C area verification — 2026-10-13
+
+At `dev` revision `962014e`, run from `backend` with the configured `DB_NAME=brightbuy_dev` development connection:
+
+```powershell
+$env:FIX82_RUN_DB_TESTS='1'; $env:FIX87_RUN_DB_TESTS='1'; $env:FIX88_RUN_DB_TESTS='1'; $env:FIX810_RUN_DB_TESTS='1'
+node --test test/catalog-timestamp-integration.test.js test/category-cycle-integration.test.js test/inventory-audit-integration.test.js test/fix8-report-regression.test.js
+```
+
+All **4/4 live PostgreSQL tests passed**, with no skips, on PostgreSQL 15.19. The tests used disposable databases or an isolated schema and cleaned them up. V27 passed upgrade, timestamp, rollback/no-op and fresh seeded catalog checks. V33 rejected dirty, self, long and concurrent category cycles while valid moves and rollback preserved the tree. V34 audited concurrent manual changes with actor and reason, rejected invalid/forged writes, kept stock unchanged when audit insertion failed, and excluded order-driven stock writes from manual history. The 8.10 fixture verified catalog filters, image metadata, report authorization, gross revenue **25.00 across 3 orders**, CSV and the date-label fix; gross totals including refund events were approved by the requester. `FIX8_REQUIRE_LIVE_DB=1 npm.cmd run test:concurrency` also passed **9/9** with the live PostgreSQL check required.
+
+`npx.cmd jest tests/productBackend.test.js tests/orderStockAtomic.test.js --runInBand --silent` passed **28/28**. ESLint passed for `salesReportModel.js`, `adminProductModel.js` and `adminInventoryModel.js`. Repository-wide backend lint still fails with four `no-empty` errors in D-owned `adminOrderModel.js` and `paymentService.js`; those errors are outside C's area. The live C tests do not cover two carts competing for the last unit or cancellation restoring stock once; C/D still need those persisted-state race cases. No browser, actual S3 fetch, staging, backup/restore or production run was performed.
+
+**Fresh-install blocker:** the V27 test's empty fresh database migration chain stops at V28 with SQLSTATE `23502` because the apparel products referenced by V28 are absent. The full available SQL chain passes when representative legacy apparel rows are present. `brightbuy_dev` has no Flyway history. Do not mark fresh installation or Flyway validation complete from this evidence; E must reconcile the seed prerequisite and validate the real migration path without rewriting an applied migration.
+
 | Environment / revision | Migration versions | Real DB race tests | UI/regression | Role tests | Backup/rollback | Result |
 | --- | --- | --- | --- | --- | --- | --- |
 | Disposable database on `brightbuy_dev` / Fix 8.2, 2026-10-13 | Available V1–V33 SQL passed on legacy upgrade fixture; fresh chain stops at V28 `23502`; Flyway not run | V27 timestamp integration passed 1/1; 8.7 concurrency tested separately | Category API regression passed; broader UI pending | Runtime role pending | Disposable database removed; rollout backup pending | Partial C evidence; release unverified |
+| Disposable PostgreSQL 15.19 / `dev` `962014e`, 2026-10-13, Member C | V27 upgrade and seeded fresh fixture pass; empty fresh chain stops at V28 `23502`; Flyway not run | V27, V33 and V34 live checks passed 3/3; last-unit checkout/cancel race pending C/D | 8.10 live fixture passed 1/1: catalog/API/report/CSV; browser and S3 fetch pending A | Not rerun in C pass | Disposable databases/schema cleaned up; rollback rehearsal pending | C area checks pass with explicit release blockers above |
 | PostgreSQL 15 (`brightbuy` target) / Fix 8.12 Concurrency Harness, 2026-10-14 | V29–V35 verified present & syntax-valid | **9/9 passed (`npm run test:concurrency`)**: live multi-client cart barrier, order FSM, delivery mode check, inventory immutability | Pending Member B (8.9) & Member A (8.10) | V35 passed 6/6 (`npm run test:db-accounts`) | Isolated schema created & cleaned up | Concurrency harness verified complete |
 | CI | Pending | Not run | Not run | Not run | N/A | Unverified |
 | Staging / representative upgrade | Pending | Not run | Not run | Not run | Pending | Unverified |
