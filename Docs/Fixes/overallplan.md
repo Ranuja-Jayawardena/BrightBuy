@@ -62,7 +62,7 @@ This document is the **master tracker** for all post-development fixes, patches,
 - [ ] **Fix 3: Admin Catalog & Media Management** → [fix3-admin-catalog-media.md](Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md)
   - [x] **3.1** Admin Sticky Sidebar Layout — **B (UI)** → [fix3.1-admin-sidebar-sticky-layout.md](Fix3-Admin-Catalog-Media/fix3.1-admin-sidebar-sticky-layout.md)
   - [x] **3.2** Product Active/Inactive Switch & Reactivation API — **C (API), B (UI)** → [fix3.2-product-status-toggle.md](Fix3-Admin-Catalog-Media/fix3.2-product-status-toggle.md)
-  - [ ] **3.3** Category Active/Inactive Switch — **B (UI)** → [fix3.3-category-status-toggle.md](Fix3-Admin-Catalog-Media/fix3.3-category-status-toggle.md)
+  - [x] **3.3** Category Active/Inactive Switch — **B (UI)** → [fix3.3-category-status-toggle.md](Fix3-Admin-Catalog-Media/fix3.3-category-status-toggle.md)
   - [ ] **3.4** Product Image Upload & Route Serving Fix — **C (API), B (UI)** → [fix3.4-product-image-upload-serving.md](Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md)
 
 - [ ] **Fix 4: Role Permissions & Operations** → [fix4-role-permissions-operations.md](Fix4-Role-Permissions-Operations/fix4-role-permissions-operations.md)

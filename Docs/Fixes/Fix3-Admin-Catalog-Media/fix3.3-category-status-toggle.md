@@ -1,7 +1,7 @@
 # Fix 3.3: Category Active/Inactive Switch
 
 > **Parent Group:** [Fix 3: Admin Catalog & Media Management](fix3-admin-catalog-media.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member B (Frontend Admin Categories UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -26,12 +26,12 @@ In the category management tree (`/admin/categories`), when a category is deacti
 ## Tasks
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/categories/page.tsx`:
-  - In `renderTree()`, replace or augment the delete icon button with an active/inactive `Switch` toggle component (or Toggle Button).
-  - When the switch is clicked:
-    - Send `PUT /api/admin/categories/:id` with `{ is_active: !node.is_active }`.
-    - Refresh the category tree or update local node state optimistically.
-    - Provide a toast or alert confirming status change.
+- [x] In `frontend/src/app/admin/categories/page.tsx`:
+  - [x] In `renderTree()`, replace or augment the delete icon button with an active/inactive `Switch` toggle component (or Toggle Button).
+  - [x] When the switch is clicked:
+    - [x] Send `PUT /api/admin/categories/:id` with `{ is_active: !node.is_active }`.
+    - [x] Refresh the category tree or update local node state optimistically.
+    - [x] Provide a toast or alert confirming status change.
 
 ---
 
