@@ -303,7 +303,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 31),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-002-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'ELC-001-WHT'),
     2,
     49.5
 );
@@ -333,7 +333,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 30),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-002-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'ELC-001-WHT'),
     1,
     49.5
 );
@@ -399,7 +399,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 24),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-002-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'ELC-001-WHT'),
     2,
     49.5
 );
@@ -645,7 +645,7 @@ INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
 );
 INSERT INTO order_items (order_id, variant_id, quantity, unit_price) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET 4),
-    (SELECT variant_id FROM product_variants WHERE variant_sku = 'PER-002-BLK'),
+    (SELECT variant_id FROM product_variants WHERE variant_sku = 'ELC-001-WHT'),
     1,
     49.5
 );

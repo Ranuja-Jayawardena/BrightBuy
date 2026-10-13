@@ -17,8 +17,20 @@ import {
   Star, 
   Plus,
   Upload,
-  Loader2
+  Loader2,
+  CheckCircle2,
+  RefreshCw,
+  X
 } from 'lucide-react';
+
+type UploadStage =
+  | 'idle'
+  | 'validating'
+  | 'requesting_permission'
+  | 'uploading'
+  | 'confirming'
+  | 'complete'
+  | 'error';
 
 interface CategoryNode {
   category_id: number;
@@ -92,12 +104,54 @@ export default function EditProductPage() {
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const activeXhrRef = useRef<XMLHttpRequest | null>(null);
+  const [uploadStage, setUploadStage] = useState<UploadStage>('idle');
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [stagedPublicUrl, setStagedPublicUrl] = useState<string | null>(null);
   const [updatingImageId, setUpdatingImageId] = useState<number | null>(null);
   const [imageToDelete, setImageToDelete] = useState<ImageType | null>(null);
   const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
+
+  // Clean up any in-flight XHR on component unmount
+  useEffect(() => {
+    return () => {
+      if (activeXhrRef.current) {
+        activeXhrRef.current.abort();
+        activeXhrRef.current = null;
+      }
+    };
+  }, []);
+
+  const sanitizeMediaError = (err: unknown, defaultMsg: string): string => {
+    if (!err) return defaultMsg;
+    const raw = err instanceof Error ? err.message : String(err);
+    if (/AWS|Signature|NoSuchKey|AccessDenied|s3\.amazonaws\.com|X-Amz/i.test(raw)) {
+      return 'Cloud storage communication error. Please verify your connection and try again.';
+    }
+    if (/duplicate key|violates|foreign key|syntax error|relation/i.test(raw)) {
+      return 'Catalog database error while updating media record. Please retry.';
+    }
+    return raw || defaultMsg;
+  };
+
+  const handleCancelUpload = () => {
+    if (activeXhrRef.current) {
+      activeXhrRef.current.abort();
+      activeXhrRef.current = null;
+    }
+    setUploadStage('idle');
+    setUploadProgress(null);
+    setUploadStatus('');
+    setUploadError(null);
+    setSelectedFile(null);
+    setStagedPublicUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -176,27 +230,50 @@ export default function EditProductPage() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
 
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      alert('Please select a valid image format: JPEG, PNG, or WebP.');
+      setUploadStage('error');
+      setUploadError('Invalid format: Please select a JPEG, PNG, or WebP image.');
+      setSelectedFile(null);
+      setStagedPublicUrl(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    if (file.size === 0) {
+      setUploadStage('error');
+      setUploadError('Selected file is empty (0 bytes).');
+      setSelectedFile(null);
+      setStagedPublicUrl(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size exceeds the 5MB limit.');
+      setUploadStage('error');
+      setUploadError('File size exceeds the 5MB limit.');
+      setSelectedFile(null);
+      setStagedPublicUrl(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
+    setSelectedFile(file);
+    setStagedPublicUrl(null);
+    setUploadError(null);
+    executeUpload(file);
+  };
+
+  const executeUpload = async (file: File) => {
     try {
-      setIsUploadingImage(true);
+      setUploadStage('requesting_permission');
       setUploadProgress(0);
       setUploadStatus('Requesting S3 pre-signed upload URL...');
+      setUploadError(null);
 
       // 1. Request S3 Pre-signed URL
       const presignRes = await apiFetch(`/api/admin/products/${productId}/images/presign`, {
@@ -214,11 +291,14 @@ export default function EditProductPage() {
       }
 
       const { uploadUrl, publicUrl } = await presignRes.json();
+      setStagedPublicUrl(publicUrl);
 
       // 2. Upload file directly to S3 with real-time progress indicator
+      setUploadStage('uploading');
       setUploadStatus('Uploading directly to AWS S3...');
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
+        activeXhrRef.current = xhr;
         xhr.open('PUT', uploadUrl);
         xhr.setRequestHeader('Content-Type', file.type);
         xhr.upload.onprogress = (evt) => {
@@ -229,18 +309,39 @@ export default function EditProductPage() {
           }
         };
         xhr.onload = () => {
+          activeXhrRef.current = null;
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve();
           } else {
             reject(new Error(`Direct S3 upload failed with status ${xhr.status}`));
           }
         };
-        xhr.onerror = () => reject(new Error('Network error during direct S3 upload'));
+        xhr.onerror = () => {
+          activeXhrRef.current = null;
+          reject(new Error('Network error during direct S3 upload'));
+        };
+        xhr.onabort = () => {
+          activeXhrRef.current = null;
+          reject(new Error('Upload was cancelled'));
+        };
         xhr.send(file);
       });
 
       // 3. Confirm image record creation in catalog database
-      setUploadStatus('Registering image in catalog...');
+      await confirmUploadedImage(publicUrl);
+    } catch (err: unknown) {
+      setUploadStage('error');
+      const sanitized = sanitizeMediaError(err, 'Failed to upload image to cloud storage');
+      setUploadError(sanitized);
+    }
+  };
+
+  const confirmUploadedImage = async (publicUrl: string) => {
+    try {
+      setUploadStage('confirming');
+      setUploadStatus('Registering image in catalog database...');
+      setUploadError(null);
+
       const sortOrder = product?.images?.length || 0;
       const isPrimary = !product?.images || product.images.length === 0;
 
@@ -259,20 +360,30 @@ export default function EditProductPage() {
         throw new Error(d.message || d.error || 'Failed to register image in catalog');
       }
 
-      await fetchData();
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to upload image');
-    } finally {
-      setIsUploadingImage(false);
-      setUploadProgress(null);
-      setUploadStatus('');
+      setUploadStage('complete');
+      setUploadStatus('Image registered successfully!');
+      setSelectedFile(null);
+      setStagedPublicUrl(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+
+      await fetchData();
+
+      setTimeout(() => {
+        setUploadStage('idle');
+        setUploadStatus('');
+        setUploadProgress(null);
+      }, 1800);
+    } catch (err: unknown) {
+      setUploadStage('error');
+      const sanitized = sanitizeMediaError(err, 'Failed to register image in catalog database');
+      setUploadError(sanitized);
     }
   };
 
   const handleSetPrimaryImage = async (imageId: number) => {
+    if (updatingImageId !== null || uploadStage === 'uploading' || uploadStage === 'confirming') return;
     try {
       setUpdatingImageId(imageId);
       const res = await apiFetch(`/api/admin/images/${imageId}`, {
@@ -286,13 +397,15 @@ export default function EditProductPage() {
       }
       await fetchData();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to set primary image');
+      alert(sanitizeMediaError(err, 'Failed to set primary image'));
+      await fetchData();
     } finally {
       setUpdatingImageId(null);
     }
   };
 
   const handleUpdateSortOrder = async (imageId: number, sortOrder: number) => {
+    if (updatingImageId !== null || uploadStage === 'uploading' || uploadStage === 'confirming') return;
     try {
       setUpdatingImageId(imageId);
       const res = await apiFetch(`/api/admin/images/${imageId}`, {
@@ -306,14 +419,15 @@ export default function EditProductPage() {
       }
       await fetchData();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to update sort order');
+      alert(sanitizeMediaError(err, 'Failed to update sort order'));
+      await fetchData();
     } finally {
       setUpdatingImageId(null);
     }
   };
 
   const handleConfirmDeleteImage = async () => {
-    if (!imageToDelete) return;
+    if (!imageToDelete || deletingImageId !== null) return;
     try {
       setDeletingImageId(imageToDelete.image_id);
       const res = await apiFetch(`/api/admin/images/${imageToDelete.image_id}`, { method: 'DELETE' });
@@ -324,9 +438,11 @@ export default function EditProductPage() {
       setImageToDelete(null);
       await fetchData();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to delete image');
+      alert(sanitizeMediaError(err, 'Failed to delete image'));
+      await fetchData();
     } finally {
       setDeletingImageId(null);
+      setImageToDelete(null);
     }
   };
 
@@ -633,51 +749,109 @@ export default function EditProductPage() {
               )}
             </div>
 
-            <div 
-              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                isUploadingImage 
-                  ? 'bg-muted/40 cursor-wait' 
-                  : 'hover:bg-muted/50 cursor-pointer'
-              }`}
-              onClick={() => {
-                if (!isUploadingImage) fileInputRef.current?.click();
-              }}
-            >
-              {isUploadingImage ? (
-                <div className="space-y-3">
-                  <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
-                  <p className="text-sm font-medium">
-                    {uploadStatus || 'Uploading image...'}
-                  </p>
-                  {uploadProgress !== null && (
-                    <div className="w-full max-w-xs mx-auto space-y-1">
-                      <div className="bg-muted rounded-full h-2 overflow-hidden border">
-                        <div 
-                          className="bg-primary h-full transition-all duration-150 rounded-full" 
-                          style={{ width: `${uploadProgress}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground font-mono">{uploadProgress}%</p>
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground">Direct-to-S3 Cloud Storage</p>
+            {/* Upload Zone / State Display */}
+            {uploadStage === 'error' ? (
+              <div className="border-2 border-dashed border-red-300 dark:border-red-900 bg-red-50/50 dark:bg-red-950/20 rounded-lg p-5 text-center space-y-3">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto">
+                  <AlertCircle className="w-5 h-5" />
                 </div>
-              ) : (
-                <>
-                  <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm font-medium">Click to upload image</p>
-                  <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, WebP up to 5MB (Direct S3)</p>
-                </>
-              )}
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                accept="image/jpeg,image/png,image/webp" 
-                disabled={isUploadingImage}
-                onChange={handleImageUpload} 
-              />
-            </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-red-900 dark:text-red-200">
+                    {stagedPublicUrl ? 'Registration Failed' : 'Upload Failed'}
+                  </p>
+                  <p className="text-xs text-red-700 dark:text-red-300 max-w-sm mx-auto">
+                    {uploadError || 'An error occurred during image processing.'}
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-2 pt-1">
+                  {stagedPublicUrl ? (
+                    <Button 
+                      size="sm" 
+                      onClick={() => confirmUploadedImage(stagedPublicUrl)}
+                      className="gap-1.5 text-xs shadow-xs"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" /> Retry Registration
+                    </Button>
+                  ) : selectedFile ? (
+                    <Button 
+                      size="sm" 
+                      onClick={() => executeUpload(selectedFile)}
+                      className="gap-1.5 text-xs shadow-xs"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" /> Retry Upload
+                    </Button>
+                  ) : null}
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={handleCancelUpload}
+                    className="text-xs"
+                  >
+                    Cancel / Choose New File
+                  </Button>
+                </div>
+              </div>
+            ) : uploadStage === 'complete' ? (
+              <div className="border-2 border-dashed border-green-300 dark:border-green-900 bg-green-50/50 dark:bg-green-950/20 rounded-lg p-6 text-center space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400 mx-auto animate-in zoom-in-75 duration-200" />
+                <p className="text-sm font-semibold text-green-900 dark:text-green-200">
+                  {uploadStatus || 'Image registered successfully!'}
+                </p>
+                <p className="text-xs text-muted-foreground">Gallery updated</p>
+              </div>
+            ) : uploadStage === 'idle' ? (
+              <div 
+                className="border-2 border-dashed rounded-lg p-6 text-center transition-colors hover:bg-muted/50 cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm font-medium">Click to upload image</p>
+                <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, WebP up to 5MB (Direct S3)</p>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  accept="image/jpeg,image/png,image/webp" 
+                  onChange={handleFileSelect} 
+                />
+              </div>
+            ) : (
+              /* In-flight states: validating, requesting_permission, uploading, confirming */
+              <div className="border-2 border-dashed rounded-lg p-6 text-center bg-muted/40 space-y-3">
+                <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">
+                    {uploadStatus || 'Processing image...'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {uploadStage === 'requesting_permission' && 'Authorizing S3 pre-signed upload'}
+                    {uploadStage === 'uploading' && 'Transferring bytes directly to cloud storage'}
+                    {uploadStage === 'confirming' && 'Saving image metadata into catalog'}
+                  </p>
+                </div>
+                {uploadProgress !== null && uploadStage === 'uploading' && (
+                  <div className="w-full max-w-xs mx-auto space-y-1">
+                    <div className="bg-muted rounded-full h-2 overflow-hidden border">
+                      <div 
+                        className="bg-primary h-full transition-all duration-150 rounded-full" 
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground font-mono">{uploadProgress}%</p>
+                  </div>
+                )}
+                <div className="pt-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleCancelUpload}
+                    className="text-xs text-muted-foreground hover:text-foreground h-7"
+                  >
+                    Cancel Upload
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

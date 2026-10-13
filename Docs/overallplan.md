@@ -224,4 +224,4 @@ Use the [shared contracts, verification and rollout guide](Fixes/Fix6-Cloud-Medi
 - **D:** Cart/checkout (8.3), order/payment consistency (8.4), delivery/value constraints (8.5).
 - **E:** Contracts and migration coordination (8.1), super-admin protection (8.6), database accounts (8.11), integration/rollout (8.12).
 
-**Status:** 0/12 complete; 8.2 In Progress, remaining items Not Started. Start with [8.1 preflight and decision contracts](Fixes/Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md). No new migration versions are allocated by this plan. V27 already exists; its database application remains unverified.
+**Status:** 1/12 complete (8.1 Complete; 8.2 In Progress; remaining items Not Started). Preflight baseline and decision contracts resolved in [8.1](Fixes/Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md). Migrations V29 through V35 officially allocated.
