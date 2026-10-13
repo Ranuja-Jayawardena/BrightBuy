@@ -7,6 +7,7 @@ import { apiFetch } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { 
   ArrowLeft, 
   AlertCircle, 
@@ -265,6 +266,27 @@ export default function EditProductPage() {
     }
   };
 
+  const handleToggleProductActive = async () => {
+    if (!product) return;
+    const nextStatus = !product.is_active;
+    setProduct(prev => prev ? { ...prev, is_active: nextStatus } : null);
+    try {
+      const res = await apiFetch(`/api/admin/products/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: nextStatus }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.message || 'Failed to update product status');
+      }
+    } catch (err: unknown) {
+      setProduct(prev => prev ? { ...prev, is_active: !nextStatus } : null);
+      const message = err instanceof Error ? err.message : 'Failed to update product status';
+      setError(message);
+    }
+  };
+
   if (loading) return <div className="p-12 text-center text-muted-foreground">Loading product details...</div>;
   if (!product) return <div className="p-12 text-center text-red-500">Product not found.</div>;
 
@@ -274,9 +296,17 @@ export default function EditProductPage() {
         <Link href="/admin/products" className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Products
         </Link>
-        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          {product.is_active ? 'ACTIVE' : 'INACTIVE'}
-        </span>
+        <div className="flex items-center gap-2.5">
+          <Switch
+            checked={product.is_active}
+            disabled={isSaving}
+            onCheckedChange={handleToggleProductActive}
+            aria-label="Toggle product active status"
+          />
+          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${product.is_active ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'}`}>
+            {product.is_active ? 'ACTIVE' : 'INACTIVE'}
+          </span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

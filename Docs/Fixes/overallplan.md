@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (2 / 14 fix items complete across 5 fix groups)
+**Status:** In Progress (3 / 14 fix items complete across 5 fix groups)
 
 ---
 
@@ -61,7 +61,7 @@ This document is the **master tracker** for all post-development fixes, patches,
 
 - [ ] **Fix 3: Admin Catalog & Media Management** → [fix3-admin-catalog-media.md](Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md)
   - [x] **3.1** Admin Sticky Sidebar Layout — **B (UI)** → [fix3.1-admin-sidebar-sticky-layout.md](Fix3-Admin-Catalog-Media/fix3.1-admin-sidebar-sticky-layout.md)
-  - [ ] **3.2** Product Active/Inactive Switch & Reactivation API — **C (API), B (UI)** → [fix3.2-product-status-toggle.md](Fix3-Admin-Catalog-Media/fix3.2-product-status-toggle.md)
+  - [x] **3.2** Product Active/Inactive Switch & Reactivation API — **C (API), B (UI)** → [fix3.2-product-status-toggle.md](Fix3-Admin-Catalog-Media/fix3.2-product-status-toggle.md)
   - [ ] **3.3** Category Active/Inactive Switch — **B (UI)** → [fix3.3-category-status-toggle.md](Fix3-Admin-Catalog-Media/fix3.3-category-status-toggle.md)
   - [ ] **3.4** Product Image Upload & Route Serving Fix — **C (API), B (UI)** → [fix3.4-product-image-upload-serving.md](Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md)
 

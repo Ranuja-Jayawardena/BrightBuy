@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { apiFetch } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { 
   Plus, 
   Edit, 
-  Trash2, 
   Search, 
   AlertCircle, 
   Package, 
@@ -32,7 +32,7 @@ export default function AdminProductsPage() {
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [togglingId, setTogglingId] = useState<number | null>(null);
 
   const fetchProducts = async (searchTerm = '') => {
     try {
@@ -43,8 +43,9 @@ export default function AdminProductsPage() {
       if (!res.ok) throw new Error('Failed to load products');
       const data = await res.json();
       setProducts(data.products || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to load products';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -59,19 +60,37 @@ export default function AdminProductsPage() {
     fetchProducts(search);
   };
 
-  const handleDelete = async (id: number) => {
-    setDeletingId(id);
+  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+    const nextStatus = !currentStatus;
+    setTogglingId(id);
     setError('');
     setSuccess('');
+
+    // Optimistic update
+    setProducts((prev) =>
+      prev.map((p) => (p.product_id === id ? { ...p, is_active: nextStatus } : p))
+    );
+
     try {
-      const res = await apiFetch(`/api/admin/products/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to deactivate product');
-      setSuccess('Product successfully deactivated.');
-      fetchProducts(search);
-    } catch (err: any) {
-      setError(err.message);
+      const res = await apiFetch(`/api/admin/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: nextStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || 'Failed to update product status');
+      }
+      setSuccess(`Product status changed to ${nextStatus ? 'Active' : 'Inactive'}.`);
+    } catch (err: unknown) {
+      // Revert optimistic update
+      setProducts((prev) =>
+        prev.map((p) => (p.product_id === id ? { ...p, is_active: currentStatus } : p))
+      );
+      const message = err instanceof Error ? err.message : 'Failed to update product status';
+      setError(message);
     } finally {
-      setDeletingId(null);
+      setTogglingId(null);
     }
   };
 
@@ -208,13 +227,21 @@ export default function AdminProductsPage() {
                     <td className="p-4 font-mono text-xs text-muted-foreground">{p.base_sku}</td>
                     <td className="p-4 text-muted-foreground">{p.brand || '—'}</td>
                     <td className="p-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        p.is_active 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' 
-                          : 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
-                      }`}>
-                        {p.is_active ? 'Active' : 'Inactive'}
-                      </span>
+                      <div className="flex items-center gap-2.5">
+                        <Switch
+                          checked={p.is_active}
+                          disabled={togglingId === p.product_id}
+                          onCheckedChange={() => handleToggleStatus(p.product_id, p.is_active)}
+                          aria-label={`Toggle active status for ${p.product_name}`}
+                        />
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+                          p.is_active 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' 
+                            : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                        }`}>
+                          {p.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
                     </td>
                     <td className="p-4 text-right space-x-1 whitespace-nowrap">
                       <Link href={`/admin/products/${p.product_id}`}>
@@ -222,16 +249,6 @@ export default function AdminProductsPage() {
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 px-2.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40"
-                        disabled={deletingId === p.product_id}
-                        title="Deactivate product"
-                        onClick={() => handleDelete(p.product_id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </td>
                   </tr>
                 ))
