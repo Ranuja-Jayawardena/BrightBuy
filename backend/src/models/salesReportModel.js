@@ -10,11 +10,14 @@ function getPeriod(period) {
 }
 
 function key(date, name) {
-  const iso = date.toISOString();
-  if (name === 'daily') return iso.slice(0, 10);
-  if (name === 'weekly') return iso.slice(0, 10);
-  if (name === 'quarterly') return `${iso.slice(0, 4)}-Q${Math.floor(Number(iso.slice(5, 7)) - 1) / 3 + 1}`;
-  return iso.slice(0, 7);
+  // pg parses TIMESTAMP WITHOUT TIME ZONE as local calendar time. Converting
+  // to UTC can move midnight buckets into the preceding day or month.
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  if (name === 'daily' || name === 'weekly') return `${year}-${month}-${day}`;
+  if (name === 'quarterly') return `${year}-Q${Math.floor(date.getMonth() / 3) + 1}`;
+  return `${year}-${month}`;
 }
 
 function filters(startDate, endDate, values) {

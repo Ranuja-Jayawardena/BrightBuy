@@ -40,7 +40,7 @@ These are source-code findings, not results from a live concurrency exercise. Th
 | [8.7: Category Hierarchy Integrity](fix8.7-category-cycle-protection.md) | C | 8.1 category contract | Complete — isolated PostgreSQL 15 verification |
 | [8.8: Manual Inventory Adjustment Audit](fix8.8-inventory-audit.md) | C (lead), E (permissions review) | 8.1 audit decision; 8.2 timestamp baseline; 8.3/8.4 lock contract | Complete implementation — V34 and isolated PostgreSQL test pass; runtime-role/browser checks in 8.11/8.9 |
 | [8.9: Checkout & Admin Conflict Handling](fix8.9-checkout-admin-ui.md) | B | 8.3–8.8 API handoffs; mock work after 8.1 | Complete |
-| [8.10: Storefront & Report Regression Verification](fix8.10-storefront-report-regression.md) | A (lead), C (report query support) | 8.2–8.5, 8.7–8.9; actual Fix 6 baseline | Not Started |
+| [8.10: Storefront & Report Regression Verification](fix8.10-storefront-report-regression.md) | A (lead), C (report query support) | 8.2–8.5, 8.7–8.9; actual Fix 6 baseline | In Progress — C isolated catalog/report checks passed; A browser and 8.9 integration verification pending |
 | [8.11: Application & Migration Database Accounts](fix8.11-database-account-separation.md) | E | 8.1 privilege audit; 8.2–8.8 final database objects | Complete — V35 role provisioning & least-privilege grants |
 | [8.12: PostgreSQL Integration Tests & Controlled Rollout](fix8.12-integration-rollout.md) | E (lead), A/B/C/D (area verification) | 8.1–8.11; test-harness preparation may start after 8.1 | In Progress — harness verified on PostgreSQL 15 (9/9 pass); release gate pending B/A |
 
