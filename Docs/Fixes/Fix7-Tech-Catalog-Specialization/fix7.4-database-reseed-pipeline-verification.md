@@ -1,7 +1,7 @@
 # Fix 7.4: Database Reseed Orchestration, Flyway Verification & Storefront Validation
 
 > **Parent Group:** [Fix 7: Consumer Technology Catalog Specialization](fix7-tech-catalog-specialization.md)  
-> **Status:** In Progress — Member E database reseed and REST API verification passed; Member A & B UI verification pending  
+> **Status:** In Progress — Member E reseed & Member B Admin UI verified; Member A Storefront UI verification pending  
 > **Assigned To:** Member E (DevOps + Architecture), Member A (Storefront Verification), Member B (Admin UI Verification)  
 > **Depends On:** [Fix 7.1](fix7.1-technology-taxonomy-hierarchy.md), [Fix 7.2](fix7.2-technology-product-catalog-seed.md), [Fix 7.3](fix7.3-catalog-links-order-seed-integrity.md), [Fix 7.5](fix7.5-cloud-media-assets-s3-sync.md)  
 > **Blocks:** Production Deployment Sync  
@@ -48,10 +48,10 @@ Any broken natural key lookups, missing attribute definitions, or orphan image U
   - Product images resolve to active S3 URLs.
 
 ### 3. Admin Dashboard Verification — Member B
-- [ ] Verify `/admin/products`:
+- [x] Verify `/admin/products`:
   - Displays all 40 tech products with base SKUs, brands, and categories.
   - Active/Inactive status toggle functions normally per Fix 3.2.
-- [ ] Verify `/admin/categories`:
+- [x] Verify `/admin/categories`:
   - Reflects the reorganized tech category tree with active toggle per Fix 3.3.
 
 ---
@@ -65,7 +65,7 @@ Any broken natural key lookups, missing attribute definitions, or orphan image U
 | Non-Tech Items Remaining | Exactly 0 (no apparel, kitchenware, or appliances) | ✅ Passed (0 non-tech items) |
 | S3 Image Delivery | S3 image URLs render HTTP 200 without broken links | ✅ Passed (80/80 URLs HTTP 200) |
 | Brand Discovery Endpoint | Dynamic brand query returns active tech brands | ✅ Passed (10 active brands) |
-| Storefront Filter Matrix | Category & price filtering operate without console errors | ⬜ Pending (Member A / B UI) |
+| Storefront Filter Matrix | Category & price filtering operate without console errors | ⬜ Pending (Member A Storefront UI) |
 
 ---
 

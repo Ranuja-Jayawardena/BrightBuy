@@ -24,6 +24,7 @@ interface ProductItem {
   base_sku: string;
   is_active: boolean;
   categories?: string[];
+  primary_image_url?: string | null;
 }
 
 export default function AdminProductsPage() {
@@ -186,7 +187,12 @@ export default function AdminProductsPage() {
               {loading ? (
                 [1, 2, 3, 4].map((i) => (
                   <tr key={i} className="animate-pulse">
-                    <td className="p-4"><div className="h-4 w-40 bg-muted rounded"></div></td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-muted shrink-0" />
+                        <div className="h-4 w-40 bg-muted rounded" />
+                      </div>
+                    </td>
                     <td className="p-4"><div className="h-4 w-20 bg-muted/70 rounded"></div></td>
                     <td className="p-4"><div className="h-4 w-24 bg-muted/70 rounded"></div></td>
                     <td className="p-4"><div className="h-5 w-16 bg-muted rounded-full"></div></td>
@@ -220,9 +226,21 @@ export default function AdminProductsPage() {
                 products.map((p) => (
                   <tr key={p.product_id} className="hover:bg-muted/30 transition-colors">
                     <td className="p-4 font-medium text-foreground">
-                      <Link href={`/admin/products/${p.product_id}`} className="hover:text-primary transition-colors">
-                        {p.product_name}
-                      </Link>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden border bg-muted/40 shrink-0">
+                          <img
+                            src={p.primary_image_url || '/placeholder-product.svg'}
+                            alt={p.product_name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                            }}
+                          />
+                        </div>
+                        <Link href={`/admin/products/${p.product_id}`} className="hover:text-primary transition-colors font-medium">
+                          {p.product_name}
+                        </Link>
+                      </div>
                     </td>
                     <td className="p-4 font-mono text-xs text-muted-foreground">{p.base_sku}</td>
                     <td className="p-4 text-muted-foreground">{p.brand || '—'}</td>
