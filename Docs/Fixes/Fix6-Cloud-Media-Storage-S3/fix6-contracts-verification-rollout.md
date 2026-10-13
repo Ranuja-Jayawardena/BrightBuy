@@ -5,11 +5,12 @@
 > **Owners:** E coordinates; C owns media contracts; B/A consume; D owns cart read changes
 > **Parent:** [Fix 6 overview and issue ledger](fix6-cloud-media-storage-s3.md)
 > **Baseline date:** 2026-10-13
+> **Merged dev recheck:** `99fdeb2`, 2026-10-13; see the new migration blocker and current check results below.
 
 ## 1. Instructions for the next implementer
 
 1. Read the parent, this file and your assigned subfix. Inspect the referenced source before editing; the baseline may have changed.
-2. Record current branch/commit, dirty files, target environment and highest migration version. The reviewed branch was `email`, with existing uncommitted changes. Do not discard them.
+2. Record current branch/commit, dirty files, target environment and every migration version. The original review used `email`; the recheck uses merged `dev` at `99fdeb2`. Two distinct migrations now use V27. Do not start Flyway/default Compose until E resolves the collision against actual target histories. Preserve existing local changes.
 3. Choose an explicitly isolated database and storage target. Validate their identity before starting Compose, migrations, fixtures, uploads or cleanup. Default development Compose can migrate and seed automatically.
 4. Fill the decision rows needed by your work. A proposed default below is not a deployed fact. Replace `Pending` with the selected contract, owner/date and evidence or linked implementation design. Resolve product-policy choices with the user when needed; engineering details can be selected by the responsible owner within authorized work.
 5. Implement only after the dependency is concrete. Hand exact request/response examples to consumers. Do not invent an API from a prose heading or silently change PUT to POST.
@@ -40,9 +41,12 @@ Before writing any media migration, E fills this ledger and reconciles it with [
 | Change | Version/file | Status |
 | --- | --- | --- |
 | S3 URL replacement | Existing `V26__replace_image_data_with_image_url.sql` | File present; target application unknown; destructive generic mapping needs the 6.2 gate |
-| Catalog timestamps | Existing `V27__set_catalog_updated_at_on_update.sql` | File present; target application unknown; owned by Fix 7.2 |
+| Apparel seed matrix | Existing `V27__apparel_variant_matrix_seed.sql` | Merged from dev; collides with timestamp migration; target history must decide which identity is already applied |
+| Catalog timestamps | Existing `V27__set_catalog_updated_at_on_update.sql` | File present; collides with apparel V27; application unknown; coordinate with Fix 7.2 and record resolved version |
 | Upload identities/object uniqueness/cleanup data | Unallocated | M4/M6 design required; E assigns the next actually free versions |
 | Any media grants, corrective data mapping or compatibility schema | Unallocated | Depends on actual target history and M1/M7; no applied migration rewriting |
+
+**F6-12 stop gate:** enumerate duplicate versions; inspect the exact file names/checksums in every intended target's Flyway history; have E/C allocate a fresh version to a migration only when proven unapplied. Update all affected ledgers and timestamp references to its resolved version, then validate the full chain and compatible startup order. If different targets already applied different V27 identities, stop for a target-specific reconciliation plan; renaming an applied file or using repair/clean is not a generic solution. This docs recheck does not modify either SQL file.
 
 ## 3. Current source contracts versus target contracts
 
@@ -88,6 +92,13 @@ These results belong to the 2026-10-13 review on this working tree. They were no
 | `npm.cmd run build` / frontend | Passed after allowing font-fetch network access | Build skips TypeScript validation because `ignoreBuildErrors: true`; not type-check evidence |
 | Live migration history, runtime-container S3, browser upload, real DB media races | Not run | Pending; do not infer success |
 
+### Current merged dev checks (2026-10-13, `99fdeb2`)
+
+- `npm.cmd run lint` in backend: passed, **0 errors / 5 warnings**. The paymentController fixes from dev resolve the original lint errors; that historical failure is no longer a current release blocker.
+- `npm.cmd run test:product` in backend: **4 passed / 1 failed**, still `detectMimeType is not a function`. F6-09 remains open for the obsolete image test.
+- Source inspection reconfirms the multipart UI/backend mismatch, unsafe V26 generic mapping, absent upload identity/cleanup guarantees and missing cart URL field.
+- Two V27 migration files exist; F6-12 blocks the migration gate. No live migration/S3 check was performed and no Jest/frontend result was rerun or promoted to this revision.
+
 For implementation verification use actual package scripts: backend `npm test`, `npm run test:product`, `npm run lint`; frontend `npm run lint -- --quiet`, `npm run build`. On this PowerShell host invoke `npm.cmd` because `npm.ps1` is blocked by execution policy. Run an explicit local TypeScript check (`npx.cmd --no-install tsc --noEmit` in frontend) or enable the build gate during authorized implementation; record existing errors separately and resolve/block release, not silently ignore them. This docs task does not change build config.
 
 ## 6. Acceptance matrix
@@ -125,7 +136,7 @@ The following is a required order, not permission to execute production changes.
 2. Gate CD on successful required CI checks. Current `cd.yml` independently deploys pushes to `main`; current CI has no Flyway stage. Implement and test explicit migration/fixture/integration stages before claiming pipeline safety.
 3. Stop incompatible media writers and scheduled cleanup for the maintenance/cutover window. Revoke or account for outstanding signed upload capabilities; merely stopping Express does not cancel issued URLs. Record the final manifest after the freeze.
 4. Provision compatible storage permissions, staging isolation and additive DB structures. Reconcile new versions with Fix 7. On pre-V26 targets, complete 6.2 preservation before its destructive step. On post-V26 targets, use a reviewed forward repair if needed.
-5. Apply required migrations through the migration identity. Verify actual `image_url`, constraints and job/session objects. If deploying the current timestamp-dependent backend, apply/verify V27 before it starts; follow Fix 7.2.
+5. Apply required migrations through the migration identity only after F6-12 is resolved and the complete chain validates. Verify actual `image_url`, constraints and job/session objects. Before starting the timestamp-dependent backend, apply/verify the catalog timestamp migration under its resolved version; follow Fix 7.2 and the updated ledger rather than assuming V27 identifies it uniquely.
 6. Deploy backend/worker and UI in the M8 compatibility sequence. If a maintenance window is selected, resume media writes only when both are ready. Old tabs must receive an actionable reload/retry response; do not restore insecure URL-only confirmation to accommodate them.
 7. Smoke-test one uniquely owned disposable image through upload, confirm, direct storefront/cart read, primary/reorder and deletion/cleanup. Record target, IDs and sanitized outcomes without signed credentials. Production writes still require the user's deployment authorization.
 8. Verify cleanup scheduling/restarts, pending jobs, error rates, migration state and object references. Test unrelated login/catalog/cart behavior. Use fake/sandbox external effects where relevant.

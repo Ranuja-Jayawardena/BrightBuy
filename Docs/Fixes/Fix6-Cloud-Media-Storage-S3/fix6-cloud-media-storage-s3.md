@@ -2,6 +2,7 @@
 
 > **Status:** In Progress — 0 / 4 items verified complete under the revised acceptance gates
 > **Reviewed:** 2026-10-13; repository branch `email`, including existing uncommitted changes
+> **Rechecked:** 2026-10-13; merged `dev` revision `99fdeb2`. Backend lint now passes; duplicate V27 migrations block Flyway. Earlier test results remain historical.
 > **Owners:** E (infrastructure, migration/release coordination), C (catalog/image backend and schema), B (admin/cart UI), A (storefront); D supports the cart read API
 > **Priority:** Critical for media release
 > **Trackers:** [Fixes](../overallplan.md) | [Project](../../overallplan.md)
@@ -36,7 +37,7 @@ Former 6.1/6.2/6.3 completion claims are reopened, not erased. Infrastructure cr
 | [6.3: Backend upload, confirmation, delivery & deletion](fix6.3-backend-s3-service-upload-apis.md) | C; E reviews storage/worker operations | In Progress — code present; lifecycle/test gaps | Resolve applicable contracts; isolated implementation may precede production cutover |
 | [6.4: Admin upload and storefront/cart delivery](fix6.4-storefront-admin-image-delivery-ui.md) | B + A; C/D provide reads | Not Started — old upload call is incompatible with backend | Mock UI after frozen contract; final acceptance needs 6.1–6.3 evidence |
 
-There are still four fix items. The companion contains shared gates, not a fifth item. Do not make Fix 6 wait for all of Fix 7: share migration allocation, lock order, role grants and release evidence where relevant. E allocates new versions jointly with [Fix 7.1](../Fix7-Database-Integrity-Concurrency/fix7.1-contracts-preflight.md); V27 is occupied.
+There are still four fix items. The companion contains shared gates, not a fifth item. Do not make Fix 6 wait for all of Fix 7: share migration allocation, lock order, role grants and release evidence where relevant. E allocates new versions jointly with [Fix 7.1](../Fix7-Database-Integrity-Concurrency/fix7.1-contracts-preflight.md). The merged tree has two V27 files; resolve F6-12 before any Flyway validation/migration or default Compose startup, then record the actual timestamp-migration version.
 
 ## Current evidence and correction ledger
 
@@ -52,9 +53,10 @@ Source paths are relative to the repository root. Keep issue IDs when closing th
 | F6-06 | Not implemented: declared MIME and object existence checks alone; no explicit byte limit, content verification, expiry cleanup or overwrite protection | Frozen validation and object-lifecycle contract with failure tests | C/E / 6.1, 6.3 | Open |
 | F6-07 | Needs correction: primary-image writes lack a common product lock; concurrent writes can conflict on the unique index | Serialize all image mutations per product; retain unique index and map expected conflicts | C / 6.3 | Open |
 | F6-08 | Not implemented: UI uses legacy routes; frontend catalog types omit URLs; cart SQL exposes only `primary_image_id` | Add/consume URL fields, preserve IDs and tested redirect compatibility | A/B/C/D / 6.3, 6.4 | Open |
-| F6-09 | Needs correction: product validation calls removed byte-image helpers; backend lint has two existing paymentController errors | Update obsolete media tests; E/D resolve or gate release on lint blockers | C / 6.3; E/D release | Open |
+| F6-09 | Needs correction: product validation still calls removed byte-image helpers. The earlier paymentController lint errors are resolved on merged dev | Update obsolete media tests; retain the passing lint check as evidence, not an open lint defect | C / 6.3 | Open for product test; lint portion closed: 2026-10-13, 0 errors / 5 warnings |
 | F6-10 | Not implemented: production Compose/CD has no migration stage; CD is independent of CI success | Tested migration/app ordering and CI-gated deployment; V26/V27 target verification | E / shared rollout | Open |
 | F6-11 | Documentation discrepancy: overview marked 6.3 complete while master tracker did not | This revision consistently reopens Fix 6 with evidence distinctions | E / docs | Closed: 2026-10-13, documentation only |
+| F6-12 | Needs correction: merged dev contains `V27__apparel_variant_matrix_seed.sql` and `V27__set_catalog_updated_at_on_update.sql` | Inspect target histories/checksums, preserve applied identities, assign a noncolliding version only to a proven unapplied migration; update ledger/references and validate full chain. Do not run repair/clean to conceal the collision | E + C / 6.2 and release | Open; blocks Flyway |
 
 This ledger does not assert that data has already been lost, production has a particular migration version, or AWS credentials fail. Those require target evidence. F6-02 identifies what the migration would do outside its assumed seed layout.
 

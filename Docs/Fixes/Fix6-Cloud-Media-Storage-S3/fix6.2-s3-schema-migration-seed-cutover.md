@@ -5,7 +5,7 @@
 > **Owners:** C (catalog data/schema), E (Flyway/backup/release)
 > **Depends on:** [6.1](fix6.1-s3-infrastructure-bucket-iam.md) storage evidence; [companion](fix6-contracts-verification-rollout.md) M1/M4/M7 and migration ledger
 > **Blocks:** Safe existing-data rollout of 6.3/6.4
-> **Issues:** F6-02, F6-03, F6-04, F6-05
+> **Issues:** F6-02, F6-03, F6-04, F6-05, F6-12
 
 ## Current implementation and incorrect assumption
 
@@ -21,7 +21,8 @@ Do not claim corruption already occurred without inspecting the target. Do not r
 
 ## Step 1 — Determine the actual migration branch
 
-- [ ] Record revision, highest repository migration and actual Flyway history/checksums in an authorized environment. V27 is already occupied; allocate additions through E and the shared ledger.
+- [ ] Resolve F6-12 before starting Flyway/default Compose: merged dev has apparel and timestamp migrations both numbered V27. Inspect actual target histories/checksums before E/C chooses an unapplied migration to renumber; preserve applied identities and record resolved versions in the shared ledger. Unknown/divergent histories block migration.
+- [ ] Record revision, all repository versions and actual Flyway history/checksums in an authorized environment; allocate additions through E and the corrected shared ledger.
 - [ ] Inspect columns and constraints on the actual `product_images` table. History and schema must agree. Unknown or inconsistent state blocks cutover.
 - [ ] Inventory row count, image IDs, product IDs, primary/sort values, MIME/size where discoverable, duplicate URLs if present, and nonseed products. Preserve IDs and foreign-key associations.
 - [ ] Back up the database and available image bytes/objects, record access-controlled backup/manifest locations and rehearse restoration on an isolated target.

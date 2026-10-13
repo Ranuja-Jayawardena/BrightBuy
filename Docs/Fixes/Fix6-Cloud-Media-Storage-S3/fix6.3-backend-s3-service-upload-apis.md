@@ -131,7 +131,7 @@ A representative proposed conflict body is `{ "error": "upload_conflict", "messa
 ## Acceptance and handoff
 
 - [ ] T06–T13/T15 pass, including malformed inputs, unauthorized roles, source overwrite, simultaneous primary writes and restart recovery.
-- [ ] Backend tests, `test:product` and changed-file lint pass; full backend lint errors remain explicit release blockers until E/D resolve them.
+- [ ] Backend tests, `test:product` and changed-file lint pass. Full backend lint passed on merged dev at `99fdeb2` (0 errors / 5 warnings); retain that dated evidence and recheck after implementation. The obsolete standalone image test still fails and blocks its gate.
 - [ ] Current successful response fields and both read routes preserved; cart URL contract verified with D/B/A.
 - [ ] Upload/cleanup schema and actual deployment grants documented; exact migration versions allocated.
 - [ ] B receives frozen request/response/error examples, expiry/retry/deletion semantics and passing integration evidence. A receives URL fields/fallback expectations.
