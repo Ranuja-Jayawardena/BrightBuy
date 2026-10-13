@@ -1,5 +1,13 @@
 const productService = require('../services/productService');
 
+async function getBrands(req, res, next) {
+  try {
+    res.status(200).json(await productService.getActiveBrands());
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function getSuggestions(req, res, next) {
   try {
     res.status(200).json(await productService.getProductSuggestions(req.query.q));
@@ -44,6 +52,7 @@ async function getProductById(req, res, next) {
 }
 
 module.exports = {
+  getBrands,
   getSuggestions,
   getProducts,
   getProductById,

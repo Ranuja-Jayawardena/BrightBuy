@@ -1,5 +1,15 @@
 const db = require('../config/db');
 
+async function findActiveBrands() {
+  const result = await db.query(`
+    SELECT DISTINCT brand
+    FROM products
+    WHERE brand IS NOT NULL AND BTRIM(brand) <> '' AND is_active = true
+    ORDER BY brand ASC
+  `);
+  return result.rows.map(row => row.brand);
+}
+
 /** Return up to six active catalog matches for a literal search phrase. */
 async function getSuggestions(query) {
   const pattern = `%${query.replace(/[\\%_]/g, '\\$&')}%`;
@@ -313,6 +323,7 @@ async function findProductCategories(productId) {
 }
 
 module.exports = {
+  findActiveBrands,
   getSuggestions,
   findProducts,
   findProductById,

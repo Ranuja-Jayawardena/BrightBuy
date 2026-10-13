@@ -18,6 +18,8 @@ function ProductsContent() {
   const searchParams = useSearchParams();
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
+  const [brandError, setBrandError] = useState(false);
   const [products, setProducts] = useState<ProductSummary[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,8 +46,13 @@ function ProductsContent() {
     document.title = title;
   }, [search, brand, categoryId, categories]);
 
-  // Hardcoded brands for filter
-  const BRANDS = ["Samsung", "Apple", "Sony", "Nike", "Adidas", "LG"];
+  useEffect(() => {
+    let active = true;
+    catalogService.getBrands().then(({ brands: available }) => {
+      if (active) { setBrands(available); setBrandError(false); }
+    }).catch(() => { if (active) setBrandError(true); });
+    return () => { active = false; };
+  }, []);
 
   const updateUrlParams = useCallback((key: string, value: string | null) => {
     const current = new URLSearchParams(searchParams.toString());
@@ -144,8 +151,9 @@ function ProductsContent() {
               onBrandChange={(b: string) => updateUrlParams('brand', b)}
               sortBy={sort}
               onSortChange={(s: string) => updateUrlParams('sort', s)}
-              brands={BRANDS}
+              brands={brands}
             />
+            {brandError && <p className="mb-4 text-sm text-red-600" role="status">Brand filters are unavailable right now. Refresh the page to try again.</p>}
 
             {/* Active Filters Bar */}
             {hasActiveFilters && (
