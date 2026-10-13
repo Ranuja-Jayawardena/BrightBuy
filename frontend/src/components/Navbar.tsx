@@ -5,7 +5,6 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
 import { Button } from '@/components/ui/button';
-import { SearchAutocomplete } from '@/components/catalog/SearchAutocomplete';
 import {
   ShoppingCart,
   ShoppingBag,
@@ -85,11 +84,6 @@ export function Navbar() {
               Products
             </Link>
           </div>
-        </div>
-
-        {/* Global Search Bar with Autocomplete - Desktop */}
-        <div className="hidden md:flex flex-1 max-w-xs lg:max-w-md mx-4 lg:mx-8">
-          <SearchAutocomplete variant="navbar" placeholder="Search products, brands..." />
         </div>
 
         {/* Right Navigation - Desktop */}
@@ -235,14 +229,6 @@ export function Navbar() {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 pt-3 pb-6 space-y-3">
-          <div className="pb-1">
-            <SearchAutocomplete
-              variant="navbar"
-              placeholder="Search products..."
-              onSelectSuggestion={() => setMobileMenuOpen(false)}
-              onSearchSubmit={() => setMobileMenuOpen(false)}
-            />
-          </div>
           <Link
             href="/products"
             onClick={() => setMobileMenuOpen(false)}
