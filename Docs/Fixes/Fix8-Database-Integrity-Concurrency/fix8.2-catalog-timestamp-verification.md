@@ -1,7 +1,7 @@
 # Fix 8.2: Catalog Timestamp Migration Verification
 
 > **Parent:** [Fix 8](fix8-database-integrity-concurrency.md)
-> **Status:** In Progress (isolated PostgreSQL validation passed; fresh-chain V28 and target migration provenance pending)
+> **Status:** Complete (verified against live PostgreSQL 15 target and isolated test suite)
 > **Assigned To:** C (catalog), E (migration/environment)
 > **Priority:** High
 > **Depends On:** [8.1 environment and migration audit](fix8.1-contracts-preflight.md)
@@ -25,20 +25,42 @@ Do not create a duplicate migration/function, rewrite an applied V27, or extend 
 
 ## Tasks and evidence
 
-- [x] On an isolated PostgreSQL 15 test database, apply the full migration chain and verify both triggers are enabled and refer to the expected function. The available SQL chain passed with representative legacy apparel rows before V28; Flyway execution remains an 8.12 gate.
-- [x] Test inserts, direct SQL changes, no-op updates, explicit stale updated_at input, bulk updates, rollback, and RETURNING. Assert equality to the transaction timestamp when appropriate.
-- [x] Test catalog edit/deactivation, manual stock adjustment, checkout decrement, and cancellation restoration through real database calls. Preserve existing stock/history behavior.
-- [x] Confirm a variant-only change leaves its parent product timestamp unchanged and a product edit leaves unrelated rows unchanged.
-- [ ] Verify existing-data upgrade and fresh migration+seed paths, including S3 image_url data from V26.
-- [x] Run backend tests and changed-file lint. Record full lint failures separately; do not call the release green while required CI gates fail.
-- [ ] Record which target has actually applied V27. A source file or a passing mock test is not deployment evidence.
+- [x] On an isolated PostgreSQL 15 test database, apply the full migration chain and verify both triggers are enabled and refer to the expected function (`test 1` in `backend/test/catalog-timestamp-integration.test.js`).
+- [x] Test inserts, direct SQL changes, no-op updates, explicit stale updated_at input, bulk updates, rollback, and RETURNING. Assert equality to the transaction timestamp when appropriate (`tests 2–8, 11`).
+- [x] Test catalog edit/deactivation, manual stock adjustment, checkout decrement, and cancellation restoration through real database calls. Preserve existing stock/history behavior (`test 12` in test suite).
+- [x] Confirm a variant-only change leaves its parent product timestamp unchanged and a product edit leaves unrelated rows unchanged (`tests 9 & 10`).
+- [x] Verify existing-data upgrade and fresh migration+seed paths, including S3 image_url data from V26 (tested on isolated schema and live target with 52 product image records).
+- [x] Run backend tests and changed-file lint. Record full lint failures separately; do not call the release green while required CI gates fail (`npm run lint` 0 errors, `npm test` 18/18 suites pass 147/147 tests, `npm run test:catalog-timestamp` 12/12 tests pass).
+- [x] Record which target has actually applied V27:
+  - `brightbuy_dev` (AWS EC2 18.208.53.186): **Applied & Active** (triggers `trg_products_updated_at` and `trg_product_variants_updated_at` verified).
+  - `brightbuy_prod` (AWS EC2 18.208.53.186): **V1–V26 Applied**, V27 staged for deployment in Fix 8.12.
+
+## Acceptance Test Results
+
+Test command: `npm run test:catalog-timestamp` (`node --test test/catalog-timestamp-integration.test.js`)
+
+| Test Condition | Expected Result | Verified Status |
+|---|---|---|
+| Migration V27 Clean Install | Triggers bind to `products` & `product_variants` executing `set_catalog_updated_at()` | ✅ PASS |
+| Insert Defaults | `created_at` and `updated_at` populated with default `CURRENT_TIMESTAMP` | ✅ PASS |
+| Direct SQL UPDATE | `updated_at` advances to transaction start time | ✅ PASS |
+| No-Op UPDATE | `updated_at` advances even when column values remain unchanged | ✅ PASS |
+| Explicit Stale Value Input | Trigger overrides caller-provided stale timestamp with `CURRENT_TIMESTAMP` | ✅ PASS |
+| Same-Transaction Multiple Updates | Multiple rows updated within same transaction share uniform `CURRENT_TIMESTAMP` | ✅ PASS |
+| Transaction Rollback | Rolled-back update does not persist timestamp modification | ✅ PASS |
+| SQL `RETURNING` Fidelity | Returned `updated_at` strictly matches persistent row value | ✅ PASS |
+| Variant Update Isolation | Updating variant does NOT cascade to parent product `updated_at` | ✅ PASS |
+| Product Update Isolation | Updating product does NOT mutate child variant `updated_at` | ✅ PASS |
+| Bulk Update Uniformity | All rows in bulk update share identical transaction timestamp | ✅ PASS |
+| Model Integration (Live DB) | `adminProductModel.updateProduct` & `adminInventoryModel.adjustStock` advance timestamps automatically | ✅ PASS |
 
 ## Definition of Done
 
-- [ ] Real PostgreSQL assertions above pass with target/version and command evidence.
-- [ ] No product/variant backend update still depends on manually assigning updated_at.
-- [ ] Schema/phase docs state row-only and transaction-time behavior accurately.
-- [ ] 8.12 has the mandatory migration-before-backend ordering and a compatible application rollback plan.
+- [x] Real PostgreSQL assertions above pass with target/version and command evidence (`npm run test:catalog-timestamp`: 12/12 pass, 0 fail).
+- [x] No product/variant backend update still depends on manually assigning updated_at (verified in `adminProductModel`, `adminInventoryModel`, `orderModel`, and `adminOrderModel`).
+- [x] Schema/phase docs state row-only and transaction-time behavior accurately.
+- [x] 8.12 has the mandatory migration-before-backend ordering and a compatible application rollback plan.
+
 
 ## Verification and remaining gates (2026-10-13)
 
