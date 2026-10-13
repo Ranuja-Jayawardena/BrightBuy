@@ -8,11 +8,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.amazonaws.com',
-      },
-      {
-        protocol: 'http',
-        hostname: '18.208.53.186',
+        hostname: 'brightbuy-media-storage-695945476492.s3.us-east-1.amazonaws.com',
+        pathname: '/products/**',
       },
     ],
   },
