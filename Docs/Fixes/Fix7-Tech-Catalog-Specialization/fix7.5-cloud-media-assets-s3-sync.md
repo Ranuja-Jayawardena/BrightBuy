@@ -1,7 +1,7 @@
 # Fix 7.5: Cloud Media Assets, Tech Imagery & S3 Bucket Synchronization
 
 > **Parent Group:** [Fix 7: Consumer Technology Catalog Specialization](fix7-tech-catalog-specialization.md)  
-> **Status:** Planned  
+> **Status:** In Progress — all 80 local images verified; S3 sync and public URL checks pending
 > **Assigned To:** Member E (Cloud DevOps & S3 Sync) & Member C (Product Media Assets)  
 > **Depends On:** [Fix 7.2: Technology Product Catalog Seed](fix7.2-technology-product-catalog-seed.md)  
 > **Blocks:** [Fix 7.4: Database Reseed Pipeline Verification](fix7.4-database-reseed-pipeline-verification.md)  
@@ -35,15 +35,21 @@
 
 ## Tasks
 
+### Local sourcing progress (2026-10-13)
+
+Member C sourced openly licensed device photographs and saved 800 × 800 WebP primary and feature-crop secondary images for product IDs **17–21, 24–30, 34–35 and 37** (30 files). Each is under 150 KB and the source/creator/license is recorded in [`backend/db/seed/assets/SOURCES.md`](../../../backend/db/seed/assets/SOURCES.md). These are representative demo photos for fictional products, not photographs of the named models. Published use must retain the recorded attribution and license terms.
+
+Member C generated unbranded demo product images for IDs **1–16, 22–23, 31–33, 36 and 38–40** and prepared primary and secondary WebP views for each. All 80 local images now pass the 800 × 800 and under-150 KB checks. The generated images are illustrative, not exact product photographs; provenance and license details are in [`SOURCES.md`](../../../backend/db/seed/assets/SOURCES.md). No S3 sync or public URL verification was performed.
+
 ### 1. Asset Preparation & WebP Optimization — Member C
-- [ ] For each replacement consumer tech product (IDs `17` to `40`), generate/source optimized WebP imagery:
+- [x] For each replacement consumer tech product (IDs `17` to `40`), generate/source optimized WebP imagery:
   - Products 17–20 (Tablets & E-Readers: `TAB-001`..`TAB-004`)
   - Products 21–24 (Displays & Monitors: `DSP-001`..`DSP-004`)
   - Products 25–28 (PC Peripherals & Audio: `PER-001`..`PER-004`)
   - Products 29–32 (Wearables & Smartwatches: `WTR-001`..`WTR-004`)
   - Products 33–36 (Smart Home & IoT: `IOT-001`..`IOT-004`)
   - Products 37–40 (Storage & Docks: `STR-001`..`STR-004`)
-- [ ] Save both `primary.webp` and `secondary.webp` into the respective local folders:
+- [x] Save both `primary.webp` and `secondary.webp` into the respective local folders:
   ```text
   backend/db/seed/assets/
   ├── 17/
@@ -69,7 +75,7 @@
   ```
 
 ### 3. Database Seed Insertion (`04_products.sql`) — Member C
-- [ ] Ensure `04_products.sql` inserts both primary and secondary image records for all 40 products:
+- [x] Ensure `04_products.sql` inserts both primary and secondary image records for all 40 products:
   ```sql
   -- Sample image inserts for tech products
   INSERT INTO product_images (product_id, image_url, sort_order, is_primary) VALUES
@@ -85,7 +91,7 @@
 
 | Item | Criteria | Owner | Status |
 |---|---|---|---|
-| **Asset Count** | 80 total images (40 primary + 40 secondary) exist locally | Member C | ⬜ Pending |
+| **Asset Count** | 80 total images (40 primary + 40 secondary) exist locally | Member C | Complete — all 80 files verified locally |
 | **MIME Type** | All uploaded files have `Content-Type: image/webp` | Member E | ⬜ Pending |
 | **S3 Sync** | `s3://brightbuy-media-storage-695945476492/products/` contains folders `1/` to `40/` | Member E | ⬜ Pending |
 | **Cache Headers** | Response includes `max-age=31536000` for client caching | Member E | ⬜ Pending |
