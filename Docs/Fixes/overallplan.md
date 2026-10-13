@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (16 / 35 fix items complete across 8 fix groups; Fix 6.1 & 6.2 verified complete)
+**Status:** In Progress (17 / 35 fix items complete across 8 fix groups; Fix 6.1, 6.2 & 8.1 verified complete)
 
 ---
 
@@ -91,7 +91,7 @@ Fix 6 has **2/4 items verified complete under the revised gates** (6.1 and 6.2 v
 Fix 7.2 is In Progress: `04_products.sql` now defines 40 technology products, 65 variants and 80 primary/secondary URL rows. The SKU matrix is published. The new S3 objects, fresh database execution and downstream links/orders still need verification; do not mark 7.2 complete until its image URLs resolve.
 
 - [ ] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
-  - [ ] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
+  - [x] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
   - [ ] **8.2: Catalog Timestamp Migration Verification** | C (catalog), E (migration/environment) | [Details](Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
   - [ ] **8.3: Cart Uniqueness & Checkout Concurrency** | D | [Details](Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
   - [ ] **8.4: Order Transitions & Payment Event Consistency** | D (implementation), E (webhook security review), C (admin order ownership handoff) | [Details](Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
@@ -104,7 +104,7 @@ Fix 7.2 is In Progress: `04_products.sql` now defines 40 technology products, 65
   - [ ] **8.11: Application & Migration Database Accounts** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
   - [ ] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
 
-Fix 8 has 0/12 items complete. Item 8.2 is In Progress because V27/backend timestamp edits already exist; actual database verification is pending. All other items are Not Started.
+Fix 8 has 1/12 items complete (8.1 Complete). Item 8.2 is In Progress because V27/backend timestamp edits already exist; actual database verification is pending. All other items are Not Started.
 
 ---
 

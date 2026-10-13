@@ -1,6 +1,6 @@
 # Fix 8: Database Integrity & Concurrency
 
-> **Status:** In Progress (0 / 12 fix items complete; V27 code exists, database verification pending)
+> **Status:** In Progress (1 / 12 fix items complete; 8.1 Complete; V27 code exists, database verification pending)
 > **Members:** A (storefront/reports), B (checkout/admin UI), C (catalog/inventory), D (cart/orders/payments), E (auth/database infrastructure)
 > **Priority:** Critical
 > **Master trackers:** [Fixes](../overallplan.md) | [Project](../../overallplan.md)
@@ -31,7 +31,7 @@ These are source-code findings, not results from a live concurrency exercise. Th
 
 | Item | Assigned | Depends on | Status |
 | --- | --- | --- | --- |
-| [8.1: Contracts, Data Preflight & Migration Coordination](fix8.1-contracts-preflight.md) | E (lead), D (payments/cart), C (catalog) | Existing phase/fix baseline | Not Started |
+| [8.1: Contracts, Data Preflight & Migration Coordination](fix8.1-contracts-preflight.md) | E (lead), D (payments/cart), C (catalog) | Existing phase/fix baseline | Complete |
 | [8.2: Catalog Timestamp Migration Verification](fix8.2-catalog-timestamp-verification.md) | C (lead), E (migration verification) | 8.1 environment/migration audit | In Progress |
 | [8.3: Cart Uniqueness & Checkout Concurrency](fix8.3-cart-checkout-concurrency.md) | D | 8.1 cart/API contract | Not Started |
 | [8.4: Order Transitions & Payment Event Consistency](fix8.4-order-payment-consistency.md) | D (lead), E (webhook infrastructure review), C (admin handoff) | 8.1 payment decisions; 8.3 lock contract | Not Started |
