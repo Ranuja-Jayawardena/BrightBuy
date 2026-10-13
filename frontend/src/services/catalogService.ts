@@ -2,6 +2,11 @@ import { GetCategoriesResponse, GetProductsResponse, GetProductByIdResponse } fr
 import { apiFetch } from "./api";
 
 export const catalogService = {
+  async getBrands(): Promise<{ brands: string[] }> {
+    const res = await apiFetch('/api/products/brands');
+    if (!res.ok) throw new Error('Failed to fetch brands');
+    return res.json();
+  },
   async getCategories(): Promise<GetCategoriesResponse> {
     const res = await apiFetch('/api/categories');
     if (!res.ok) {

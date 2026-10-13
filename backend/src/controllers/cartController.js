@@ -8,12 +8,22 @@ function isPositiveInt(value) {
     return Number.isSafeInteger(num) && num > 0;
 }
 
+function getCustomerId(req, res) {
+    if (!req.user || req.user.role !== 'customer' || !req.user.customer_id) {
+        res.status(403).json({
+            error: 'forbidden',
+            message: 'Administrative and staff accounts cannot create or modify shopping carts',
+            statusCode: 403
+        });
+        return null;
+    }
+    return req.user.customer_id;
+}
+
 const getCart = async (req, res) => {
     try {
-        const customer_id = req.user ? req.user.customer_id : null;
-        if (!customer_id) {
-            return res.status(403).json({ error: 'forbidden', message: 'Only customers can have carts', statusCode: 403 });
-        }
+        const customer_id = getCustomerId(req, res);
+        if (!customer_id) return;
         
         const cart_id = await cartModel.getOrCreateCart(customer_id);
         const items = await cartModel.getCartItems(cart_id);
@@ -46,10 +56,8 @@ const getCart = async (req, res) => {
 
 const addItem = async (req, res) => {
     try {
-        const customer_id = req.user ? req.user.customer_id : null;
-        if (!customer_id) {
-            return res.status(403).json({ error: 'forbidden', message: 'Only customers can add items to cart', statusCode: 403 });
-        }
+        const customer_id = getCustomerId(req, res);
+        if (!customer_id) return;
         
         const { variant_id, quantity } = req.body || {};
         if (!isPositiveInt(variant_id)) {
@@ -91,10 +99,8 @@ const addItem = async (req, res) => {
 
 const updateItemQuantity = async (req, res) => {
     try {
-        const customer_id = req.user ? req.user.customer_id : null;
-        if (!customer_id) {
-            return res.status(403).json({ error: 'forbidden', message: 'Only customers can update cart items', statusCode: 403 });
-        }
+        const customer_id = getCustomerId(req, res);
+        if (!customer_id) return;
         
         if (!isPositiveInt(req.params.id)) {
             return res.status(400).json({ error: 'invalid_request', message: 'id must be a positive integer', statusCode: 400 });
@@ -139,10 +145,8 @@ const updateItemQuantity = async (req, res) => {
 
 const removeItem = async (req, res) => {
     try {
-        const customer_id = req.user ? req.user.customer_id : null;
-        if (!customer_id) {
-            return res.status(403).json({ error: 'forbidden', message: 'Only customers can remove cart items', statusCode: 403 });
-        }
+        const customer_id = getCustomerId(req, res);
+        if (!customer_id) return;
         
         if (!isPositiveInt(req.params.id)) {
             return res.status(400).json({ error: 'invalid_request', message: 'id must be a positive integer', statusCode: 400 });

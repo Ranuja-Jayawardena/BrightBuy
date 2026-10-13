@@ -22,7 +22,8 @@ import {
   User,
   MapPin,
   ExternalLink,
-  X
+  X,
+  Store
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -36,6 +37,7 @@ interface OrderSummary {
   last_name: string | null;
   email: string;
   item_count: number;
+  delivery_mode?: string | null;
 }
 
 interface OrderDetailItem {
@@ -58,7 +60,7 @@ interface OrderDetailDelivery {
   delivery_zip_code: string;
   estimated_delivery_days: number | null;
   tracking_number: string | null;
-  delivery_status: 'pending' | 'processing' | 'shipped' | 'out_for_delivery' | 'delivered' | 'cancelled';
+  delivery_status: 'pending' | 'processing' | 'shipped' | 'out_for_delivery' | 'delivered' | 'ready_for_pickup' | 'collected' | 'cancelled';
   updated_at?: string;
 }
 
@@ -434,6 +436,7 @@ export default function AdminOrdersPage() {
                 <th className="p-4 font-semibold">Order #</th>
                 <th className="p-4 font-semibold">Date</th>
                 <th className="p-4 font-semibold">Customer</th>
+                <th className="p-4 font-semibold">Fulfillment</th>
                 <th className="p-4 font-semibold">Items</th>
                 <th className="p-4 font-semibold">Total Amount</th>
                 <th className="p-4 font-semibold">Status</th>
@@ -443,7 +446,7 @@ export default function AdminOrdersPage() {
             <tbody className="divide-y">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="p-10 text-center text-muted-foreground">
+                  <td colSpan={8} className="p-10 text-center text-muted-foreground">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <RefreshCw className="w-6 h-6 animate-spin text-primary" />
                       <span>Loading orders...</span>
@@ -452,7 +455,7 @@ export default function AdminOrdersPage() {
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-10 text-center text-muted-foreground">
+                  <td colSpan={8} className="p-10 text-center text-muted-foreground">
                     <p className="font-medium text-foreground">No orders matched the criteria</p>
                     <p className="text-sm mt-1">Try resetting the status filter or date range.</p>
                   </td>
@@ -460,6 +463,8 @@ export default function AdminOrdersPage() {
               ) : (
                 orders.map((order) => {
                   const customerName = `${order.first_name || ''} ${order.last_name || ''}`.trim() || 'Guest / User';
+                  const isStorePickup = order.delivery_mode === 'store_pickup';
+
                   return (
                     <tr
                       key={order.order_id}
@@ -479,6 +484,17 @@ export default function AdminOrdersPage() {
                       <td className="p-4">
                         <div className="font-medium">{customerName}</div>
                         <div className="text-xs text-muted-foreground">{order.email}</div>
+                      </td>
+                      <td className="p-4 whitespace-nowrap">
+                        {isStorePickup ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                            <Store className="w-3 h-3" /> Store Pickup
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+                            <Truck className="w-3 h-3" /> Home Delivery
+                          </span>
+                        )}
                       </td>
                       <td className="p-4 text-muted-foreground whitespace-nowrap">
                         {order.item_count} {order.item_count === 1 ? 'item' : 'items'}
@@ -631,20 +647,41 @@ export default function AdminOrdersPage() {
                     {/* Delivery Summary Card */}
                     <div className="border rounded-lg p-4 bg-muted/10 space-y-2">
                       <div className="flex items-center gap-2 font-semibold text-sm border-b pb-2">
-                        <MapPin className="w-4 h-4 text-primary" /> Shipping Address
+                        {selectedOrder.delivery?.delivery_mode === 'store_pickup' ? (
+                          <>
+                            <Store className="w-4 h-4 text-primary" /> Store Pickup Location
+                          </>
+                        ) : (
+                          <>
+                            <MapPin className="w-4 h-4 text-primary" /> Shipping Address
+                          </>
+                        )}
                       </div>
                       {selectedOrder.delivery ? (
                         <div className="text-sm space-y-1">
-                          <p className="font-medium capitalize">
-                            {selectedOrder.delivery.delivery_mode.replace('_', ' ')}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {selectedOrder.delivery.delivery_address_line1}
-                            {selectedOrder.delivery.delivery_address_line2 ? `, ${selectedOrder.delivery.delivery_address_line2}` : ''}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {selectedOrder.delivery.city_name} {selectedOrder.delivery.delivery_zip_code}
-                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium capitalize">
+                              {selectedOrder.delivery.delivery_mode.replace('_', ' ')}
+                            </span>
+                            <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-primary/10 text-primary capitalize">
+                              {selectedOrder.delivery.delivery_status.replace(/_/g, ' ')}
+                            </span>
+                          </div>
+                          {selectedOrder.delivery.delivery_mode === 'store_pickup' ? (
+                            <p className="text-xs text-muted-foreground pt-1">
+                              BrightBuy Retail Store & Main Warehouse Gate
+                            </p>
+                          ) : (
+                            <>
+                              <p className="text-xs text-muted-foreground">
+                                {selectedOrder.delivery.delivery_address_line1}
+                                {selectedOrder.delivery.delivery_address_line2 ? `, ${selectedOrder.delivery.delivery_address_line2}` : ''}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {selectedOrder.delivery.city_name} {selectedOrder.delivery.delivery_zip_code}
+                              </p>
+                            </>
+                          )}
                         </div>
                       ) : (
                         <p className="text-xs text-muted-foreground italic">No delivery record</p>
@@ -743,61 +780,99 @@ export default function AdminOrdersPage() {
                     </div>
 
                     {/* Control 2: Delivery & Tracking Update */}
-                    <div className="border rounded-lg p-5 bg-card space-y-4">
-                      <div>
-                        <h3 className="font-semibold text-sm">Delivery & Fulfillment Details</h3>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Update courier tracking code and package dispatch status.
-                        </p>
-                      </div>
+                    {(() => {
+                      const isStorePickup = selectedOrder.delivery?.delivery_mode === 'store_pickup';
 
-                      {selectedOrder.delivery ? (
-                        <div className="space-y-3">
+                      return (
+                        <div className="border rounded-lg p-5 bg-card space-y-4">
                           <div>
-                            <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                              Delivery Status
-                            </label>
-                            <select
-                              value={deliveryStatus}
-                              onChange={(e) => setDeliveryStatus(e.target.value)}
-                              className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="processing">Processing</option>
-                              <option value="shipped">Shipped</option>
-                              <option value="out_for_delivery">Out for Delivery</option>
-                              <option value="delivered">Delivered</option>
-                              <option value="cancelled">Cancelled</option>
-                            </select>
+                            <h3 className="font-semibold text-sm">
+                              {isStorePickup ? 'Store Pickup & Gate Fulfillment' : 'Courier & Shipping Management'}
+                            </h3>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {isStorePickup
+                                ? 'Manage store pickup status and gate collection verification.'
+                                : 'Update courier tracking code and package dispatch status.'}
+                            </p>
                           </div>
 
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                              Tracking Number
-                            </label>
-                            <Input
-                              placeholder="e.g. TRK-982347102"
-                              value={trackingNumber}
-                              onChange={(e) => setTrackingNumber(e.target.value)}
-                              className="text-sm"
-                            />
-                          </div>
+                          {selectedOrder.delivery ? (
+                            <div className="space-y-3">
+                              <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                                  {isStorePickup ? 'Pickup Status' : 'Delivery Status'}
+                                </label>
+                                <select
+                                  value={deliveryStatus}
+                                  onChange={(e) => setDeliveryStatus(e.target.value)}
+                                  className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                >
+                                  {isStorePickup ? (
+                                    <>
+                                      <option value="pending">Pending</option>
+                                      <option value="processing">Processing / Preparing</option>
+                                      <option value="ready_for_pickup">Ready for Pickup</option>
+                                      <option value="collected">Collected by Customer</option>
+                                      <option value="cancelled">Cancelled</option>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <option value="pending">Pending</option>
+                                      <option value="processing">Processing</option>
+                                      <option value="shipped">Shipped</option>
+                                      <option value="out_for_delivery">Out for Delivery</option>
+                                      <option value="delivered">Delivered</option>
+                                      <option value="cancelled">Cancelled</option>
+                                    </>
+                                  )}
+                                </select>
+                              </div>
 
-                          <Button
-                            variant="secondary"
-                            onClick={handleUpdateDelivery}
-                            disabled={isUpdatingDelivery}
-                            className="w-full"
-                          >
-                            {isUpdatingDelivery ? 'Saving Delivery...' : 'Update Delivery Info'}
-                          </Button>
+                              {isStorePickup ? (
+                                <div>
+                                  <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                                    Courier Tracking Code
+                                  </label>
+                                  <div className="p-2.5 rounded-md border bg-muted/40 text-xs text-muted-foreground flex items-center gap-2">
+                                    <Store className="w-3.5 h-3.5 text-primary shrink-0" />
+                                    <span>N/A — Store Pickup / Gate Collection</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                                    Tracking Number
+                                  </label>
+                                  <Input
+                                    placeholder="e.g. TRK-982347102"
+                                    value={trackingNumber}
+                                    onChange={(e) => setTrackingNumber(e.target.value)}
+                                    className="text-sm"
+                                  />
+                                </div>
+                              )}
+
+                              <Button
+                                variant="secondary"
+                                onClick={handleUpdateDelivery}
+                                disabled={isUpdatingDelivery}
+                                className="w-full"
+                              >
+                                {isUpdatingDelivery
+                                  ? 'Saving...'
+                                  : isStorePickup
+                                  ? 'Update Pickup Status'
+                                  : 'Update Delivery Info'}
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="p-3 rounded bg-muted/40 text-xs text-muted-foreground">
+                              No delivery record associated with this order.
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <div className="p-3 rounded bg-muted/40 text-xs text-muted-foreground">
-                          No delivery record associated with this order.
-                        </div>
-                      )}
-                    </div>
+                      );
+                    })()}
                   </div>
                 </>
               ) : null}

@@ -21,6 +21,7 @@ const authLimiter = rateLimit({
   max: process.env.NODE_ENV === 'test' ? 100 : 20, // 20 requests per window in production/dev
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   handler: rateLimitHandler('Too many authentication attempts from this IP, please try again after 15 minutes'),
   skip: (req) => process.env.NODE_ENV === 'test' && req.headers['x-skip-rate-limit'] === 'true',
 });
@@ -33,6 +34,7 @@ const apiLimiter = rateLimit({
   max: process.env.NODE_ENV === 'test' ? 1000 : 500, // 500 requests per window
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   handler: rateLimitHandler('Too many requests from this IP, please try again after 15 minutes'),
   skip: (req) => process.env.NODE_ENV === 'test' && req.headers['x-skip-rate-limit'] === 'true',
 });

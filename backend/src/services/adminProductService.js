@@ -201,14 +201,28 @@ async function createProduct(body) {
 
 async function updateProduct(productId, body) {
   requireBody(body);
+  if (body.is_active !== undefined && body.product_name === undefined && body.base_sku === undefined) {
+    const isActive = parseBoolean(body.is_active, 'is_active');
+    const product = await adminProductModel.setProductActiveStatus(productId, isActive);
+    return product ? { product: mapProduct(product) } : null;
+  }
+
   const payload = {
     product_name: normalizeString(body.product_name, 'product_name', { required: true, maxLength: 100 }),
     brand: normalizeString(body.brand, 'brand', { maxLength: 100 }),
     description: normalizeString(body.description, 'description'),
     base_sku: normalizeString(body.base_sku, 'base_sku', { required: true, maxLength: 50 }),
-    category_ids: normalizeCategoryIds(body.category_ids),
+    category_ids: body.category_ids !== undefined ? normalizeCategoryIds(body.category_ids) : undefined,
+    is_active: body.is_active !== undefined ? parseBoolean(body.is_active, 'is_active') : undefined,
   };
   const product = await adminProductModel.updateProduct(productId, payload);
+  return product ? { product: mapProduct(product) } : null;
+}
+
+async function setProductStatus(productId, body) {
+  requireBody(body);
+  const isActive = parseBoolean(body.is_active, 'is_active');
+  const product = await adminProductModel.setProductActiveStatus(productId, isActive);
   return product ? { product: mapProduct(product) } : null;
 }
 
@@ -306,6 +320,7 @@ module.exports = {
   getProductDetail,
   createProduct,
   updateProduct,
+  setProductStatus,
   softDeleteProduct,
   createImage,
   updateImage,

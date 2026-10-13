@@ -1,7 +1,7 @@
 # Fix 2.1: Price Range Filtering & Composite Indexing
 
 > **Parent Group:** [Fix 2: Search & Filter Performance](fix2-search-filter-performance.md)
-> **Status:** Not Started
+> **Status:** In Progress (C backend complete; A UI pending)
 > **Assigned To:** Member C (Backend Models & DB Migration) & Member A (Storefront Filter UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -54,10 +54,10 @@ In `backend/src/models/productModel.js`, support `min_price` and `max_price`:
 ## Tasks
 
 ### Backend & DB — Member C
-- [ ] Create Flyway migration `backend/db/migrations/V22__add_product_price_index.sql`.
-- [ ] Update `backend/src/models/productModel.js` to accept `min_price` and `max_price` filter parameters.
-- [ ] Update `backend/src/controllers/productController.js` to parse and validate `req.query.min_price` and `req.query.max_price`.
-- [ ] Update `Docs/Database/DB_Schema.md` with the new indexes.
+- [x] Create Flyway migration `backend/db/migrations/V22__add_product_price_index.sql`.
+- [x] Update `backend/src/models/productModel.js` to accept `min_price` and `max_price` filter parameters.
+- [x] Validate `req.query.min_price` and `req.query.max_price` through the product service used by `productController.js`.
+- [x] Update `Docs/Database/DB_Schema.md` with the new indexes.
 
 ### Storefront UI — Member A
 - [ ] In `frontend/src/components/catalog/ProductFilterSidebar.tsx`:
@@ -117,3 +117,7 @@ GET /api/products?min_price=50&max_price=250&page=1&limit=12
 2. Filtering by min and max prices returns only products with variants in that range.
 3. Pagination count accurately reflects price-filtered results.
 4. Storefront displays responsive price inputs with seamless URL sync.
+
+## Implementation Note
+
+The API includes products only when at least one active variant falls within the requested range. Product card min/max prices and variant counts are calculated from those matching variants. The storefront controls remain assigned to Member A. The migration file is ready but has not been applied to a database in this checkout.

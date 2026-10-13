@@ -38,7 +38,11 @@ const handleLemonSqueezyWebhook = async (req, res) => {
     }
 
     const data = payload.data;
-    const orderId = data.attributes.custom_data ? data.attributes.custom_data.order_id : 'unknown';
+    const orderId = payload.meta?.custom_data?.order_id
+      || payload.meta?.custom?.order_id
+      || data?.attributes?.custom_data?.order_id
+      || data?.attributes?.first_order_item?.order_id
+      || 'unknown';
     const transactionId = data.id;
 
     if (eventName === 'order_created') {

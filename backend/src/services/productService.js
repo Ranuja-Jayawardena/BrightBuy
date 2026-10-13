@@ -1,5 +1,16 @@
 const productModel = require('../models/productModel');
 
+async function getActiveBrands() {
+  return { brands: await productModel.findActiveBrands() };
+}
+
+async function getProductSuggestions(query) {
+  if (typeof query !== 'string' || query.trim().length < 2 || query.trim().length > 100) {
+    const error = new Error('q must contain 2 to 100 characters'); error.status = 400; throw error;
+  }
+  return { suggestions: await productModel.getSuggestions(query.trim()) };
+}
+
 /**
  * Service to fetch paginated product list with search, filtering, and sorting.
  *
@@ -11,6 +22,11 @@ async function getProductsList(queryParams) {
   const limit = positiveQueryInteger(queryParams.limit, 'limit', 12, 100);
   const search = optionalQueryString(queryParams.search, 'search', 100);
   const brand = optionalQueryString(queryParams.brand, 'brand', 100);
+  const minPrice = optionalPrice(queryParams.min_price, 'min_price');
+  const maxPrice = optionalPrice(queryParams.max_price, 'max_price');
+  if (minPrice !== undefined && maxPrice !== undefined && minPrice > maxPrice) {
+    const error = new Error('min_price must be less than or equal to max_price'); error.status = 400; throw error;
+  }
   const categoryId = queryParams.category_id === undefined ? undefined : positiveQueryInteger(queryParams.category_id, 'category_id', undefined, 1000000000);
   const sort = queryParams.sort === undefined ? undefined : queryParams.sort;
   if (sort !== undefined && !['name_asc', 'name_desc', 'price_asc', 'price_desc'].includes(sort)) {
@@ -23,6 +39,8 @@ async function getProductsList(queryParams) {
     search,
     categoryId,
     brand,
+    minPrice,
+    maxPrice,
     sort,
   });
 
@@ -65,6 +83,14 @@ function optionalQueryString(value, field, maximum) {
   const normalized = value.trim();
   if (normalized.length > maximum) { const error = new Error(`${field} must be ${maximum} characters or fewer`); error.status = 400; throw error; }
   return normalized || undefined;
+}
+
+function optionalPrice(value, field) {
+  if (value === undefined || value === '') return undefined;
+  if (typeof value !== 'string' || !/^\d+(?:\.\d{1,2})?$/.test(value) || Number(value) > 99999999.99) {
+    const error = new Error(`${field} must be a non-negative amount with at most two decimal places`); error.status = 400; throw error;
+  }
+  return Number(value);
 }
 
 /**
@@ -114,8 +140,11 @@ async function getProductDetails(productId) {
 }
 
 module.exports = {
+  getActiveBrands,
+  getProductSuggestions,
   getProductsList,
   getProductDetails,
   positiveQueryInteger,
   optionalQueryString,
+  optionalPrice,
 };

@@ -1,7 +1,7 @@
 # Fix 3.1: Admin Sticky Sidebar Layout
 
 > **Parent Group:** [Fix 3: Admin Catalog & Media Management](fix3-admin-catalog-media.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member B (Frontend Admin UI Layout)
 > **Depends On:** —
 > **Blocks:** —
@@ -29,7 +29,7 @@ The `<aside>` is rendered as a normal block in a flex row without `sticky` posit
 ## Tasks
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/layout.tsx`:
+- [x] In `frontend/src/app/admin/layout.tsx`:
   - Update the desktop `<aside>` classes to include:
     `sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto`
   - Ensure the sidebar stays locked in place while the `<main>` content container scrolls freely.

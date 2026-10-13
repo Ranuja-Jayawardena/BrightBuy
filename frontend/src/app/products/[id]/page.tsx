@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const { addItem, isLoading: isCartLoading } = useCartStore();
   
   const productId = params.id as string;
@@ -26,6 +26,7 @@ export default function ProductDetailPage() {
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [addedSuccess, setAddedSuccess] = useState(false);
+  const [showStaffRestrictedModal, setShowStaffRestrictedModal] = useState(false);
 
   const loadProduct = async () => {
     try {
@@ -45,7 +46,7 @@ export default function ProductDetailPage() {
       }
       
       if (data.product.variants?.length > 0) {
-        const firstVariant = data.product.variants[0];
+        const firstVariant = data.product.variants.find(variant => variant.stock_quantity > 0) || data.product.variants[0];
         const initialAttrs: Record<string, string> = {};
         firstVariant.attributes.forEach(attr => {
           initialAttrs[attr.attribute_name] = attr.attribute_value;
@@ -94,16 +95,33 @@ export default function ProductDetailPage() {
   }, [product, selectedAttributes]);
 
   const handleAttributeSelect = (name: string, value: string) => {
-    setSelectedAttributes(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setSelectedAttributes(prev => {
+      const next = { ...prev, [name]: value };
+      const variants = product?.variants || [];
+      const exact = variants.find(variant =>
+        variant.attributes.every(attr => next[attr.attribute_name] === attr.attribute_value)
+      );
+      if (exact) return next;
+
+      // Preserve the chosen option and switch the other attributes to a real variant.
+      const alternative = variants.find(variant =>
+        variant.stock_quantity > 0 && variant.attributes.some(attr => attr.attribute_name === name && attr.attribute_value === value)
+      ) || variants.find(variant =>
+        variant.attributes.some(attr => attr.attribute_name === name && attr.attribute_value === value)
+      );
+      return alternative ? Object.fromEntries(alternative.attributes.map(attr => [attr.attribute_name, attr.attribute_value])) : next;
+    });
     setQuantity(1); // Reset quantity on variant change
   };
 
   const onAddToCart = async (variantId: number, qty: number) => {
     if (!isAuthenticated) {
       router.push(`/login?redirect=/products/${productId}`);
+      return;
+    }
+
+    if (user?.role === 'admin') {
+      setShowStaffRestrictedModal(true);
       return;
     }
     
@@ -113,8 +131,13 @@ export default function ProductDetailPage() {
       setTimeout(() => {
         setAddedSuccess(false);
       }, 3000);
-    } catch (error: any) {
-      alert(error.message || 'Failed to add item to cart');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to add item to cart';
+      if (message.toLowerCase().includes('staff') || message.toLowerCase().includes('customer') || message.toLowerCase().includes('forbidden')) {
+        setShowStaffRestrictedModal(true);
+      } else {
+        alert(message);
+      }
     }
   };
 
@@ -285,14 +308,27 @@ export default function ProductDetailPage() {
                 <div className="flex flex-wrap gap-2">
                   {attributeOptions[attrName].map(val => {
                     const isSelected = selectedAttributes[attrName] === val;
+                    const matchingVariant = product.variants.find(variant =>
+                      variant.attributes.every(attr =>
+                        attr.attribute_name === attrName
+                          ? attr.attribute_value === val
+                          : selectedAttributes[attr.attribute_name] === attr.attribute_value
+                      )
+                    );
+                    const isUnavailable = !matchingVariant;
+                    const isSoldOut = matchingVariant?.stock_quantity === 0;
                     return (
                       <button
                         key={val}
                         onClick={() => handleAttributeSelect(attrName, val)}
+                        aria-pressed={isSelected}
+                        title={isUnavailable ? 'Selecting this option will change other selections' : isSoldOut ? 'Out of stock' : undefined}
                         className={`px-4 py-2 text-sm font-medium rounded-md border transition-all ${
                           isSelected 
                             ? 'bg-primary text-primary-foreground border-primary shadow-sm' 
-                            : 'bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground'
+                            : isUnavailable || isSoldOut
+                              ? 'bg-background text-muted-foreground border-input opacity-50 line-through hover:opacity-75'
+                              : 'bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground'
                         }`}
                       >
                         {val}
@@ -300,6 +336,7 @@ export default function ProductDetailPage() {
                     );
                   })}
                 </div>
+                {attrName === 'Size' && <p className="mt-2 text-xs text-muted-foreground">Faded sizes are sold out or unavailable with the current selection. Choosing an unavailable size may change the color.</p>}
               </div>
             ))}
           </div>
@@ -379,9 +416,46 @@ export default function ProductDetailPage() {
               SKU: {selectedVariant ? selectedVariant.variant_sku : product.base_sku}
             </p>
           </div>
-
         </div>
       </div>
+
+      {/* Staff Purchase Restricted Modal */}
+      {showStaffRestrictedModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card border rounded-2xl max-w-md w-full p-6 shadow-xl animate-in fade-in-50 zoom-in-95 duration-150">
+            <div className="flex items-center gap-3.5 mb-4">
+              <div className="p-3 rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                <AlertCircle className="w-6 h-6 shrink-0" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-foreground">Staff Account Restricted</h3>
+                <p className="text-xs text-muted-foreground">Store Purchasing Policy</p>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Employees and administrators cannot make store purchases or add items to cart. Please log out and sign in with a standard customer account to place orders.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row justify-end gap-2.5">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowStaffRestrictedModal(false)}
+              >
+                Continue Browsing
+              </Button>
+              <Button 
+                variant="destructive"
+                onClick={async () => {
+                  setShowStaffRestrictedModal(false);
+                  await logout();
+                  router.push('/login');
+                }}
+              >
+                Log Out
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

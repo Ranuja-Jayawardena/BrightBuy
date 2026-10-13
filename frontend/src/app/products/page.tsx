@@ -18,6 +18,8 @@ function ProductsContent() {
   const searchParams = useSearchParams();
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
+  const [brandError, setBrandError] = useState(false);
   const [products, setProducts] = useState<ProductSummary[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,32 +46,13 @@ function ProductsContent() {
     document.title = title;
   }, [search, brand, categoryId, categories]);
 
-  const [brands, setBrands] = useState<string[]>([]);
-
-  // Fetch available catalog brands dynamically
   useEffect(() => {
-    let isMounted = true;
-    catalogService.getBrands()
-      .then((res) => {
-        if (isMounted && res.brands && res.brands.length > 0) {
-          setBrands(res.brands);
-        }
-      })
-      .catch(() => {
-        // Fallback gracefully if endpoint is not yet live
-      });
-    return () => { isMounted = false; };
+    let active = true;
+    catalogService.getBrands().then(({ brands: available }) => {
+      if (active) { setBrands(available); setBrandError(false); }
+    }).catch(() => { if (active) setBrandError(true); });
+    return () => { active = false; };
   }, []);
-
-  // Fallback: derive brands from loaded catalog products if endpoint is not available
-  useEffect(() => {
-    if (products.length > 0 && brands.length === 0) {
-      const derived = Array.from(new Set(products.map((p) => p.brand).filter(Boolean))) as string[];
-      if (derived.length > 0) {
-        setBrands(derived.sort());
-      }
-    }
-  }, [products, brands.length]);
 
   const updateUrlParams = useCallback((key: string, value: string | null) => {
     const current = new URLSearchParams(searchParams.toString());
@@ -170,6 +153,7 @@ function ProductsContent() {
               onSortChange={(s: string) => updateUrlParams('sort', s)}
               brands={brands}
             />
+            {brandError && <p className="mb-4 text-sm text-red-600" role="status">Brand filters are unavailable right now. Refresh the page to try again.</p>}
 
             {/* Active Filters Bar */}
             {hasActiveFilters && (

@@ -193,28 +193,40 @@ async function createProduct({ product_name, brand, description, base_sku, categ
   }
 }
 
-async function updateProduct(productId, { product_name, brand, description, base_sku, category_ids }) {
+async function updateProduct(productId, { product_name, brand, description, base_sku, category_ids, is_active }) {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
     const productResult = await client.query(`
       UPDATE products
       SET
-        product_name = $2,
-        brand = $3,
-        description = $4,
-        base_sku = $5,
+        product_name = COALESCE($2, product_name),
+        brand = CASE WHEN $3::boolean THEN $4 ELSE brand END,
+        description = CASE WHEN $5::boolean THEN $6 ELSE description END,
+        base_sku = COALESCE($7, base_sku),
+        is_active = COALESCE($8, is_active),
         updated_at = CURRENT_TIMESTAMP
       WHERE product_id = $1
       RETURNING product_id, product_name, brand, description, base_sku, is_active, created_at, updated_at
-    `, [productId, product_name, brand || null, description || null, base_sku]);
+    `, [
+      productId,
+      product_name || null,
+      brand !== undefined,
+      brand || null,
+      description !== undefined,
+      description || null,
+      base_sku || null,
+      is_active !== undefined ? is_active : null,
+    ]);
 
     if (productResult.rowCount === 0) {
       await client.query('ROLLBACK');
       return null;
     }
 
-    await replaceProductCategories(client, productId, category_ids);
+    if (category_ids !== undefined) {
+      await replaceProductCategories(client, productId, category_ids);
+    }
     await client.query('COMMIT');
     return productResult.rows[0];
   } catch (error) {
@@ -223,6 +235,16 @@ async function updateProduct(productId, { product_name, brand, description, base
   } finally {
     client.release();
   }
+}
+
+async function setProductActiveStatus(productId, isActive) {
+  const result = await db.query(`
+    UPDATE products
+    SET is_active = $2, updated_at = CURRENT_TIMESTAMP
+    WHERE product_id = $1
+    RETURNING product_id, product_name, brand, description, base_sku, is_active, created_at, updated_at
+  `, [productId, isActive]);
+  return result.rows[0] || null;
 }
 
 async function softDeleteProduct(productId) {
@@ -395,6 +417,7 @@ module.exports = {
   productExists,
   createProduct,
   updateProduct,
+  setProductActiveStatus,
   softDeleteProduct,
   createImage,
   updateImage,

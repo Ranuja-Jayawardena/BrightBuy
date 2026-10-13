@@ -1,7 +1,12 @@
 const db = require('../config/db');
 
 function mapOrder(row) {
-  return { ...row, total_amount: Number(row.total_amount), item_count: Number(row.item_count || 0) };
+  return {
+    ...row,
+    total_amount: Number(row.total_amount),
+    item_count: Number(row.item_count || 0),
+    delivery_mode: row.delivery_mode || null
+  };
 }
 
 async function findOrders({ page, limit, status, dateFrom, dateTo, customer }) {
@@ -21,10 +26,11 @@ async function findOrders({ page, limit, status, dateFrom, dateTo, customer }) {
   const dataValues = [...values, limit, offset];
   const result = await db.query(`
     SELECT o.order_id, o.order_date, o.status, o.total_amount, c.customer_id,
-      c.first_name, c.last_name, u.email, COUNT(oi.order_item_id)::int AS item_count
+      c.first_name, c.last_name, u.email, d.delivery_mode, COUNT(oi.order_item_id)::int AS item_count
     FROM orders o JOIN customers c ON c.customer_id=o.customer_id JOIN users u ON u.user_id=c.user_id
+    LEFT JOIN deliveries d ON d.order_id=o.order_id
     LEFT JOIN order_items oi ON oi.order_id=o.order_id ${clause}
-    GROUP BY o.order_id, c.customer_id, c.first_name, c.last_name, u.email
+    GROUP BY o.order_id, c.customer_id, c.first_name, c.last_name, u.email, d.delivery_mode
     ORDER BY o.order_date DESC LIMIT $${dataValues.length - 1} OFFSET $${dataValues.length}`, dataValues);
   return { rows: result.rows.map(mapOrder), total: count.rows[0].total };
 }
@@ -38,7 +44,20 @@ async function findOrderById(orderId) {
     db.query('SELECT payment_id,payment_method,payment_status,amount,transaction_id,payment_date FROM payments WHERE order_id=$1', [orderId]),
     db.query('SELECT d.*,c.city_name FROM deliveries d JOIN cities c ON c.city_id=d.delivery_city_id WHERE d.order_id=$1', [orderId]),
   ]);
-  return { ...order.rows[0], total_amount: Number(order.rows[0].total_amount), items: items.rows.map(i => ({ ...i, unit_price: Number(i.unit_price) })), payment: payment.rows[0] || null, delivery: delivery.rows[0] || null };
+  const deliveryData = delivery.rows[0] || null;
+  return {
+    ...order.rows[0],
+    delivery_mode: deliveryData ? deliveryData.delivery_mode : null,
+    total_amount: Number(order.rows[0].total_amount),
+    items: items.rows.map(i => ({ ...i, unit_price: Number(i.unit_price) })),
+    payment: payment.rows[0] || null,
+    delivery: deliveryData
+  };
+}
+
+async function findDeliveryById(deliveryId) {
+  const result = await db.query('SELECT * FROM deliveries WHERE delivery_id = $1', [deliveryId]);
+  return result.rows[0] || null;
 }
 
 async function updateOrderStatus(orderId, status) {
@@ -57,8 +76,8 @@ async function updateOrderStatus(orderId, status) {
 }
 
 async function updateDeliveryStatus(deliveryId, deliveryStatus, trackingNumber) {
-  const result = await db.query(`UPDATE deliveries SET delivery_status=$2,tracking_number=COALESCE($3,tracking_number),updated_at=CURRENT_TIMESTAMP WHERE delivery_id=$1 RETURNING delivery_id,order_id,delivery_status,tracking_number`, [deliveryId, deliveryStatus, trackingNumber]);
+  const result = await db.query(`UPDATE deliveries SET delivery_status=$2,tracking_number=CASE WHEN $3::text IS NOT NULL THEN $3 ELSE tracking_number END,updated_at=CURRENT_TIMESTAMP WHERE delivery_id=$1 RETURNING delivery_id,order_id,delivery_mode,delivery_status,tracking_number,updated_at`, [deliveryId, deliveryStatus, trackingNumber !== undefined ? trackingNumber : null]);
   return result.rows[0] || null;
 }
 
-module.exports = { findOrders, findOrderById, updateOrderStatus, updateDeliveryStatus };
+module.exports = { findOrders, findOrderById, findDeliveryById, updateOrderStatus, updateDeliveryStatus };

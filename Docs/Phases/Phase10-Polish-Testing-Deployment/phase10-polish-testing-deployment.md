@@ -1,6 +1,6 @@
 # Phase 10: Polish, Testing & Deployment
 
-> **Status:** In Progress (6 / 7 subphases complete)
+> **Status:** Complete (7 / 7 subphases complete)
 > **Lead:** E (deployment)
 > **Members:** A, B, C, D, E — each polishes and tests their own area
 > **Phase Dependencies:** All previous phases should be substantially complete
@@ -21,6 +21,7 @@ Final quality pass and go-live preparation. Each member polishes their own area:
 - **10.3 Product Backend Validation & Tests (C):** Added request validation and service/controller tests for product CRUD, category cycles, images, admin inputs, and reports; repaired the backend test scripts and lock file. Both test suites pass.
 - **10.4 Order Backend Validation & Tests (D):** Standardized input validation and shared error responses (`{ error, message, statusCode }`) across cart, address, order, payment, and delivery endpoints; verified atomic stock deduction and deadlock prevention via sorted row locks; added 34 automated unit and integration tests across two suites covering happy paths, rollback edge cases, COD and Card flows, Lemon Squeezy webhook handling, and non-blocking email notifications; all 6 backend test suites (69 tests) pass.
 - **10.5 Security Hardening (E):** Implemented Helmet.js HTTP security headers and CSP, configured restrictive CORS with frontend origin and credentials, added `express-rate-limit` to auth and API endpoints, performed SQL injection audit verifying parameterized queries across all endpoints, standardized 404 and global error handlers to `{ error, message, statusCode }`, and added a 21-test automated suite (`jest` + `supertest`) covering registration, login, refresh rotation, logout, `requireAuth`, and `requireRole`.
+- **10.6 Production Deployment (E):** Deployed containerized stack (Postgres dual databases, Express backend, Next.js frontend, Nginx reverse proxy, Certbot) on AWS EC2 (`18.208.53.186`). Configured GitHub Actions CI (`ci.yml`: Postgres container, 91 unit/integration tests, Next.js build, Docker build) and automated CD (`cd.yml`: automatic SSH deployment upon push/merge to `main`). Verified live storefront and `/api/health` connectivity.
 - **10.7 Staff Role-Based Access Control (RBAC) (E):** Implemented database migration V21 adding operational sub-roles to employees (`super_admin`, `inventory_manager`, `order_dispatcher`, `catalog_manager`, `analyst`), extended JWT auth middleware with `requireStaffRole` least-privilege guards across all administrative and analytics endpoints, updated auth store, dynamic sidebar navigation in admin layout with custom access restriction view, role selector in employee onboarding UI, and automated unit tests for role guards.
 
 ---
@@ -34,7 +35,7 @@ Final quality pass and go-live preparation. Each member polishes their own area:
 | 10.3 | [Product Backend Validation & Tests](phase10.3-product-backend-validation-tests.md) | C | Phase 4, 7, 9 APIs | Complete |
 | 10.4 | [Order Backend Validation & Tests](phase10.4-order-backend-validation-tests.md) | D | Phase 5, 6, 8 APIs | Complete |
 | 10.5 | [Security Hardening](phase10.5-security-hardening.md) | E | Phase 3, 6.1 | Complete |
-| 10.6 | [Production Deployment](phase10.6-production-deployment.md) | E | 10.1 – 10.5 | In Progress |
+| 10.6 | [Production Deployment](phase10.6-production-deployment.md) | E | 10.1 – 10.5 | Complete |
 | 10.7 | [Staff Role-Based Access Control (RBAC)](phase10.7-staff-rbac.md) | E | 10.2, 10.5 | Complete |
 
 ---

@@ -44,6 +44,18 @@ async function updateProduct(req, res, next) {
   }
 }
 
+async function setProductStatus(req, res, next) {
+  try {
+    const result = await adminProductService.setProductStatus(parseId(req.params.id), req.body);
+    if (!result) {
+      return res.status(404).json({ error: 'not_found', message: 'Product not found', statusCode: 404 });
+    }
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function deleteProduct(req, res, next) {
   try {
     const result = await adminProductService.softDeleteProduct(parseId(req.params.id));
@@ -133,6 +145,7 @@ module.exports = {
   getProduct,
   createProduct,
   updateProduct,
+  setProductStatus,
   deleteProduct,
   createImage,
   updateImage,

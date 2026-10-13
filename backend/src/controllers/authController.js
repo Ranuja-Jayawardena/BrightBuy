@@ -2,6 +2,7 @@ const db = require('../config/db');
 const { hashPassword, comparePassword } = require('../utils/password');
 const { signAccessToken, signRefreshToken, verifyRefreshToken, verifyAccessToken } = require('../utils/jwt');
 const notificationService = require('../services/notificationService');
+const accountEmailService = require('../services/accountEmailService');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const cookieOptions = {
@@ -56,6 +57,8 @@ const register = async (req, res, next) => {
       firstName: first_name,
       lastName: last_name,
     }).catch(err => console.error('[Auth] Failed to send welcome email:', err));
+    accountEmailService.issueToken(user.user_id, user.email, 'verify')
+      .catch(err => console.error('[Auth] Failed to queue verification email:', err));
 
     res.cookie('access_token', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
     res.cookie('refresh_token', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
@@ -409,5 +412,41 @@ module.exports = {
   logout,
   me,
   updateProfile,
-  updatePassword
+  updatePassword,
+  requestVerification: async (req, res, next) => {
+    try {
+      const { email } = req.body || {};
+      if (typeof email !== 'string' || !email.includes('@')) return res.status(400).json({ error: 'Invalid email' });
+      const found = await db.query('SELECT user_id,email FROM users WHERE email=$1 AND email_verified_at IS NULL', [email]);
+      if (found.rows.length) await accountEmailService.issueToken(found.rows[0].user_id, found.rows[0].email, 'verify');
+      res.json({ message: 'If the account needs verification, an email has been sent.' });
+    } catch (error) { next(error); }
+  },
+  verifyEmail: async (req, res, next) => {
+    try {
+      const ok = await accountEmailService.consumeToken(req.body?.token, 'verify');
+      if (!ok) return res.status(400).json({ error: 'Invalid or expired token' });
+      res.json({ message: 'Email verified' });
+    } catch (error) { next(error); }
+  },
+  requestPasswordReset: async (req, res, next) => {
+    try {
+      const { email } = req.body || {};
+      if (typeof email !== 'string' || !email.includes('@')) return res.status(400).json({ error: 'Invalid email' });
+      const found = await db.query('SELECT user_id,email FROM users WHERE email=$1', [email]);
+      if (found.rows.length) await accountEmailService.issueToken(found.rows[0].user_id, found.rows[0].email, 'reset');
+      res.json({ message: 'If the account exists, a reset email has been sent.' });
+    } catch (error) { next(error); }
+  },
+  resetPassword: async (req, res, next) => {
+    try {
+      const { token, password } = req.body || {};
+      if (typeof password !== 'string' || password.length < 8 || password.length > 200)
+        return res.status(400).json({ error: 'Password must be 8 to 200 characters' });
+      const ok = await accountEmailService.consumeToken(token, 'reset', password);
+      if (!ok) return res.status(400).json({ error: 'Invalid or expired token' });
+      res.clearCookie('access_token'); res.clearCookie('refresh_token');
+      res.json({ message: 'Password updated' });
+    } catch (error) { next(error); }
+  }
 };
