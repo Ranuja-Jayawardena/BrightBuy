@@ -37,6 +37,7 @@ router.get('/products', requireStaffRole('catalog_manager', 'inventory_manager')
 router.get('/products/:id', requireStaffRole('catalog_manager', 'inventory_manager'), adminProductController.getProduct);
 router.post('/products', requireStaffRole('catalog_manager'), adminProductController.createProduct);
 router.put('/products/:id', requireStaffRole('catalog_manager'), adminProductController.updateProduct);
+router.patch('/products/:id/status', requireStaffRole('catalog_manager'), adminProductController.setProductStatus);
 router.delete('/products/:id', requireStaffRole('catalog_manager'), adminProductController.deleteProduct);
 
 // Product images

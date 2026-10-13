@@ -1,7 +1,7 @@
 # Fix 3.2: Product Active/Inactive Switch & Reactivation API
 
 > **Parent Group:** [Fix 3: Admin Catalog & Media Management](fix3-admin-catalog-media.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member C (Backend Admin Product Service & Model) & Member B (Admin Products UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -29,17 +29,17 @@ In the admin products management table (`/admin/products`), when an admin clicks
 ## Tasks
 
 ### Backend — Member C
-- [ ] In `backend/src/models/adminProductModel.js`:
+- [x] In `backend/src/models/adminProductModel.js`:
   - Update `updateProduct` query to support updating `is_active`.
   - Or add `setProductActiveStatus(productId, isActive)`.
-- [ ] In `backend/src/services/adminProductService.js`:
+- [x] In `backend/src/services/adminProductService.js`:
   - Allow `is_active` (boolean) in `updateProduct(productId, body)`.
   - Or implement `setProductStatus(productId, isActive)`.
-- [ ] In `backend/src/routes/adminRoutes.js`:
+- [x] In `backend/src/routes/adminRoutes.js`:
   - Ensure `PUT /api/admin/products/:id` supports `{ is_active: boolean }` and/or add `PATCH /api/admin/products/:id/status`.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/products/page.tsx`:
+- [x] In `frontend/src/app/admin/products/page.tsx`:
   - Replace the red delete button with a shadcn/ui `Switch` toggle component (or an Active/Inactive toggle button).
   - Handle toggle click with an optimistic update and call `PUT /api/admin/products/:id` with `{ is_active: newStatus }`.
   - Provide toast/alert feedback on status toggle success and revert on error.
