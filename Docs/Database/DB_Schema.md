@@ -83,7 +83,7 @@ Table products {
   base_sku varchar(50) [unique, not null]
   is_active boolean [not null, default: true]
   created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`, note: 'Set on UPDATE by V27 trigger']
+  updated_at timestamp [default: `now()`, note: 'V27 row trigger sets transaction timestamp on every UPDATE, including no-op updates']
 
   indexes {
     product_name
@@ -115,7 +115,7 @@ Table product_variants {
   price decimal(10,2) [not null, note: 'CHECK price >= 0']
   stock_quantity int [not null, default: 0, note: 'CHECK stock_quantity >= 0']
   is_active boolean [not null, default: true]
-  updated_at timestamp [default: `now()`, note: 'Set on UPDATE by V27 trigger']
+  updated_at timestamp [default: `now()`, note: 'V27 row trigger sets transaction timestamp on every UPDATE, including no-op updates']
 
   indexes {
     product_id
