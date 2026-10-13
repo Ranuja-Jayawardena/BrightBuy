@@ -54,6 +54,7 @@ Create the core product tables (products, variants, images) and seed the 40-prod
 ### Implementation Decisions
 - **Binary Image Storage:** Implemented strictly using PostgreSQL `BYTEA` with base64 decoded PNG binaries (`decode('<base64>', 'base64')`) in `04_products.sql` per project constraints.
 - **Cloud Storage Migration (Lecturer Approved):** See [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) and [Fix 6.2](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md) for Flyway migration `V26` completely replacing `image_data` BYTEA with `image_url NOT NULL`.
+- **Consumer Technology Catalog Specialization:** See [Fix 7.2: Technology Product Catalog Seed](../../Fixes/Fix7-Tech-Catalog-Specialization/fix7.2-technology-product-catalog-seed.md) for replacing the 24 non-tech products (`HAP-*`, `KIT-*`, `CLN-*`, `APP-*`, `MCL-*`, `WCL-*`) in `04_products.sql` with consumer tech devices (Tablets, Displays, Peripherals, Wearables, IoT, SSDs).
 - **Constraints & Indexes:**
   - `idx_products_product_name` on `products(product_name)` for text search.
   - `idx_product_variants_product_id` on `product_variants(product_id)` with `ON DELETE CASCADE`.

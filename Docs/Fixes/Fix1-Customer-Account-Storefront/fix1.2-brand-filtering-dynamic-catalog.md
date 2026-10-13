@@ -49,6 +49,8 @@
 
 **Decision:** The hardcoded popular brand names were unrelated to the seeded fictional products. The storefront now lists the distinct active product brands returned by the API. Renaming products to real manufacturers would misrepresent the demo catalog and require reseeding existing databases.
 
+> **Note on Fix 7 Specialization:** In [Fix 7: Consumer Technology Catalog Specialization](../Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md), all non-tech products are replaced with consumer tech items. Because `GET /api/products/brands` queries `DISTINCT brand FROM products WHERE is_active = true`, the brand filter will automatically reflect the updated tech brands (Lumina, Zenith, Titan, NovaTech, Sonus, etc.) without API code changes.
+
 ---
 
 ## API Contracts
