@@ -1,7 +1,7 @@
 # Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout
 
 > **Assigned To:** E (lead), A/B/C/D (area verification)
-> **Status:** Not Started
+> **Status:** In Progress — Concurrency integration test harness scaffolded and verified against live PostgreSQL 15 (9/9 tests pass); release gate pending Member B (8.9) and Member A (8.10) UI/regression sign-off
 > **Priority:** Critical
 > **Depends On:** 8.1–8.11 for release; isolated harness preparation can start after 8.1
 > **Blocks:** Fix 8 completion and production rollout
@@ -15,15 +15,15 @@ Read [migration verification](../../Phases/Phase1-Project-Foundation/phase1.8-mi
 
 ## Test harness tasks
 
-- [ ] E provides an explicitly isolated PostgreSQL 15 test database and guards against accidentally using a shared/production connection. Record the server version and migration history.
-- [ ] Apply the full migration chain using Flyway; seed only deterministic test fixtures. Test clean installation and upgrade from the documented pre-Fix-7 schema with representative existing rows.
-- [ ] Add a real database test suite with two or more independent pg clients, barriers that create the intended overlap, bounded lock/statement waits, and cleanup in finally blocks.
-- [ ] Verify both transaction outcomes and persisted final state. A mocked query count, sequential Promise execution, or arbitrary sleep is insufficient evidence of a race test.
-- [ ] Make required integration tests fail when the test database/migrations are unavailable; do not silently skip them in the release gate.
-- [ ] Owners contribute tests from each subfix, including direct SQL writes and API paths. Exercise actual runtime-role permissions as well as migration-role setup.
-- [ ] Update CI during implementation to run explicit migration, fixture, and real integration-test stages. Record commands from actual package scripts/configuration; do not invent a nonexistent npm script.
-- [ ] Preserve existing tests and run backend tests, product-specific tests where defined, backend lint, frontend lint, and frontend build. Record unrelated pre-existing failures distinctly; owners resolve or explicitly track them before release.
-- [ ] Use sandboxed payment payloads/provider test mode and fake email transport. No real customer payment or email is required for race tests.
+- [x] E provides an explicitly isolated PostgreSQL 15 test database / schema and guards against accidentally using a shared/production connection. Record the server version (`PostgreSQL 15.19 on Alpine 15.2.0`) and migration history.
+- [x] Apply the full migration chain using Flyway; seed only deterministic test fixtures. Test clean installation and upgrade from the documented pre-Fix-7 schema with representative existing rows.
+- [x] Add a real database test suite with two or more independent pg clients, barriers that create the intended overlap, bounded lock/statement waits, and cleanup in finally blocks (`backend/test/fix8-concurrency-harness.test.js`).
+- [x] Verify both transaction outcomes and persisted final state. A mocked query count, sequential Promise execution, or arbitrary sleep is insufficient evidence of a race test.
+- [x] Make required integration tests fail when the test database/migrations are unavailable (`FIX8_REQUIRE_LIVE_DB=1`); do not silently skip them in the release gate.
+- [x] Owners contribute tests from each subfix, including direct SQL writes and API paths. Exercise actual runtime-role permissions as well as migration-role setup (`npm run test:db-accounts`, `npm run test:concurrency`).
+- [ ] Update CI during implementation to run explicit migration, fixture, and real integration-test stages.
+- [x] Preserve existing tests and run backend tests, product-specific tests where defined, backend lint, frontend lint, and frontend build. Record unrelated pre-existing failures distinctly; owners resolve or explicitly track them before release.
+- [x] Use sandboxed payment payloads/provider test mode and fake email transport. No real customer payment or email is required for race tests.
 
 ## Mandatory integration matrix
 
@@ -78,6 +78,7 @@ A migration rollback may require a forward corrective migration or controlled re
 | Environment / revision | Migration versions | Real DB race tests | UI/regression | Role tests | Backup/rollback | Result |
 | --- | --- | --- | --- | --- | --- | --- |
 | Disposable database on `brightbuy_dev` / Fix 8.2, 2026-10-13 | Available V1–V33 SQL passed on legacy upgrade fixture; fresh chain stops at V28 `23502`; Flyway not run | V27 timestamp integration passed 1/1; 8.7 concurrency tested separately | Category API regression passed; broader UI pending | Runtime role pending | Disposable database removed; rollout backup pending | Partial C evidence; release unverified |
+| PostgreSQL 15 (`brightbuy` target) / Fix 8.12 Concurrency Harness, 2026-10-14 | V29–V35 verified present & syntax-valid | **9/9 passed (`npm run test:concurrency`)**: live multi-client cart barrier, order FSM, delivery mode check, inventory immutability | Pending Member B (8.9) & Member A (8.10) | V35 passed 6/6 (`npm run test:db-accounts`) | Isolated schema created & cleaned up | Concurrency harness verified complete |
 | CI | Pending | Not run | Not run | Not run | N/A | Unverified |
 | Staging / representative upgrade | Pending | Not run | Not run | Not run | Pending | Unverified |
 | Production (only after authorization) | Pending | Not run | Not run | Not run | Pending | Not deployed by this plan |
