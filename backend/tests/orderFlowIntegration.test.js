@@ -421,6 +421,29 @@ describe('Order & Checkout Backend Validation, Integration & Error Format Tests'
       expect(res.body.message).toContain('Valid delivery_mode');
     });
 
+    it('POST /api/orders allows store_pickup without address_id', async () => {
+      orderModel.createOrder.mockResolvedValueOnce({
+        order_id: 1005,
+        total_amount: 96.00,
+        status: 'pending',
+        delivery: {
+          delivery_mode: 'store_pickup',
+          delivery_address_line1: 'BrightBuy Central Retail Store & Pickup Gate',
+          estimated_delivery_days: 2
+        }
+      });
+
+      const res = await request(app)
+        .post('/api/orders')
+        .set('Cookie', [`access_token=${customerToken}`])
+        .set('x-skip-rate-limit', 'true')
+        .send({ delivery_mode: 'store_pickup' });
+
+      expect(res.status).toBe(201);
+      expect(res.body.order.order_id).toBe(1005);
+      expect(orderModel.createOrder).toHaveBeenCalledWith(expect.any(Number), null, 'store_pickup');
+    });
+
     it('POST /api/orders formats business logic errors to shared error shape', async () => {
       // Empty cart
       orderModel.createOrder.mockRejectedValueOnce(new Error('Cart is empty'));

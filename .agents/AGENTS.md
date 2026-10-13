@@ -27,6 +27,15 @@ When writing or modifying code in this project, you MUST strictly adhere to the 
   - Advise them to **wait until Member [Letter] completes their job** before doing the dependent work.
   - Point them to unblocked work they can do meanwhile: another of their subphases/fixes, or building against documented API contracts with mock data (where allowed).
 
+### 4. Git Branching & Main Branch Protection (STRICT RULE)
+- **NEVER push, commit, or merge to the `main` branch without the user's EXPLICIT PERMISSION.**
+- All development, feature work, and fixes must be carried out on `dev` or dedicated feature branches.
+- The agent is **STRICTLY PROHIBITED** from:
+  1. Running `git push origin main` or pushing commits directly to `main`.
+  2. Merging any Pull Request targeting `main` (e.g. via `gh pr merge`) without explicit user sign-off.
+  3. Creating a merge commit into `main` locally.
+- **Rationale:** Merging or pushing to `main` automatically triggers the production Continuous Deployment (CD) pipeline to the live AWS EC2 server. Therefore, `main` is strictly protected, and any deployment-triggering action requires explicit, prior approval from the user.
+
 ---
 
 ## Architectural Constraints

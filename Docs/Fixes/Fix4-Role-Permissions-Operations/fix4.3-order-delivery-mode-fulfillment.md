@@ -1,7 +1,7 @@
 # Fix 4.3: Order Fulfillment: Courier Tracking vs. Store Pickup
 
 > **Parent Group:** [Fix 4: Role Permissions & Operations](fix4-role-permissions-operations.md)
-> **Status:** Not Started
+> **Status:** In Progress
 > **Assigned To:** Member D (Backend Orders & Deliveries) & Member B (Admin Orders UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -38,10 +38,10 @@ However, BrightBuy supports two distinct fulfillment modes:
 ## Tasks
 
 ### Backend — Member D
-- [ ] In `backend/src/services/adminOrderService.js`:
+- [x] In `backend/src/services/adminOrderService.js`:
   - When updating delivery status for `store_pickup`, support `ready_for_pickup` and `collected` status transitions.
   - Optional validation: Do not require or enforce tracking number format on `store_pickup`.
-- [ ] In `backend/src/controllers/adminOrderController.js`:
+- [x] In `backend/src/controllers/adminOrderController.js`:
   - Return `delivery_mode` clearly in order summary and details.
 
 ### Frontend — Member B

@@ -18,14 +18,19 @@ const createOrder = async (req, res) => {
 
         const { address_id, delivery_mode } = req.body || {};
 
-        if (!isPositiveInt(address_id)) {
-            return res.status(400).json({ error: 'invalid_request', message: 'address_id must be a positive integer', statusCode: 400 });
-        }
         if (!delivery_mode || !['home_delivery', 'store_pickup'].includes(delivery_mode)) {
             return res.status(400).json({ error: 'invalid_request', message: 'Valid delivery_mode is required (home_delivery or store_pickup)', statusCode: 400 });
         }
 
-        const aid = Number(address_id);
+        if (delivery_mode === 'home_delivery') {
+            if (!isPositiveInt(address_id)) {
+                return res.status(400).json({ error: 'invalid_request', message: 'address_id must be a positive integer', statusCode: 400 });
+            }
+        } else if (address_id !== undefined && address_id !== null && !isPositiveInt(address_id)) {
+            return res.status(400).json({ error: 'invalid_request', message: 'address_id must be a positive integer if provided', statusCode: 400 });
+        }
+
+        const aid = isPositiveInt(address_id) ? Number(address_id) : null;
         const order = await orderModel.createOrder(customer_id, aid, delivery_mode);
 
         // Trigger Order Confirmation Email (Phase 8.2 - non-blocking after DB commit)

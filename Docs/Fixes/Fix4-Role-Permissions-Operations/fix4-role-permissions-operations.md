@@ -18,6 +18,7 @@ Fix 4 establishes strict separation between customer shopping actions and employ
 
 - **4.1 Staff Cart & Purchase Policy Enforcement (B, D):** Completely hid cart icon from navbar for admin/staff accounts, intercepted storefront "Add to Cart" clicks for staff users with the explanatory `StaffPurchaseRestrictedModal` explaining the purchasing policy, added redirect from `/cart` to `/admin`, and verified/standardized all backend cart endpoints to return 403 Forbidden with standard messages for non-customer accounts.
 - **4.2 Super Admin Employee Lifecycle & Active Status (E):** Created Flyway migration `V24__add_employee_active_status.sql`, updated `DB_Schema.md`, enforced login and middleware rejection for deactivated employees, and implemented `PUT /api/admin/employees/:id` & `PATCH /api/admin/employees/:id/status` endpoints with self-deactivation and super admin protection.
+- **4.3 Order Fulfillment Mode Differentiation (D):** Updated `backend/src/services/adminOrderService.js` and `adminOrderModel.js` to support distinct status workflows for `store_pickup` (`ready_for_pickup`, `collected`) without requiring courier tracking codes, and `home_delivery` requiring tracking codes for shipment. Explicitly exposed `delivery_mode` in order summary list and details endpoints in `adminOrderController.js`.
 
 ---
 
@@ -27,7 +28,7 @@ Fix 4 establishes strict separation between customer shopping actions and employ
 |---|----------|----------|------------|----------|--------|
 | 4.1 | [Staff Cart & Purchase Policy Enforcement](fix4.1-staff-cart-purchase-restriction.md) | B (UI), D (Backend Cart) | — | High | Complete |
 | 4.2 | [Super Admin Employee Management & Deactivation](fix4.2-employee-lifecycle-role-management.md) | E (DB/Backend), B (UI) | — | Critical | In Progress |
-| 4.3 | [Order Fulfillment: Courier Tracking vs. Store Pickup](fix4.3-order-delivery-mode-fulfillment.md) | D (Backend), B (UI) | — | Medium | Not Started |
+| 4.3 | [Order Fulfillment: Courier Tracking vs. Store Pickup](fix4.3-order-delivery-mode-fulfillment.md) | D (Backend), B (UI) | — | Medium | In Progress |
 
 ---
 
