@@ -42,7 +42,7 @@ These are source-code findings, not results from a live concurrency exercise. Th
 | [8.9: Checkout & Admin Conflict Handling](fix8.9-checkout-admin-ui.md) | B | 8.3–8.8 API handoffs; mock work after 8.1 | Not Started |
 | [8.10: Storefront & Report Regression Verification](fix8.10-storefront-report-regression.md) | A (lead), C (report query support) | 8.2–8.5, 8.7–8.9; actual Fix 6 baseline | Not Started |
 | [8.11: Application & Migration Database Accounts](fix8.11-database-account-separation.md) | E | 8.1 privilege audit; 8.2–8.8 final database objects | Complete — V35 role provisioning & least-privilege grants |
-| [8.12: PostgreSQL Integration Tests & Controlled Rollout](fix8.12-integration-rollout.md) | E (lead), A/B/C/D (area verification) | 8.1–8.11; test-harness preparation may start after 8.1 | Not Started |
+| [8.12: PostgreSQL Integration Tests & Controlled Rollout](fix8.12-integration-rollout.md) | E (lead), A/B/C/D (area verification) | 8.1–8.11; test-harness preparation may start after 8.1 | In Progress — harness verified on PostgreSQL 15 (9/9 pass); release gate pending B/A |
 
 A owns customer catalog and report regression, not checkout implementation. B owns checkout and admin UI. C owns catalog/category/inventory writes. D owns cart/order/payment writes, including the order portions of adminOrderModel and adminOrderService for this fix, coordinated with their original owner C. E owns staff protection, Flyway coordination, grants, CI, and deployment.
 
