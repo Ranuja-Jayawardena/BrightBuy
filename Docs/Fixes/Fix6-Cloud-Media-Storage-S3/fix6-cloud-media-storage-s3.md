@@ -1,6 +1,6 @@
 # Fix 6: Cloud Object Storage (AWS S3) & Media Delivery
 
-> **Status:** In Progress (3 / 4 fix items complete)
+> **Status:** Complete (4 / 4 fix items complete)
 > **Members:** E (DevOps & Architecture), C (Backend Catalog & Image APIs), B (Frontend Admin UI), A (Frontend Storefront UI)  
 > **Priority:** High  
 > **Related Phases:** [Phase 1.6: Product Schema](../../Phases/Phase1-Project-Foundation/phase1.6-product-schema.md), [Phase 4.2: Image Serving Endpoint](../../Phases/Phase4-Product-Catalog-Browsing/phase4.2-image-serving-endpoint.md), [Phase 7.1: Product Variant & Image Admin APIs](../../Phases/Phase7-Inventory-Admin-Dashboard/phase7.1-product-variant-image-admin-apis.md), [Phase 10.6: Production Deployment](../../Phases/Phase10-Polish-Testing-Deployment/phase10.6-production-deployment.md)  
@@ -38,7 +38,7 @@ The legacy `BYTEA` column is being **completely retired and dropped from the dat
 | 6.1 | [AWS S3 Infrastructure, Bucket Security & EC2 IAM Integration](fix6.1-s3-infrastructure-bucket-iam.md) | **E** (DevOps) | — | Critical | Complete |
 | 6.2 | [Database Schema Migration & S3 Seed Cutover](fix6.2-s3-schema-migration-seed-cutover.md) | **C** (DB), **E** (Architecture) | 6.1 | High | Complete |
 | 6.3 | [Backend S3 Service & Pre-signed Upload APIs](fix6.3-backend-s3-service-upload-apis.md) | **C** (Backend) | 6.1, 6.2 | High | Complete |
-| 6.4 | [Storefront & Admin Direct Image Delivery & Upload UI](fix6.4-storefront-admin-image-delivery-ui.md) | **A** (Storefront), **B** (Admin) | 6.3 | Medium | Planned |
+| 6.4 | [Storefront & Admin Direct Image Delivery & Upload UI](fix6.4-storefront-admin-image-delivery-ui.md) | **A** (Storefront), **B** (Admin) | 6.3 | Medium | Complete |
 
 ---
 

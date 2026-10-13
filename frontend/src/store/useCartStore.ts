@@ -8,6 +8,7 @@ export interface CartItem {
   variant_name: string;
   product_name: string;
   primary_image_id?: number;
+  primary_image_url?: string | null;
   price: string | number;
   quantity: number;
   subtotal: string | number;
