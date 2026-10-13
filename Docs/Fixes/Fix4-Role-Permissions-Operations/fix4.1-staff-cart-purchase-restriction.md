@@ -72,3 +72,12 @@ In `frontend/src/app/products/[id]/page.tsx`:
 1. Administrators and staff members never see a cart icon anywhere in the storefront navigation.
 2. Clicking "Add to Cart" while authenticated as staff displays the explanatory modal dialog and prevents request dispatch.
 3. Attempting to directly load `/cart` as staff blocks checkout actions.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.3: Cart Uniqueness & Checkout Concurrency](../Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
+- [Fix 8.9: Checkout & Admin Conflict Handling](../Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

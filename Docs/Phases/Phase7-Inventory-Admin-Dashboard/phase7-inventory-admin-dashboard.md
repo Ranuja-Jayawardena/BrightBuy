@@ -69,4 +69,15 @@ Admin operations and inventory workflows are enhanced and resolved by the follow
 - **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Distinguishes Store Pickup from Courier Home Delivery in admin order fulfillment, enforcing tracking numbers only when dispatching couriers.
 - **[Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md):** Lecturer-approved upgrade from PostgreSQL BYTEA storage to AWS S3 cloud object storage with direct pre-signed URL uploads and clean `image_url` schema.
 
+## Fix 8 follow-up
 
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.2: Catalog Timestamp Migration Verification](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+- [Fix 8.4: Order Transitions & Payment Event Consistency](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
+- [Fix 8.6: Concurrent Super Admin Protection](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
+- [Fix 8.7: Category Hierarchy Integrity](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.7-category-cycle-protection.md)
+- [Fix 8.8: Manual Inventory Adjustment Audit](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
+- [Fix 8.9: Checkout & Admin Conflict Handling](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

@@ -5,6 +5,8 @@
 
 ---
 
+> **Media evidence status (2026-10-13 documentation review):** Resource values and CLI rows below are historical provisioning records. This revision performed no AWS operations. Actual policies/CORS, backend-container role access, per-image object contents and target V26/V27 migration history remain unverified. The migration log records V1–V20; it does not establish that later migrations were applied or absent. Fix 6.1–6.3 are reopened for corrections/evidence, and 6.4 is Not Started. Follow the [Fix 6 guide and evidence ledger](../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md); append real verification results here only when executed.
+
 ## 1. AWS Account & Configuration
 
 - **Target Region:** `us-east-1` (US East, N. Virginia)
@@ -114,4 +116,3 @@ All production application secrets reside exclusively on the EC2 host at `/home/
 | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` | Backend | Nodemailer transactional email delivery credentials |
 
 > **Security Note:** Because `.env*` is committed to `.gitignore`, `/home/ubuntu/BrightBuy/.env.prod` is completely ignored by Git. Automated `git pull origin main` during CI/CD will never overwrite, erase, or expose these production credentials.
-

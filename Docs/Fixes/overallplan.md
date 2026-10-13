@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (18 / 23 fix items complete across 7 fix groups)
+**Status:** In Progress (14 / 35 fix items complete across 8 fix groups; Fix 6 reopened for verified acceptance)
 
 ---
 
@@ -73,11 +73,13 @@ This document is the **master tracker** for all post-development fixes, patches,
 - [x] **Fix 5: Analytics & Reports Visuals** → [fix5-analytics-reports-visuals.md](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
   - [x] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
 
-- [x] **Fix 6: Cloud Object Storage (AWS S3) & Media Delivery** → [fix6-cloud-media-storage-s3.md](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md)
-  - [x] **6.1** AWS S3 Infrastructure, Bucket Security & EC2 IAM Integration — **E (DevOps)** → [fix6.1-s3-infrastructure-bucket-iam.md](Fix6-Cloud-Media-Storage-S3/fix6.1-s3-infrastructure-bucket-iam.md)
-  - [x] **6.2** Database Schema Migration & S3 Seed Cutover — **C (DB), E (Architecture)** → [fix6.2-s3-schema-migration-seed-cutover.md](Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md)
-  - [x] **6.3** Backend S3 Service & Pre-signed Upload APIs — **C (API)** → [fix6.3-backend-s3-service-upload-apis.md](Fix6-Cloud-Media-Storage-S3/fix6.3-backend-s3-service-upload-apis.md)
-  - [x] **6.4** Storefront & Admin Direct Image Delivery & Upload UI — **A (UI), B (UI)** → [fix6.4-storefront-admin-image-delivery-ui.md](Fix6-Cloud-Media-Storage-S3/fix6.4-storefront-admin-image-delivery-ui.md)
+- [ ] **Fix 6: Cloud Object Storage (AWS S3) & Media Delivery** → [fix6-cloud-media-storage-s3.md](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md)
+  - [ ] **6.1** AWS S3 Infrastructure, Bucket Security & EC2 IAM Integration — **E (DevOps)** → [fix6.1-s3-infrastructure-bucket-iam.md](Fix6-Cloud-Media-Storage-S3/fix6.1-s3-infrastructure-bucket-iam.md)
+  - [ ] **6.2** Database Schema Migration & S3 Seed Cutover — **C (DB), E (Architecture)** → [fix6.2-s3-schema-migration-seed-cutover.md](Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md)
+  - [ ] **6.3** Backend S3 Service & Pre-signed Upload APIs — **C (API)** → [fix6.3-backend-s3-service-upload-apis.md](Fix6-Cloud-Media-Storage-S3/fix6.3-backend-s3-service-upload-apis.md)
+  - [ ] **6.4** Storefront & Admin Direct Image Delivery & Upload UI — **A (UI), B (UI)** → [fix6.4-storefront-admin-image-delivery-ui.md](Fix6-Cloud-Media-Storage-S3/fix6.4-storefront-admin-image-delivery-ui.md)
+
+Fix 6 has **0/4 items verified complete under the revised gates**. 6.1–6.4 are In Progress: provisioning or code exists, but operational evidence and known corrections remain. The direct-upload and URL-rendering code is present; browser and lifecycle acceptance remain unverified. Earlier completion claims are retained as historical evidence in the [overview issue ledger](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md); they do not close the new gates. Start with the [shared contracts, verification and rollout guide](Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md). Recheck on merged dev `99fdeb2`: backend lint passes (0 errors / 5 warnings), the obsolete product image test still fails, and two V27 migrations block Flyway until F6-12 is resolved against target history.
 
 - [ ] **Fix 7: Consumer Technology Catalog Specialization** → [fix7-tech-catalog-specialization.md](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
   - [x] **7.1** Technology Taxonomy & Category Hierarchy Restructuring — **A (Taxonomy)** → [fix7.1-technology-taxonomy-hierarchy.md](Fix7-Tech-Catalog-Specialization/fix7.1-technology-taxonomy-hierarchy.md)
@@ -85,6 +87,22 @@ This document is the **master tracker** for all post-development fixes, patches,
   - [ ] **7.3** Catalog Links, Attribute Values & Order History Referential Integrity — **A (Links), D (Orders)** → [fix7.3-catalog-links-order-seed-integrity.md](Fix7-Tech-Catalog-Specialization/fix7.3-catalog-links-order-seed-integrity.md)
   - [ ] **7.4** Database Reseed Orchestration, Flyway Verification & Storefront Validation — **E (DevOps), A (UI), B (UI)** → [fix7.4-database-reseed-pipeline-verification.md](Fix7-Tech-Catalog-Specialization/fix7.4-database-reseed-pipeline-verification.md)
   - [ ] **7.5** Cloud Media Assets, Tech Imagery & S3 Bucket Synchronization — **E (DevOps), C (Media)** → [fix7.5-cloud-media-assets-s3-sync.md](Fix7-Tech-Catalog-Specialization/fix7.5-cloud-media-assets-s3-sync.md)
+
+- [ ] **Fix 8: Database Integrity & Concurrency** | [Overview](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
+  - [ ] **8.1: Contracts, Data Preflight & Migration Coordination** | E (lead), D (cart/payment decisions), C (catalog/audit decisions) | [Details](Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
+  - [ ] **8.2: Catalog Timestamp Migration Verification** | C (catalog), E (migration/environment) | [Details](Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+  - [ ] **8.3: Cart Uniqueness & Checkout Concurrency** | D | [Details](Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
+  - [ ] **8.4: Order Transitions & Payment Event Consistency** | D (implementation), E (webhook security review), C (admin order ownership handoff) | [Details](Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
+  - [ ] **8.5: Delivery Cardinality & Value Constraints** | D; E reviews migration sequencing | [Details](Fix8-Database-Integrity-Concurrency/fix8.5-delivery-value-constraints.md)
+  - [ ] **8.6: Concurrent Super Admin Protection** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
+  - [ ] **8.7: Category Hierarchy Integrity** | C | [Details](Fix8-Database-Integrity-Concurrency/fix8.7-category-cycle-protection.md)
+  - [ ] **8.8: Manual Inventory Adjustment Audit** | C (implementation), E (privilege/routine review) | [Details](Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
+  - [ ] **8.9: Checkout & Admin Conflict Handling** | B | [Details](Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+  - [ ] **8.10: Storefront & Report Regression Verification** | A (lead), C (report query support) | [Details](Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
+  - [ ] **8.11: Application & Migration Database Accounts** | E | [Details](Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+  - [ ] **8.12: PostgreSQL Integration Tests & Controlled Rollout** | E (lead), A/B/C/D (area verification) | [Details](Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
+
+Fix 8 has 0/12 items complete. Item 8.2 is In Progress because V27/backend timestamp edits already exist; actual database verification is pending. All other items are Not Started.
 
 ---
 
@@ -116,14 +134,27 @@ Converts the Top Performing Products report chart to horizontal bars (`layout="v
 → [Full Details](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
 
 ### Fix 6: Cloud Object Storage (AWS S3) & Media Delivery
-Lecturer-approved complete cutover from PostgreSQL `BYTEA` binary storage to AWS S3 cloud object storage. Drops the legacy `image_data` binary column completely, migrates seed assets to S3 with direct `image_url` links, provisions secure IAM instance profile roles on EC2 without hardcoding secrets, supports direct pre-signed URL client uploads, and ensures seamless image rendering across Storefront and Admin dashboards.  
-**Leads:** E, C, B, A | **Priority:** High  
-→ [Full Details](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md)
 
+Finish the approved S3 cutover with per-image preservation, container/IAM/CORS verification, durable upload identity, immutable publication, idempotent confirmation, safe deletion/cleanup and direct frontend URLs. V26's generic backfill and the current UI/backend upload mismatch need correction; production migration status is unverified. Preserve existing provisioning/code evidence while requiring actual acceptance tests before closure.
+
+**Leads:** E, C, B, A; D supports cart URL reads | **Priority:** Critical | **Progress:** 0/4 verified complete; 6.1–6.4 In Progress
+
+[Overview and issue ledger](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) | [Contracts, evidence and rollout](Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md)
 ### Fix 7: Consumer Technology Catalog Specialization
-Overhauls taxonomy, product seeds, variants, and historical order references so BrightBuy exclusively sells consumer technology items (laptops, smartphones, tablets, audio/earbuds, PC peripherals, and smart wearables). Replaces non-tech seeds (`03_taxonomy.sql`, `04_products.sql`, `05_catalog_links.sql`, `07_orders.sql`) and validates clean reseed in Docker and AWS deployment.  
-**Leads:** A, C, D, E, B | **Priority:** High  
-→ [Full Details](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
+
+Replace the apparel and home catalog seed with a coherent consumer technology taxonomy, product set, order references and S3 media assets. Verify the complete reseed and storefront behavior.
+
+**Priority:** High | **Progress:** 0/5 complete
+
+[Full details](Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md)
+
+### Fix 8: Database Integrity & Concurrency
+
+Database-enforced integrity, cart/checkout locking and retries, payment-event consistency, staff/category guards, inventory audit, separate database accounts, and real PostgreSQL verification. Owners follow AGENTS.md: A storefront/reports; B checkout/admin UI; C catalog/inventory; D orders/payments; E staff/migrations/deployment. Begin with 8.1 decisions and preflight; do not infer production migrations have run. Views and new reporting features remain deferred.
+
+**Priority:** Critical | **Progress:** 0/12 complete
+
+[Full details](Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md)
 
 ---
 

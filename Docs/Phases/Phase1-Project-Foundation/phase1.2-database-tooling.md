@@ -38,3 +38,11 @@ Provide the database tooling every member needs to run and test their own migrat
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.1: Contracts, Data Preflight & Migration Coordination](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
+- [Fix 8.11: Application & Migration Database Accounts](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

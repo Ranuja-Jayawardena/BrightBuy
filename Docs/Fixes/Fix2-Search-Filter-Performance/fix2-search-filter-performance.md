@@ -49,3 +49,11 @@ graph TD
 - **API Endpoints:**
   - `GET /api/products?min_price=10&max_price=200`
   - `GET /api/products/suggestions?q=app`
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.10: Storefront & Report Regression Verification](../Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

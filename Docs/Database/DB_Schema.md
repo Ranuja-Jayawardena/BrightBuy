@@ -1,3 +1,7 @@
+// Media evidence note (2026-10-13): this describes repository schema after V26/V27,
+// not verified live target state. V26 needs per-image preservation/target-history proof.
+// Proposed upload identity, object-uniqueness and cleanup objects are not yet implemented.
+// [Fix 6 migration gate](../Fixes/Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md)
 Table users {
   user_id serial [pk]
   email varchar(100) [unique, not null]
@@ -72,7 +76,7 @@ Table products {
   base_sku varchar(50) [unique, not null]
   is_active boolean [not null, default: true]
   created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`, note: 'Set on UPDATE by V27 trigger']
 
   indexes {
     product_name
@@ -85,7 +89,7 @@ Table products {
 Table product_images {
   image_id serial [pk]
   product_id int [ref: > products.product_id, delete: cascade, not null]
-  image_url varchar(500) [not null, note: 'Direct AWS S3 object URL or CDN URL (V26 migration)']
+  image_url varchar(500) [not null, note: 'Permanent AWS S3 object URL (V26); current backend requires configured bucket/product prefix; CDN support needs a contract change']
   sort_order int [not null, default: 0]
   is_primary boolean [not null, default: false]
   created_at timestamp [default: `now()`]
@@ -104,7 +108,7 @@ Table product_variants {
   price decimal(10,2) [not null, note: 'CHECK price >= 0']
   stock_quantity int [not null, default: 0, note: 'CHECK stock_quantity >= 0']
   is_active boolean [not null, default: true]
-  updated_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`, note: 'Set on UPDATE by V27 trigger']
 
   indexes {
     product_id

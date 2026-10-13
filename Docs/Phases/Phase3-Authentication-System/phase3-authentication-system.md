@@ -60,3 +60,11 @@ This phase is extended and refined by the following post-development fix items i
 - **[Fix 4.1: Staff Cart & Purchase Policy Enforcement](../../Fixes/Fix4-Role-Permissions-Operations/fix4.1-staff-cart-purchase-restriction.md):** Adds staff role check in auth store to intercept cart actions and hide cart in navbar.
 - **[Fix 4.2: Super Admin Employee Management & Deactivation](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Adds login-time active status verification (`is_active`) and Super Admin employee management endpoints.
 
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.6: Concurrent Super Admin Protection](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
+- [Fix 8.11: Application & Migration Database Accounts](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

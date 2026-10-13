@@ -59,3 +59,11 @@ In `frontend/src/components/reports/charts/ReportBarChart.tsx`:
 
 - The backend query joins `order_items` to `product_variants` and `products`, selects `p.product_name`, and passes it through the route response. `backend/tests/topProductsReport.test.js` verifies the join, field, and revenue conversion.
 - Both top products charts use the vertical layout. The shared chart displays every category tick, truncates long labels at 20 characters, reserves 155px for the name axis, expands height with row count, and shows the full product name in the tooltip.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.10: Storefront & Report Regression Verification](../Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

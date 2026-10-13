@@ -1,0 +1,92 @@
+# Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout
+
+> **Assigned To:** E (lead), A/B/C/D (area verification)
+> **Status:** Not Started
+> **Priority:** Critical
+> **Depends On:** 8.1–8.11 for release; isolated harness preparation can start after 8.1
+> **Blocks:** Fix 8 completion and production rollout
+> **Navigation:** [Fix 8 overview](fix8-database-integrity-concurrency.md) | [Preflight/decision ledger](fix8.1-contracts-preflight.md)
+
+## Verified gap
+
+Current CI starts PostgreSQL 15 but does not explicitly run Flyway. Existing orderStockAtomic Jest tests mock pg. Current production Compose has no migration service, and current CD rebuilds/starts containers without an explicit migration stage. None of these establish that a target database has V27 or future Fix 8 migrations.
+
+Read [migration verification](../../Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md), [order tests](../../Phases/Phase10-Polish-Testing-Deployment/phase10.4-order-backend-validation-tests.md), [production deployment](../../Phases/Phase10-Polish-Testing-Deployment/phase10.6-production-deployment.md), [email integration](../../Phases/Phase8-Email-Notifications/phase8.2-email-triggers-integration.md), and [S3 cutover](../Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md).
+
+## Test harness tasks
+
+- [ ] E provides an explicitly isolated PostgreSQL 15 test database and guards against accidentally using a shared/production connection. Record the server version and migration history.
+- [ ] Apply the full migration chain using Flyway; seed only deterministic test fixtures. Test clean installation and upgrade from the documented pre-Fix-7 schema with representative existing rows.
+- [ ] Add a real database test suite with two or more independent pg clients, barriers that create the intended overlap, bounded lock/statement waits, and cleanup in finally blocks.
+- [ ] Verify both transaction outcomes and persisted final state. A mocked query count, sequential Promise execution, or arbitrary sleep is insufficient evidence of a race test.
+- [ ] Make required integration tests fail when the test database/migrations are unavailable; do not silently skip them in the release gate.
+- [ ] Owners contribute tests from each subfix, including direct SQL writes and API paths. Exercise actual runtime-role permissions as well as migration-role setup.
+- [ ] Update CI during implementation to run explicit migration, fixture, and real integration-test stages. Record commands from actual package scripts/configuration; do not invent a nonexistent npm script.
+- [ ] Preserve existing tests and run backend tests, product-specific tests where defined, backend lint, frontend lint, and frontend build. Record unrelated pre-existing failures distinctly; owners resolve or explicitly track them before release.
+- [ ] Use sandboxed payment payloads/provider test mode and fake email transport. No real customer payment or email is required for race tests.
+
+## Mandatory integration matrix
+
+| Area / owner | Required evidence |
+| --- | --- |
+| Timestamps / C,E | V27 applies fresh and on upgrade; direct SQL, no-op, rollback, RETURNING and transaction-time behavior |
+| Carts / D | Concurrent creation yields one cart; duplicate checkout with ample stock yields one intended purchase; edits are not lost |
+| Stock / C,D | Different carts competing for last units; sorted lock order; rollback and cancellation restore once |
+| Checkout retries / D,B | Same key/body replays same result; changed body conflicts; wrong customer cannot access result; token refresh preserves key |
+| Orders/payments / D,E | Locked transition validation; concurrent cancel/success; late failure; duplicate/reordered events; refund contract; session response races |
+| Delivery/value rules / D | Duplicate delivery and invalid values rejected; normal courier/pickup and zero amounts allowed under agreed rules |
+| Super admins / E | Concurrent removal of different admins; multirow/cascade/direct writes; bootstrap/recovery; last admin remains |
+| Categories / C | Self/long/concurrent cycles rejected; valid subtree moves and rollback work |
+| Inventory audit / C,E | All agreed manual paths audited atomically; actor/reason valid; failed operations leave neither stock nor history changes |
+| UI/reports / A,B,C | Existing flows, images, authorization, report/CSV totals, and meaningful conflict handling |
+| Accounts / E | Least privileges verified on existing and future objects, including triggers and sequence access |
+| Notification effects / D | Replays do not create duplicate notification jobs; failed transactions do not send false success |
+
+For retryable deadlocks/serialization failures, test bounded retries of the whole transaction with stable request/event identity. Never retry just the last SQL statement inside an aborted transaction. Record supported isolation levels and prove guard behavior at those levels.
+
+## Migration and data gates
+
+- [ ] Run the 8.1 preflight on the intended upgrade dataset: duplicates, invalid values, status inconsistencies, category cycles, staff counts, and manual-audit limitations.
+- [ ] Stop on conflicting data. Produce a reviewed correction plan with affected records and consequences; do not arbitrarily merge/delete carts, payments, deliveries, or financial history.
+- [ ] Allocate migration numbers from the current ledger; validate Flyway history/checksums and the exact application revision. No rewriting applied migrations or Flyway repair/clean to suppress failures.
+- [ ] Measure migration locking and duration on representative data. Document an explicit maintenance window if compatible online enforcement cannot be demonstrated.
+- [ ] Rehearse backup restoration and application compatibility with the intended schema before changing a shared environment.
+
+## Release sequence to make concrete during implementation
+
+1. E records the target, backup location/access method, restoration evidence, exact migration/application revisions, and responsible operator.
+2. A–E sign off their evidence; D1–D9 decisions and API contracts are resolved. Verify the revised Fix 6 issue/evidence ledgers and actual media integration; documentation reconciliation alone is not runtime verification.
+3. Apply additive compatibility changes first where needed. Deploy compatible writers before restrictive constraints, or use a tested maintenance-window sequence that prevents old writers operating against new rules.
+4. Apply V27 before starting backend code that no longer assigns catalog updated_at. Verify the trigger definitions and a controlled write on the actual target.
+5. Deploy the agreed cart/payment protocol and corresponding UI in the documented compatibility order. Explicitly handle old clients and in-flight provider callbacks; disabling all callbacks is not a substitute for durable event handling.
+6. Apply enforcement migrations only once all writers and existing data satisfy their contracts. Verify order guards, uniqueness, and concurrency controls.
+7. Provision/grant the 8.11 accounts, verify workflows, then switch runtime connections and confirm the active role.
+8. Run smoke tests for login, catalog/images, checkout/COD, sandbox card events, admin inventory/staff/delivery, reports, and email-job behavior.
+9. Monitor constraint failures, deadlocks, retry exhaustion, callback failures, and reconciliation backlog with identifiers that do not expose secrets/personal data.
+10. Record actual target results and update trackers only after acceptance.
+
+The final runbook must contain executable commands validated against this repository's actual deployment configuration, with placeholders explained and secrets supplied through protected configuration. Writing this plan does not authorize deployment. Main-branch merge/push and production deployment still require explicit user permission under AGENTS.md. Confirm CI gates actually block CD; do not assume a green workflow is required by the current deployment workflow.
+
+## Failure and rollback
+
+Stop release if migrations, role permissions, callback handling, or invariants fail. Record the last successful step. Prefer a compatible application rollback while retaining safe additive schema. Do not drop durable checkout/event identity or audit history to restore an old binary. Old webhook code may be incompatible with order guards, and old code may require privileges removed in 8.11: prove the fallback combination before using it.
+
+A migration rollback may require a forward corrective migration or controlled restore. Define recovery point, possible writes since backup, and reconciliation before restoring. Never silently lose paid orders or accepted events. Do not disable database guards while the deployed backend relies on them.
+
+## Evidence ledger (fill with actual results)
+
+| Environment / revision | Migration versions | Real DB race tests | UI/regression | Role tests | Backup/rollback | Result |
+| --- | --- | --- | --- | --- | --- | --- |
+| Local isolated | Pending | Not run | Not run | Not run | Pending | Unverified |
+| CI | Pending | Not run | Not run | Not run | N/A | Unverified |
+| Staging / representative upgrade | Pending | Not run | Not run | Not run | Pending | Unverified |
+| Production (only after authorization) | Pending | Not run | Not run | Not run | Pending | Not deployed by this plan |
+
+## Definition of Done
+
+- [ ] Every required scenario has reproducible evidence; no test was silently skipped.
+- [ ] Fresh installation and representative upgrade pass with the final runtime role.
+- [ ] Compatible rollout and rollback are rehearsed; the operational migration step is explicit.
+- [ ] All owners have signed off their contracts and regressions.
+- [ ] Schema, affected phase/fix docs, both master trackers, and this ledger reflect actual implementation and verification.
+- [ ] If production is pending authorization, report that separately; do not label production verified.

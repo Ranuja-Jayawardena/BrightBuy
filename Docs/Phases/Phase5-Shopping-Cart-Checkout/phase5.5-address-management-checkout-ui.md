@@ -41,4 +41,10 @@ _Record any implementation decisions, trade-offs, or deviations from the plan he
 - **[Fix 1.4: Address Form Cancel Action & UI Feedback](../../Fixes/Fix1-Customer-Account-Storefront/fix1.4-address-form-cancel-feedback.md):** Resolves cancel callback in address creation/editing modal during checkout, cleanly restoring previous state without side-effects.
 - **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Aligns delivery mode selector (Store Pickup vs Home Delivery) with required address inputs and shipping calculations.
 
+## Fix 8 follow-up
 
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.9: Checkout & Admin Conflict Handling](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
