@@ -46,4 +46,10 @@ Build the day-to-day operations screens for admins.
 - **[Fix 4.2: Employee Lifecycle & Role Management](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Adds active/inactive switch for employee accounts and restricts employee role modifications to Super Admin.
 - **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Updates admin order management and delivery update modal to differentiate Store Pickup (no tracking code required) from Courier Home Delivery (courier name and tracking code required).
 
+## Fix 7 follow-up
 
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.9: Checkout & Admin Conflict Handling](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.9-checkout-admin-ui.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

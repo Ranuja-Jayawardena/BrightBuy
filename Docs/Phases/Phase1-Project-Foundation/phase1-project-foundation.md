@@ -145,4 +145,13 @@ This foundational schema and seed framework is extended by the following post-de
 - **[Fix 2.2: Search Autocomplete & GIN Trigram Indexing](../../Fixes/Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md):** Adds Flyway migration `V23__add_product_trgm_index.sql` enabling `pg_trgm` extension and trigram GIN indexes.
 - **[Fix 4.2: Employee Lifecycle & Role Management](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Adds Flyway migration `V24__add_employee_is_active.sql` adding `is_active` column to `employees`.
 
+## Fix 7 follow-up
 
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.1: Contracts, Data Preflight & Migration Coordination](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.1-contracts-preflight.md)
+- [Fix 7.2: Catalog Timestamp Migration Verification](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.2-catalog-timestamp-verification.md)
+- [Fix 7.5: Delivery Cardinality & Value Constraints](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.5-delivery-value-constraints.md)
+- [Fix 7.11: Application & Migration Database Accounts](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.11-database-account-separation.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

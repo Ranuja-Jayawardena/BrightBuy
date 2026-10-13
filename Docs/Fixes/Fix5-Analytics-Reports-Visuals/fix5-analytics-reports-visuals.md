@@ -34,3 +34,11 @@ Fix 5 enhances business intelligence and reporting readability in the admin repo
 graph TD
     F51_BE["5.1 Verify Sales Top Products Data (C)"] --> F51_UI["5.1 Horizontal Bar Chart & Product Name Labels (A)"]
 ```
+
+## Fix 7 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 7](../Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.10: Storefront & Report Regression Verification](../Fix7-Database-Integrity-Concurrency/fix7.10-storefront-report-regression.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

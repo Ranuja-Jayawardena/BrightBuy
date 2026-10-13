@@ -53,3 +53,14 @@ graph TD
 - **Category Update Route:** `PUT /api/admin/categories/:id` accepts `{ is_active: boolean }` (already supported by backend service).
 - **Image URL Standard:** All product images must be served from `/api/images/:id` consistently across admin and storefront.
 - **Future Cloud Media Storage:** Succeeded by [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) for complete AWS S3 cloud object storage migration.
+
+## Fix 7 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 7](../Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.2: Catalog Timestamp Migration Verification](../Fix7-Database-Integrity-Concurrency/fix7.2-catalog-timestamp-verification.md)
+- [Fix 7.7: Category Hierarchy Integrity](../Fix7-Database-Integrity-Concurrency/fix7.7-category-cycle-protection.md)
+- [Fix 7.8: Manual Inventory Adjustment Audit](../Fix7-Database-Integrity-Concurrency/fix7.8-inventory-audit.md)
+- [Fix 7.9: Checkout & Admin Conflict Handling](../Fix7-Database-Integrity-Concurrency/fix7.9-checkout-admin-ui.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

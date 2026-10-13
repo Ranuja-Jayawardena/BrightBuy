@@ -56,4 +56,11 @@ graph LR
 Transactional notifications are extended by the following post-development fix item in [Docs/Fixes/overallplan.md](../../Fixes/overallplan.md):
 - **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** D updates delivery status notification email templates to conditionally render courier tracking numbers and links for courier deliveries, while displaying storefront pickup instructions for store pickup orders.
 
+## Fix 7 follow-up
 
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.4: Order Transitions & Payment Event Consistency](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.4-order-payment-consistency.md)
+- [Fix 7.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.12-integration-rollout.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

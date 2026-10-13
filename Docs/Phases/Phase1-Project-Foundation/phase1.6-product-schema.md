@@ -1,5 +1,7 @@
 # Phase 1.6: Product Schema
 
+> **Fix 6 status correction (2026-10-13):** Media schema evidence: current repository V26 replaces BYTEA with image_url, but its generic backfill needs the per-image preservation gate and actual target history is unverified. Any BYTEA schema below is historical. Proposed upload/cleanup structures are not implemented until new migrations exist; follow revised Fix 6.2 before any destructive cutover. [Active Fix 6 guidance](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md).
+
 > **Parent Phase:** [Phase 1: Project Foundation & Database](phase1-project-foundation.md)
 > **Status:** Complete
 > **Assigned To:** C
@@ -61,6 +63,7 @@ Create the core product tables (products, variants, images) and seed the 40-prod
   - `idx_product_images_single_primary` as a partial unique index on `product_images(product_id) WHERE is_primary = true` ensuring strictly at most one primary image per product.
   - `idx_product_images_product_sort` on `product_images(product_id, sort_order)`.
 - **Database Schema Sync:** Added all indexes and constraint annotations into `DB_Schema.md`.
+- **Catalog timestamps (V27):** `products` and `product_variants` retain their insert defaults; PostgreSQL `BEFORE UPDATE` triggers now set each row's `updated_at`. The backend no longer assigns those timestamps. Related-row changes do not update the parent product timestamp.
 
 ### Published SKU & Catalog Matrix (For Members A, B, and D)
 
@@ -140,3 +143,12 @@ The following 40 products and 70 variants have been seeded in `backend/db/seed/0
 |  |  |  |  | `WCL-003-GRY-L` | Dove Gray / Size L | $119.00 | 15 |
 | `WCL-004` | Breathable Flex Yoga Leggings | PeakAthletics | Women's Clothing | `WCL-004-BLK-S` | Classic Black / Size S | $48.00 | 55 |
 |  |  |  |  | `WCL-004-SGE-M` | Sage Green / Size M | $48.00 | 0 |
+
+## Fix 7 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.2: Catalog Timestamp Migration Verification](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.2-catalog-timestamp-verification.md)
+- [Fix 7.8: Manual Inventory Adjustment Audit](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.8-inventory-audit.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

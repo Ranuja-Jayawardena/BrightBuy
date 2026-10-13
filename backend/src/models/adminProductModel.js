@@ -209,8 +209,7 @@ async function updateProduct(productId, { product_name, brand, description, base
         brand = CASE WHEN $3::boolean THEN $4 ELSE brand END,
         description = CASE WHEN $5::boolean THEN $6 ELSE description END,
         base_sku = COALESCE($7, base_sku),
-        is_active = COALESCE($8, is_active),
-        updated_at = CURRENT_TIMESTAMP
+        is_active = COALESCE($8, is_active)
       WHERE product_id = $1
       RETURNING product_id, product_name, brand, description, base_sku, is_active, created_at, updated_at
     `, [
@@ -245,7 +244,7 @@ async function updateProduct(productId, { product_name, brand, description, base
 async function setProductActiveStatus(productId, isActive) {
   const result = await db.query(`
     UPDATE products
-    SET is_active = $2, updated_at = CURRENT_TIMESTAMP
+    SET is_active = $2
     WHERE product_id = $1
     RETURNING product_id, product_name, brand, description, base_sku, is_active, created_at, updated_at
   `, [productId, isActive]);
@@ -255,7 +254,7 @@ async function setProductActiveStatus(productId, isActive) {
 async function softDeleteProduct(productId) {
   const result = await db.query(`
     UPDATE products
-    SET is_active = false, updated_at = CURRENT_TIMESTAMP
+    SET is_active = false
     WHERE product_id = $1
     RETURNING product_id, product_name, brand, description, base_sku, is_active, created_at, updated_at
   `, [productId]);
@@ -364,8 +363,7 @@ async function updateVariant(variantId, { variant_sku, variant_name, price, stoc
         variant_sku = COALESCE($2, variant_sku),
         variant_name = COALESCE($3, variant_name),
         price = COALESCE($4, price),
-        stock_quantity = COALESCE($5, stock_quantity),
-        updated_at = CURRENT_TIMESTAMP
+        stock_quantity = COALESCE($5, stock_quantity)
       WHERE variant_id = $1
       RETURNING variant_id, product_id, variant_sku, variant_name, price, stock_quantity, is_active
     `, [variantId, variant_sku, variant_name || null, price, stock_quantity]);
@@ -389,7 +387,7 @@ async function updateVariant(variantId, { variant_sku, variant_name, price, stoc
 async function softDeleteVariant(variantId) {
   const result = await db.query(`
     UPDATE product_variants
-    SET is_active = false, updated_at = CURRENT_TIMESTAMP
+    SET is_active = false
     WHERE variant_id = $1
     RETURNING variant_id, product_id, variant_sku, variant_name, price, stock_quantity, is_active
   `, [variantId]);

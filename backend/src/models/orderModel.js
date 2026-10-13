@@ -122,7 +122,7 @@ const createOrder = async (customer_id, address_id, delivery_mode) => {
 
             await client.query(`
                 UPDATE product_variants
-                SET stock_quantity = stock_quantity - $1, updated_at = NOW()
+                SET stock_quantity = stock_quantity - $1
                 WHERE variant_id = $2
             `, [item.quantity, item.variant_id]);
         }

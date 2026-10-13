@@ -58,3 +58,10 @@ Create the tables that classify and describe products (categories, product-categ
 - **Attributes Published:** Color, Storage, RAM, Size, Material.
 - **Dependencies Update:** Indexes `idx_categories_parent_id` and `idx_product_categories_category_id`, plus `ON DELETE CASCADE` behaviors added to `DB_Schema.md`.
 
+## Fix 7 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.7: Category Hierarchy Integrity](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.7-category-cycle-protection.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

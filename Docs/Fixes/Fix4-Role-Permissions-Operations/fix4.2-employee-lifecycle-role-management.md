@@ -150,3 +150,12 @@ Cookie: access_token=...
 3. Deactivated employees cannot log into the system; login returns 403 Forbidden.
 4. Non-super admin staff cannot access the employee page or execute employee update APIs.
 5. Super admin cannot deactivate their own account.
+
+## Fix 7 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 7](../Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.6: Concurrent Super Admin Protection](../Fix7-Database-Integrity-Concurrency/fix7.6-super-admin-protection.md)
+- [Fix 7.9: Checkout & Admin Conflict Handling](../Fix7-Database-Integrity-Concurrency/fix7.9-checkout-admin-ui.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

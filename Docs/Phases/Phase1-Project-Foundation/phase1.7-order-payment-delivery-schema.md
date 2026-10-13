@@ -52,3 +52,11 @@ Create the tables for orders, order line items, payments, and deliveries, plus r
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+## Fix 7 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.4: Order Transitions & Payment Event Consistency](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.4-order-payment-consistency.md)
+- [Fix 7.5: Delivery Cardinality & Value Constraints](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.5-delivery-value-constraints.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

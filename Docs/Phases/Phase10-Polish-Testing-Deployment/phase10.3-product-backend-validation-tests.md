@@ -1,4 +1,6 @@
-﻿# Phase 10.3: Product Backend Validation & Tests
+# Phase 10.3: Product Backend Validation & Tests
+
+> **Fix 6 status correction (2026-10-13):** Current validation gap: the 2026-10-13 review passed 139 Jest tests, but npm run test:product failed because its image test calls removed BYTEA helpers. Current mock success is not PostgreSQL/S3 integration evidence. Follow Fix 6.3 and the shared acceptance matrix; historical completion below does not close these new gates. [Active Fix 6 guidance](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md).
 
 > **Parent Phase:** [Phase 10: Polish, Testing & Deployment](phase10-polish-testing-deployment.md)
 > **Status:** Complete
@@ -33,3 +35,13 @@ _Record any implementation decisions, trade-offs, or deviations from the plan he
 - Added Jest service/controller tests for product CRUD validation, ancestor-cycle rejection, image upload and conditional retrieval, admin request validation, CSV safety, and report query validation. The existing Node tests cover additional pure helpers.
 - Verified on October 11, 2026: `npm ci` succeeds, `npm test` passes 35 Jest tests, `npm run test:product` passes 5 Node tests, and `npm run lint` reports no errors (8 existing warnings).
 
+## Fix 7 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.2: Catalog Timestamp Migration Verification](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.2-catalog-timestamp-verification.md)
+- [Fix 7.7: Category Hierarchy Integrity](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.7-category-cycle-protection.md)
+- [Fix 7.8: Manual Inventory Adjustment Audit](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.8-inventory-audit.md)
+- [Fix 7.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.12-integration-rollout.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

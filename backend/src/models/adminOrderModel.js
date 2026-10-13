@@ -68,7 +68,7 @@ async function updateOrderStatus(orderId, status) {
     if (!current.rowCount) { await client.query('ROLLBACK'); return null; }
     const updated = await client.query('UPDATE orders SET status=$2,updated_at=CURRENT_TIMESTAMP WHERE order_id=$1 RETURNING order_id,status,updated_at', [orderId, status]);
     if (status === 'cancelled' && current.rows[0].status !== 'cancelled') {
-      await client.query(`UPDATE product_variants v SET stock_quantity=v.stock_quantity+oi.quantity,updated_at=CURRENT_TIMESTAMP FROM order_items oi WHERE oi.order_id=$1 AND oi.variant_id=v.variant_id`, [orderId]);
+      await client.query(`UPDATE product_variants v SET stock_quantity=v.stock_quantity+oi.quantity FROM order_items oi WHERE oi.order_id=$1 AND oi.variant_id=v.variant_id`, [orderId]);
     }
     await client.query('COMMIT');
     return updated.rows[0];

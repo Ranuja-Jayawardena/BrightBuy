@@ -1,4 +1,4 @@
-﻿# Phase 9.2: Inventory & Customer Report APIs + CSV Export
+# Phase 9.2: Inventory & Customer Report APIs + CSV Export
 
 > **Parent Phase:** [Phase 9: Reports & Analytics](phase9-reports-analytics.md)
 > **Status:** Complete
@@ -88,3 +88,10 @@ _Record any implementation decisions, trade-offs, or deviations from the plan he
 - Customer spend, geographic revenue, and exported sales use revenue-bearing orders only: `paid`, `shipped`, and `delivered`.
 - Exports are spreadsheet-safe UTF-8 CSV downloads. Sales exports use monthly revenue, inventory exports use stock summary by category, and customer exports use the top 100 customers by spend.
 
+## Fix 7 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.10: Storefront & Report Regression Verification](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.10-storefront-report-regression.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

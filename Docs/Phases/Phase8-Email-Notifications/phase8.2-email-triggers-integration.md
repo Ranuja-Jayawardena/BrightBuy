@@ -40,3 +40,11 @@ Send the right email whenever a key event happens.
   - `paymentService.js` (`handlePaymentSuccess`): calls `notificationService.sendPaymentConfirmation`.
   - `adminOrderService.js` (`updateDelivery`): connects to `notificationService.onDeliveryStatusChanged` / `sendDeliveryStatusUpdate`.
 
+## Fix 7 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 7](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 7.4: Order Transitions & Payment Event Consistency](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.4-order-payment-consistency.md)
+- [Fix 7.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix7-Database-Integrity-Concurrency/fix7.12-integration-rollout.md)
+
+Read the Fix 7 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.
