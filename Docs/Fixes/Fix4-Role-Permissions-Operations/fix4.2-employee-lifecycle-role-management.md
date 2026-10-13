@@ -1,7 +1,7 @@
 # Fix 4.2: Super Admin Employee Management & Deactivation
 
 > **Parent Group:** [Fix 4: Role Permissions & Operations](fix4-role-permissions-operations.md)
-> **Status:** In Progress
+> **Status:** Complete
 > **Assigned To:** Member E (DevOps/Architecture & Auth Backend) & Member B (Admin Employees UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -72,11 +72,11 @@
 - [x] Update `Docs/Database/DB_Schema.md`.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/employees/page.tsx`:
-  - Add Active/Inactive toggle switch per employee row.
-  - Add "Edit Employee" action opening an edit modal.
-  - Implement form submission to `PUT /api/admin/employees/:id`.
-  - Disable editing/toggling of the current logged-in user's own status.
+- [x] In `frontend/src/app/admin/employees/page.tsx`:
+  - [x] Add Active/Inactive toggle switch per employee row.
+  - [x] Add "Edit Employee" action opening an edit modal.
+  - [x] Implement form submission to `PUT /api/admin/employees/:id`.
+  - [x] Disable editing/toggling of the current logged-in user's own status.
 
 ---
 
