@@ -243,7 +243,7 @@ function orderConfirmationEmail({
           ${escapeHtml(deliveryAddress.city_name || deliveryAddress.city || '')} ${escapeHtml(deliveryAddress.zip_code || '')}
         </p>
         <p style="margin: 10px 0 0; font-size: 13px; color: #4f46e5; font-weight: 600;">
-          Estimated delivery: ${estimatedDeliveryDays || 5-7} business days
+          Estimated delivery: ${estimatedDeliveryDays ?? '5–7'} business days
         </p>
       </div>
     `
