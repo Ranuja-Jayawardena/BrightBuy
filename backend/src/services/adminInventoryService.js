@@ -50,8 +50,15 @@ async function updateEmployee(id, body, currentEmployeeId) {
     role = body.role;
   }
 
-  const updated = await model.updateEmployee(employeeId, { firstName, lastName, phone, role });
-  return { employee: updated };
+  try {
+    const updated = await model.updateEmployee(employeeId, { firstName, lastName, phone, role });
+    return { employee: updated };
+  } catch (err) {
+    if (err.code === 'P0001' || (err.message && err.message.includes('Cannot remove the last active super admin'))) {
+      throw httpError(400, 'Cannot demote the last active super admin');
+    }
+    throw err;
+  }
 }
 
 async function setEmployeeStatus(id, body, currentEmployeeId) {
@@ -79,12 +86,19 @@ async function setEmployeeStatus(id, body, currentEmployeeId) {
     }
   }
 
-  const updated = await model.setEmployeeStatus(employeeId, body.is_active);
-  return {
-    message: body.is_active ? 'Employee activated successfully' : 'Employee deactivated successfully',
-    employee_id: updated.employee_id,
-    is_active: updated.is_active,
-  };
+  try {
+    const updated = await model.setEmployeeStatus(employeeId, body.is_active);
+    return {
+      message: body.is_active ? 'Employee activated successfully' : 'Employee deactivated successfully',
+      employee_id: updated.employee_id,
+      is_active: updated.is_active,
+    };
+  } catch (err) {
+    if (err.code === 'P0001' || (err.message && err.message.includes('Cannot remove the last active super admin'))) {
+      throw httpError(400, 'Cannot deactivate the last active super admin');
+    }
+    throw err;
+  }
 }
 
 module.exports = { list, adjust, createEmployee, listEmployees: model.listEmployees, updateEmployee, setEmployeeStatus };

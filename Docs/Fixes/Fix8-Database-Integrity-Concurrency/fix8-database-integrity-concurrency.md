@@ -1,6 +1,6 @@
 # Fix 8: Database Integrity & Concurrency
 
-> **Status:** In Progress (1 / 12 fix items complete; 8.1 Complete; V27 code exists, database verification pending)
+> **Status:** In Progress (2 / 12 fix items complete; 8.1 & 8.6 Complete; V27 code exists, database verification pending)
 > **Members:** A (storefront/reports), B (checkout/admin UI), C (catalog/inventory), D (cart/orders/payments), E (auth/database infrastructure)
 > **Priority:** Critical
 > **Master trackers:** [Fixes](../overallplan.md) | [Project](../../overallplan.md)
@@ -36,7 +36,7 @@ These are source-code findings, not results from a live concurrency exercise. Th
 | [8.3: Cart Uniqueness & Checkout Concurrency](fix8.3-cart-checkout-concurrency.md) | D | 8.1 cart/API contract | Not Started |
 | [8.4: Order Transitions & Payment Event Consistency](fix8.4-order-payment-consistency.md) | D (lead), E (webhook infrastructure review), C (admin handoff) | 8.1 payment decisions; 8.3 lock contract | Not Started |
 | [8.5: Delivery Cardinality & Value Constraints](fix8.5-delivery-value-constraints.md) | D (lead), E (migration review) | 8.1 delivery decisions; 8.4 writer compatibility | Not Started |
-| [8.6: Concurrent Super Admin Protection](fix8.6-super-admin-protection.md) | E | 8.1 staff contract | Not Started |
+| [8.6: Concurrent Super Admin Protection](fix8.6-super-admin-protection.md) | E | 8.1 staff contract | Complete |
 | [8.7: Category Hierarchy Integrity](fix8.7-category-cycle-protection.md) | C | 8.1 category contract | Not Started |
 | [8.8: Manual Inventory Adjustment Audit](fix8.8-inventory-audit.md) | C (lead), E (permissions review) | 8.1 audit decision; 8.2 timestamp baseline; 8.3/8.4 lock contract | Not Started |
 | [8.9: Checkout & Admin Conflict Handling](fix8.9-checkout-admin-ui.md) | B | 8.3–8.8 API handoffs; mock work after 8.1 | Not Started |

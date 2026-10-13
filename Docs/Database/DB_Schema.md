@@ -33,6 +33,12 @@ Table employees {
   indexes {
     (is_active) [name: 'idx_employees_active']
   }
+  note: 'Guarded by V32: At least one active super_admin must always exist. Triggers: trg_protect_super_admin_row, trg_protect_super_admin_statement.'
+}
+
+Table super_admin_guard {
+  id int [pk, note: 'Dedicated serialization row (id = 1) for concurrent super admin mutation gate']
+  last_action timestamp [not null, default: `now()`]
 }
 
 Table addresses {

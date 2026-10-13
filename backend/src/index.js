@@ -112,7 +112,7 @@ app.use((err, req, res, _next) => {
   if (process.env.NODE_ENV !== 'test') {
     console.error('Server error:', err);
   }
-  const statusCode = Number.isInteger(err.status) ? err.status : Number.isInteger(err.statusCode) ? err.statusCode : err.code === '23505' ? 409 : err.code === '23503' ? 400 : 500;
+  const statusCode = Number.isInteger(err.status) ? err.status : Number.isInteger(err.statusCode) ? err.statusCode : err.code === '23505' ? 409 : (err.code === '23503' || err.code === 'P0001') ? 400 : 500;
   const errorName = err.publicCode || err.error || (statusCode === 409 ? 'conflict' : statusCode >= 500 ? 'internal_error' : 'invalid_request');
   res.status(statusCode).json({
     error: errorName,
