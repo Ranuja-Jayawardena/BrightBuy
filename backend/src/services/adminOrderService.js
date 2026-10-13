@@ -77,7 +77,7 @@ async function updateDelivery(deliveryId, body) {
 
   const result = await model.updateDeliveryStatus(parsedDeliveryId, delivery_status, trackingNumber);
   if (result) await notificationService.onDeliveryStatusChanged(result);
-  return result;
+  return result || currentDelivery;
 }
 
 module.exports = {

@@ -65,5 +65,6 @@ This storefront catalog experience is enhanced by the following post-development
 - **[Fix 2.1: Price Range Filter & Composite Index](../../Fixes/Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md):** Adds `min_price` / `max_price` query filters, dual range slider UI in filters sidebar, and `V22` composite index.
 - **[Fix 2.2: Search Autocomplete & GIN Trigram Indexing](../../Fixes/Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md):** Introduces `GET /api/products/search/suggestions` with debounced instant dropdown and `V23` trigram GIN index.
 - **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Resolves `/api/images/:id` 404 route mount mismatch so product thumbnails and detail galleries render seamlessly.
+- **[Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md):** Lecturer-approved transition to AWS S3. Upgrades image delivery to direct S3 object links, dropping the legacy `image_data` binary column with direct pre-signed URL uploads.
 
 

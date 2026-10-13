@@ -11,6 +11,7 @@
 ## 1. Executive Summary & Architecture
 
 BrightBuy supports two checkout payment methods:
+
 1. **Cash on Delivery (COD):** Processed internally; order is immediately confirmed with status `pending`/`cod_pending`.
 2. **Credit / Debit Card:** Processed via **Lemon Squeezy Hosted Checkout**.
 
@@ -49,16 +50,17 @@ sequenceDiagram
 
 ## 2. Lemon Squeezy Credentials & Identifiers
 
-| Parameter | Current Value | Notes |
-|:---|:---|:---|
-| **Store ID** | `495997` | Lemon Squeezy BrightBuy Store |
-| **Variant ID** | `2238318` | Variant ID of "BrightBuy Store Order" product |
-| **Product Pricing Type** | *Pay what you want* | Minimum: `$0.01`. Backend sends real order total via `custom_price` in cents |
-| **API Key (Bearer Token)** | `eyJ0eXAi...` *(Full key below)* | Used for `https://api.lemonsqueezy.com/v1/checkouts` |
-| **Webhook Signing Secret** | `bb_secret_webhook_2026_lemon_secure` | Secret string for HMAC SHA-256 signature verification |
-| **Webhook Endpoint** | `http://18.208.53.186/api/webhooks/lemonsqueezy` | Route on AWS EC2 Nginx / Express stack |
+| Parameter                  | Current Value                                    | Notes                                                                        |
+| :------------------------- | :----------------------------------------------- | :--------------------------------------------------------------------------- |
+| **Store ID**               | `495997`                                         | Lemon Squeezy BrightBuy Store                                                |
+| **Variant ID**             | `2238318`                                        | Variant ID of "BrightBuy Store Order" product                                |
+| **Product Pricing Type**   | _Pay what you want_                              | Minimum: `$0.01`. Backend sends real order total via `custom_price` in cents |
+| **API Key (Bearer Token)** | `eyJ0eXAi...` _(Full key below)_                 | Used for `https://api.lemonsqueezy.com/v1/checkouts`                         |
+| **Webhook Signing Secret** | `bb_secret_webhook_2026_lemon_secure`            | Secret string for HMAC SHA-256 signature verification                        |
+| **Webhook Endpoint**       | `http://18.208.53.186/api/webhooks/lemonsqueezy` | Route on AWS EC2 Nginx / Express stack                                       |
 
 ### Full API Key (Bearer Token)
+
 ```text
 eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5NGQ1OWNlZi1kYmI4LTRlYTUtYjE3OC1kMjU0MGZjZDY5MTkiLCJqdGkiOiJkMDIzZWNjYWRkZWNiMGZlNTM1ZTIzZWMyZGJhYjg2YTYyODU4ZDA0NTE5ZDJhY2Y2MjdhZDRmOWY2YjZlYTgzZWEwYTMwNTgwM2ZkZGMzOSIsImlhdCI6MTc5MTgxMTUzNy40ODIxLCJuYmYiOjE3OTE4MTE1MzcuNDgyMTAzLCJleHAiOjE4MDc0ODgwMDAuMDIyODAzLCJzdWIiOiI4MTU2NDc4Iiwic2NvcGVzIjpbXX0.xvZY1uTLQCydg176ORNLYi3BsYdBjy4p89AVoudaKDtbK64ASlcj6dCIyOueHQR4K48d8sPwArVYHMPLsgUZ_ZCmp6V3el5sgA--kR6--C0Rr7SgRC7IOK-KRRkS0WX3FDKaubFTSWlpuGWEm67lwKZQIAJ0R8JtpPWAnKcp7EKpupGGbGmCza7f6HR8dy9nAEtMtfK9LazwfHe_ryrOGSU6F0HSES5ZWUxNK0ju5atM87Xs9eDvj1UjsJtAk7T1Dg3WJ5wPQy3WpM0zIjjKxqxfcbTOSVOOVjv-jwAbruSHleMm6SMLB3BPhKiXtYQ8ur1jj1g0LFfWKe3ewDQUtv2k8KcAExdRMN85lgmRFkEHl0kL5VMIf3i1PdBGkj_eyrHEjcWj_86YgRK-gtj5Sca1JuKgMex1IhfXtSk_2HPNBBGE1e49-3t-_9lN7D2U2BBU1FQ-Vu9yRRkAdOeF_EhL2HdMISttYpfLXgR8n6gqcJOQB5TJCL7Aqp0VFgRxWG2HvSHYOU77qlNNoAbYY-4qy_but-f3MKTB22wThwJDKjy_Gtrd3Zm2B1Fj5yHTuiMk3_XimhHdB9W4zCqeR3Dsu2imZnSz_ziXBjvGYLiyAfifN-eRLWXJA7pj9_EYZ3BhRIzJv05kWSprTvdkNUPQ32TnPPLha9MKTNgbxC8
 ```
@@ -77,14 +79,14 @@ To ensure orders update from `pending` to `paid` automatically:
      ```text
      http://18.208.53.186/api/webhooks/lemonsqueezy
      ```
-     *(Note: When a custom domain with SSL is added in the future, change `http://18.208.53.186` to `https://yourdomain.com`).*
+     _(Note: When a custom domain with SSL is added in the future, change `http://18.208.53.186` to `https://yourdomain.com`)._
    - **Signing Secret:**
      ```text
      bb_secret_webhook_2026_lemon_secure
      ```
    - **Events to send:**
      - Check `order_created` (Required — signals that payment succeeded).
-     - *(Optional)* Check `order_refunded` (For refunds if applicable).
+     - _(Optional)_ Check `order_refunded` (For refunds if applicable).
 5. Click **Save Webhook**.
 
 ---
@@ -92,6 +94,7 @@ To ensure orders update from `pending` to `paid` automatically:
 ## 4. AWS EC2 Server Setup Instructions
 
 ### Server Details
+
 - **Public Elastic IP:** `18.208.53.186`
 - **Instance ID:** `i-0a19078299834fba2`
 - **User:** `ubuntu`
@@ -99,12 +102,15 @@ To ensure orders update from `pending` to `paid` automatically:
 - **Production Environment File:** `/home/ubuntu/BrightBuy/.env.prod`
 
 ### Method A: Connect via SSH (Terminal)
+
 If you have `brightbuy-key.pem`:
+
 ```bash
 ssh -i brightbuy-key.pem ubuntu@18.208.53.186
 ```
 
 ### Method B: Connect via AWS Console (Browser)
+
 1. Open the [AWS EC2 Console](https://console.aws.amazon.com/ec2/home?region=us-east-1#Instances:).
 2. Select instance `i-0a19078299834fba2` (`18.208.53.186`).
 3. Click **Connect** ➔ **EC2 Instance Connect** ➔ **Connect**.
@@ -154,25 +160,27 @@ LEMON_SQUEEZY_API_KEY=eyJ0eXAi...
 ```
 
 > **Note on Local Webhook Testing:** Lemon Squeezy cannot make HTTP requests directly to `localhost`. To test webhooks locally during development, use a tunnel like ngrok:
+>
 > ```bash
 > ngrok http 8080
 > ```
+>
 > And temporarily set the webhook URL in the Lemon Squeezy dashboard to `https://<ngrok-id>.ngrok-free.app/api/webhooks/lemonsqueezy`.
 
 ---
 
 ## 6. Codebase File Map & Flow
 
-| File Path | Role in Payment Flow |
-|:---|:---|
-| `backend/src/routes/paymentRoutes.js` | Defines `POST /api/payments/create-session` (customer auth guard). |
-| `backend/src/controllers/paymentController.js` | Validates order total, contacts Lemon Squeezy Checkout API (`https://api.lemonsqueezy.com/v1/checkouts`), passes `custom_price` in cents and `custom.order_id`. |
-| `backend/src/routes/webhookRoutes.js` | Mounts `POST /api/webhooks/lemonsqueezy` with `express.raw({ type: 'application/json' })` parser. |
-| `backend/src/controllers/webhookController.js` | Verifies `X-Signature` using crypto HMAC SHA-256 against `LEMON_SQUEEZY_WEBHOOK_SECRET`. Parses `order_created` events and deduplicates via in-memory set. |
-| `backend/src/services/paymentService.js` | Atomic DB transaction: updates `payments` table (`status='completed'`, sets `transaction_id`), updates `orders` table (`status='paid'`), dispatches payment confirmation email. |
-| `frontend/src/app/checkout/page.tsx` | UI where user selects "Credit/Debit Card", triggers checkout session creation, and redirects to returned URL. |
-| `frontend/src/app/checkout/return/page.tsx` | Customer return landing page showing confirmation and link to view order history. |
-| `nginx/default.conf` | Proxies `/api/` traffic directly to the Express backend container on port 5000. |
+| File Path                                      | Role in Payment Flow                                                                                                                                                            |
+| :--------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `backend/src/routes/paymentRoutes.js`          | Defines `POST /api/payments/create-session` (customer auth guard).                                                                                                              |
+| `backend/src/controllers/paymentController.js` | Validates order total, contacts Lemon Squeezy Checkout API (`https://api.lemonsqueezy.com/v1/checkouts`), passes `custom_price` in cents and `custom.order_id`.                 |
+| `backend/src/routes/webhookRoutes.js`          | Mounts `POST /api/webhooks/lemonsqueezy` with `express.raw({ type: 'application/json' })` parser.                                                                               |
+| `backend/src/controllers/webhookController.js` | Verifies `X-Signature` using crypto HMAC SHA-256 against `LEMON_SQUEEZY_WEBHOOK_SECRET`. Parses `order_created` events and deduplicates via in-memory set.                      |
+| `backend/src/services/paymentService.js`       | Atomic DB transaction: updates `payments` table (`status='completed'`, sets `transaction_id`), updates `orders` table (`status='paid'`), dispatches payment confirmation email. |
+| `frontend/src/app/checkout/page.tsx`           | UI where user selects "Credit/Debit Card", triggers checkout session creation, and redirects to returned URL.                                                                   |
+| `frontend/src/app/checkout/return/page.tsx`    | Customer return landing page showing confirmation and link to view order history.                                                                                               |
+| `nginx/default.conf`                           | Proxies `/api/` traffic directly to the Express backend container on port 5000.                                                                                                 |
 
 ---
 
