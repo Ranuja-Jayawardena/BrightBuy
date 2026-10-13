@@ -9,15 +9,15 @@
 
 ## Decision boundary and evidence
 
-Implementation started on `dev` after 8.3/8.4 established the variant lock order. Stock writers found: variant creation (initial stock), admin variant edit (manual), dedicated inventory adjustment (manual), checkout deduction (automated), cancellation restoration (automated), and seed/migration inserts (initial stock). The admin variant-edit path now locks the variant and writes one adjustment in the same transaction when its stock changes; the dedicated adjustment path skips a no-op. Both use the authenticated employee ID. A changed stock value on the variant-edit API requires `reason` (maximum 255 characters); the admin product form owned by B must supply it or direct stock changes to the inventory screen. Initial stock is treated as creation, not an adjustment; checkout/cancellation remain automated movements. This is application-path protection only until V34 and runtime grants are designed and verified.
+Implementation started on `dev` after 8.3/8.4 established the variant lock order. Stock writers found: variant creation (initial stock), admin variant edit (manual), dedicated inventory adjustment (manual), checkout deduction (automated), cancellation restoration (automated), and seed/migration inserts (initial stock). The admin variant-edit path locks the variant and writes one adjustment in the same transaction when its stock changes; the dedicated adjustment path skips a no-op. Both use the authenticated employee ID. The admin product form now supplies a reason only when editing an existing variant changes stock. Initial stock is creation; checkout/cancellation remain automated movements. V34 protects adjustment-row integrity and immutability, but does not prevent a direct SQL stock update without an audit row; 8.11 must resolve the runtime grant boundary.
 
-Verification so far: changed-file ESLint passed; 18 database-independent Jest suites passed (147 tests). The full Jest command failed in two existing integration suites because this environment could not connect to the configured PostgreSQL host (`EACCES`); real database race and rollback checks remain open. The repository-wide lint currently has 14 errors in other files.
+Verification: PowerShell `$env:FIX88_RUN_DB_TESTS='1'; npm.cmd run test:inventory-audit` passed on a disposable PostgreSQL 15+ database on the configured development host, applying the committed V34 after prerequisite schema migrations. It tested concurrent manual adjustments, simulated automated stock interleaving, a missing reason, forged employee ID, blank reason, negative quantity, immutable history, and injected audit-insert failure rollback. The test dropped its temporary database. Focused Jest tests passed (6/6), as did frontend lint, build and explicit TypeScript check. Browser and restricted-role checks remain with 8.9/8.11/8.12. The full backend suite has unrelated remote-DB/S3 credential failures and existing mock failures.
 
 Read [Phase 7.1 variants](../../Phases/Phase7-Inventory-Admin-Dashboard/phase7.1-product-variant-image-admin-apis.md), [7.4 inventory](../../Phases/Phase7-Inventory-Admin-Dashboard/phase7.4-inventory-employee-admin-apis.md), and [Fix 3 catalog](../Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md).
 
-V20 requires variant_id, employee_id, previous_quantity, new_quantity, and reason. The dedicated inventory model fills those in one transaction, but adminProductModel.updateVariant also sets stock_quantity without inserting history. Variant creation accepts initial stock too.
+V20 requires variant_id, employee_id, previous_quantity, new_quantity, and reason. Both manual update paths now fill these in the stock transaction. Variant creation accepts initial stock without an adjustment.
 
-D5 must decide whether every manual change to existing stock is audited, whether initial quantities are included, and who may adjust stock. If complete manual-change history is rejected, record the accepted narrower scope and make documentation accurate; do not implement a fictional audit guarantee.
+D5 is resolved in 8.1: manual updates to existing stock require an employee and reason. Initial quantities and automated order movements are separate.
 
 ## Implementation path if full manual-change audit is selected
 
@@ -47,7 +47,7 @@ D5 must decide whether every manual change to existing stock is audited, whether
 
 3. **API & UI Contract Handoff to Member B (Fix 8.9):**
    - `PUT /api/admin/variants/:id`: When `stock_quantity` is modified, the payload MUST include a non-empty `reason` string (max 255 chars). Missing reason yields HTTP 400 (`reason is required when stock_quantity changes`).
-   - The product variant modal owned by B in Fix 8.9 must either expose a Reason input when stock is edited or make stock quantity read-only in the variant modal and link administrators to `/admin/inventory`.
+   - The product variant modal now exposes a required Reason input when an existing variant's stock changes. It sends `reason` with the PUT and displays the server message on failure. Browser verification remains in 8.9.
 
 ## Acceptance
 

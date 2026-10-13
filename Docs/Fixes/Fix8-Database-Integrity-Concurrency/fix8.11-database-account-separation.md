@@ -11,6 +11,8 @@
 
 The development Compose configuration previously reused `DB_USER`/`DB_PASSWORD` (`postgres`) across bootstrap, Flyway, seed execution, and the API runtime.
 
+**Fix 8.8 follow-up:** V34 protects audit rows, and the isolated PostgreSQL audit test passes. V35 grants `brightbuy_app` direct `UPDATE` on `product_variants`, so another SQL caller using that role can change stock without an audit row. The role grants protect audit history from editing, but do not enforce audit creation for every direct stock write. A controlled stock-write path and restricted-role integration check remain necessary if that stronger guarantee is required.
+
 Fix 8.11 establishes strict role separation in PostgreSQL:
 1. **Cluster / Provisioning Identity (`postgres`):** Root cluster administrator used only for database initialization and superuser disaster recovery.
 2. **Migration Identity (`brightbuy_migrator`):** Dedicated DDL account that owns schemas, tables, triggers, sequences, and `flyway_schema_history`.
