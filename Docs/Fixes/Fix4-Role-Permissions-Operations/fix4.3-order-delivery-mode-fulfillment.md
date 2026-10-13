@@ -1,7 +1,7 @@
 # Fix 4.3: Order Fulfillment: Courier Tracking vs. Store Pickup
 
 > **Parent Group:** [Fix 4: Role Permissions & Operations](fix4-role-permissions-operations.md)
-> **Status:** In Progress
+> **Status:** Complete
 > **Assigned To:** Member D (Backend Orders & Deliveries) & Member B (Admin Orders UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -45,12 +45,12 @@ However, BrightBuy supports two distinct fulfillment modes:
   - Return `delivery_mode` clearly in order summary and details.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/orders/[id]/page.tsx`:
-  - Check `order.delivery.delivery_mode`:
+- [x] In `frontend/src/app/admin/orders/[id]/page.tsx`:
+  - [x] Check `order.delivery.delivery_mode`:
     - If `store_pickup`: Adjust title to "Store Pickup & Gate Fulfillment". Hide the courier tracking code input. Show pickup status options.
     - If `home_delivery`: Show "Courier & Shipping Management" with tracking number input and courier status options.
-- [ ] In `frontend/src/app/admin/orders/page.tsx`:
-  - Add a "Fulfillment Mode" badge in the orders list table (`Home Delivery` vs. `Store Pickup`).
+- [x] In `frontend/src/app/admin/orders/page.tsx`:
+  - [x] Add a "Fulfillment Mode" badge in the orders list table (`Home Delivery` vs. `Store Pickup`).
 
 ---
 
