@@ -44,8 +44,32 @@ function ProductsContent() {
     document.title = title;
   }, [search, brand, categoryId, categories]);
 
-  // Hardcoded brands for filter
-  const BRANDS = ["Samsung", "Apple", "Sony", "Nike", "Adidas", "LG"];
+  const [brands, setBrands] = useState<string[]>([]);
+
+  // Fetch available catalog brands dynamically
+  useEffect(() => {
+    let isMounted = true;
+    catalogService.getBrands()
+      .then((res) => {
+        if (isMounted && res.brands && res.brands.length > 0) {
+          setBrands(res.brands);
+        }
+      })
+      .catch(() => {
+        // Fallback gracefully if endpoint is not yet live
+      });
+    return () => { isMounted = false; };
+  }, []);
+
+  // Fallback: derive brands from loaded catalog products if endpoint is not available
+  useEffect(() => {
+    if (products.length > 0 && brands.length === 0) {
+      const derived = Array.from(new Set(products.map((p) => p.brand).filter(Boolean))) as string[];
+      if (derived.length > 0) {
+        setBrands(derived.sort());
+      }
+    }
+  }, [products, brands.length]);
 
   const updateUrlParams = useCallback((key: string, value: string | null) => {
     const current = new URLSearchParams(searchParams.toString());
@@ -144,7 +168,7 @@ function ProductsContent() {
               onBrandChange={(b: string) => updateUrlParams('brand', b)}
               sortBy={sort}
               onSortChange={(s: string) => updateUrlParams('sort', s)}
-              brands={BRANDS}
+              brands={brands}
             />
 
             {/* Active Filters Bar */}

@@ -1,7 +1,7 @@
 # Fix 5.1: Top Performing Products Chart Display
 
 > **Parent Group:** [Fix 5: Analytics & Reports Visuals](fix5-analytics-reports-visuals.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member A (Frontend Reports & Analytics UI) & Member C (Backend Sales Reports)
 > **Depends On:** —
 > **Blocks:** —
@@ -28,16 +28,16 @@ In `frontend/src/components/reports/charts/ReportBarChart.tsx`:
 ## Tasks
 
 ### Frontend — Member A
-- [ ] In `frontend/src/app/admin/reports/page.tsx` and `frontend/src/app/admin/reports/sales/page.tsx`:
+- [x] In `frontend/src/app/admin/reports/page.tsx` and `frontend/src/app/admin/reports/sales/page.tsx`:
   - Set `layout="vertical"` for the Top Performing Products bar chart.
   - Set `xKey="product_name"`, placing category product names cleanly along the vertical Y-axis with horizontal revenue bars.
-- [ ] In `frontend/src/components/reports/charts/ReportBarChart.tsx`:
+- [x] In `frontend/src/components/reports/charts/ReportBarChart.tsx`:
   - Provide adequate Y-axis width (e.g. `width={140}`) for vertical layouts.
   - Add clean label truncation (e.g., max 20 characters with ellipsis) on tick labels and full product name in tooltip.
   - Ensure bar tooltips explicitly state `Product Name: {name}` alongside formatted revenue `$XX,XXX`.
 
 ### Backend Verification — Member C
-- [ ] Verify `GET /api/reports/sales/top-products` continues returning `product_name` cleanly populated from database joins.
+- [x] Verify `GET /api/reports/sales/top-products` continues returning `product_name` cleanly populated from database joins.
 
 ---
 

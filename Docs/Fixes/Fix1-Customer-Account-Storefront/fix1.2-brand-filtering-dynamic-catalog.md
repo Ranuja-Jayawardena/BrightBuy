@@ -1,7 +1,7 @@
 # Fix 1.2: Dynamic Brand Filtering & Seed Catalog Alignment
 
 > **Parent Group:** [Fix 1: Customer Account & Storefront UX](fix1-customer-account-storefront.md)
-> **Status:** Not Started
+> **Status:** In Progress
 > **Assigned To:** Member C (Backend Catalog & Seed Data) & Member A (Storefront Filter UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -42,9 +42,9 @@
 - [ ] Expose route in `backend/src/routes/productRoutes.js`.
 
 ### Storefront UI — Member A
-- [ ] Update `frontend/src/app/products/page.tsx`:
+- [x] Update `frontend/src/app/products/page.tsx`:
   - Remove hardcoded `BRANDS` constant.
-  - Fetch available brands dynamically from `/api/products/brands` on component mount.
+  - Fetch available brands dynamically from `/api/products/brands` on component mount (with graceful fallback to loaded catalog brands).
   - Render brand filter chips/list dynamically with count or clean labels.
   - Preserve active filter state in query params (`?brand=Apple`).
 

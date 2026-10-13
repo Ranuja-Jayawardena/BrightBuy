@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (0 / 14 fix items complete across 5 fix groups)
+**Status:** In Progress (2 / 14 fix items complete across 5 fix groups)
 
 ---
 
@@ -50,7 +50,7 @@ This document is the **master tracker** for all post-development fixes, patches,
 ## Fix Progress Tracker
 
 - [ ] **Fix 1: Customer Account & Storefront UX** → [fix1-customer-account-storefront.md](Fix1-Customer-Account-Storefront/fix1-customer-account-storefront.md)
-  - [ ] **1.1** Customer Profile Management & Navigation — **E (API), A (UI)** → [fix1.1-customer-profile-management.md](Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md)
+  - [x] **1.1** Customer Profile Management & Navigation — **E (API), A (UI)** → [fix1.1-customer-profile-management.md](Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md)
   - [ ] **1.2** Dynamic Brand Filtering & Seed Catalog Alignment — **C (Seed/API), A (UI)** → [fix1.2-brand-filtering-dynamic-catalog.md](Fix1-Customer-Account-Storefront/fix1.2-brand-filtering-dynamic-catalog.md)
   - [ ] **1.3** Apparel Variant Matrix Completeness — **C (Seed), A (UI)** → [fix1.3-apparel-variant-matrix.md](Fix1-Customer-Account-Storefront/fix1.3-apparel-variant-matrix.md)
   - [ ] **1.4** Address Form Cancel Feedback Fix — **B (UI)** → [fix1.4-address-form-cancel-feedback.md](Fix1-Customer-Account-Storefront/fix1.4-address-form-cancel-feedback.md)
@@ -70,8 +70,8 @@ This document is the **master tracker** for all post-development fixes, patches,
   - [ ] **4.2** Super Admin Employee Management & Deactivation — **E (DB/API), B (UI)** → [fix4.2-employee-lifecycle-role-management.md](Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md)
   - [ ] **4.3** Order Fulfillment: Courier Tracking vs. Store Pickup — **D (API), B (UI)** → [fix4.3-order-delivery-mode-fulfillment.md](Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md)
 
-- [ ] **Fix 5: Analytics & Reports Visuals** → [fix5-analytics-reports-visuals.md](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
-  - [ ] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
+- [x] **Fix 5: Analytics & Reports Visuals** → [fix5-analytics-reports-visuals.md](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
+  - [x] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
 
 ---
 

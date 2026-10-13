@@ -1,6 +1,6 @@
 # Fix 5: Analytics & Reports Visuals
 
-> **Status:** Not Started (0 / 1 fix items complete)
+> **Status:** Complete (1 / 1 fix items complete)
 > **Members:** A (Storefront & Reports UI), C (Backend Sales & Analytics Queries)
 > **Priority:** Medium
 > **Related Phases:** Phase 9 (Reports & Analytics)
@@ -16,7 +16,7 @@ Fix 5 enhances business intelligence and reporting readability in the admin repo
 
 ## What's Done
 
-- (nothing yet)
+- **5.1 Top Performing Products Chart Display (A):** Converted Top Performing Products chart to horizontal bars (`layout="vertical"`) with full product category names along the Y-axis (width 140, max 20 char truncation with ellipsis) and explicit product tooltips in `/admin/reports` and `/admin/reports/sales`.
 
 ---
 
@@ -24,7 +24,7 @@ Fix 5 enhances business intelligence and reporting readability in the admin repo
 
 | # | Fix Item | Assigned | Depends On | Priority | Status |
 |---|----------|----------|------------|----------|--------|
-| 5.1 | [Top Performing Products Chart Display](fix5.1-top-performing-products-chart.md) | A (UI), C (Reports Backend) | — | Medium | Not Started |
+| 5.1 | [Top Performing Products Chart Display](fix5.1-top-performing-products-chart.md) | A (UI), C (Reports Backend) | — | Medium | Complete |
 
 ---
 
