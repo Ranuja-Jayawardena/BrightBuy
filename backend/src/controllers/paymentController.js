@@ -42,16 +42,36 @@ const createSession = async (req, res) => {
             return res.status(400).json({ error: 'invalid_order_status', message: 'Order is not pending payment', statusCode: 400 });
         }
 
-        if (payment_method === 'cod') {
-            const insertResult = await db.query(
-                `INSERT INTO payments (order_id, payment_method, payment_status, amount)
-                 VALUES ($1, $2, $3, $4) RETURNING payment_id`,
-                [oid, 'cod', 'cod_pending', order.total_amount]
+        const upsertPayment = async (method, status) => {
+            const existingPayment = await db.query(
+                'SELECT payment_id FROM payments WHERE order_id = $1 ORDER BY payment_id DESC LIMIT 1',
+                [oid]
             );
+            if (existingPayment.rows.length > 0) {
+                const pid = existingPayment.rows[0].payment_id;
+                await db.query(
+                    `UPDATE payments 
+                     SET payment_method = $1, payment_status = $2, amount = $3, updated_at = NOW() 
+                     WHERE payment_id = $4`,
+                    [method, status, order.total_amount, pid]
+                );
+                return pid;
+            } else {
+                const insertResult = await db.query(
+                    `INSERT INTO payments (order_id, payment_method, payment_status, amount)
+                     VALUES ($1, $2, $3, $4) RETURNING payment_id`,
+                    [oid, method, status, order.total_amount]
+                );
+                return insertResult.rows[0].payment_id;
+            }
+        };
+
+        if (payment_method === 'cod') {
+            const payment_id = await upsertPayment('cod', 'cod_pending');
 
             return res.status(200).json({
                 message: 'COD order confirmed',
-                payment_id: insertResult.rows[0].payment_id
+                payment_id
             });
         } else if (payment_method === 'card') {
             let checkout_url = 'https://checkout.lemonsqueezy.com/test-url'; // Fallback for testing without env vars
@@ -71,8 +91,29 @@ const createSession = async (req, res) => {
                     }
                 } catch (_) {}
 
-                const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-                const redirectUrl = `${frontendBaseUrl.replace(/\/+$/, '')}/checkout/return?order_id=${oid}`;
+                const clientOrigin = req.get('origin') || req.get('referer');
+                let frontendBaseUrl = 'http://localhost:3000';
+                const configuredOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+                    .split(',')
+                    .map(url => url.trim().replace(/\/+$/, ''))
+                    .filter(Boolean);
+
+                if (clientOrigin) {
+                    try {
+                        const parsed = new URL(clientOrigin).origin;
+                        if (configuredOrigins.includes(parsed)) {
+                            frontendBaseUrl = parsed;
+                        } else if (configuredOrigins.length > 0) {
+                            frontendBaseUrl = configuredOrigins[0];
+                        }
+                    } catch (_) {
+                        frontendBaseUrl = configuredOrigins[0] || 'http://localhost:3000';
+                    }
+                } else if (configuredOrigins.length > 0) {
+                    frontendBaseUrl = configuredOrigins[0];
+                }
+
+                const redirectUrl = `${frontendBaseUrl}/checkout/return?order_id=${oid}`;
 
                 const checkoutPayload = {
                     data: {
@@ -131,15 +172,11 @@ const createSession = async (req, res) => {
                 }
             }
 
-            const insertResult = await db.query(
-                `INSERT INTO payments (order_id, payment_method, payment_status, amount)
-                 VALUES ($1, $2, $3, $4) RETURNING payment_id`,
-                [oid, 'card', 'pending', order.total_amount]
-            );
+            const payment_id = await upsertPayment('card', 'pending');
 
             return res.status(200).json({
                 checkout_url,
-                payment_id: insertResult.rows[0].payment_id
+                payment_id
             });
         }
     } catch (error) {
