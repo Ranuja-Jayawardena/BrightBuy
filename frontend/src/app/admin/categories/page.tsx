@@ -251,7 +251,7 @@ export default function AdminCategoriesPage() {
           <Button onClick={() => {
             setIsCreating(true);
             setEditingCategory(null);
-            setFormData({ category_name: '', parent_category_id: '' });
+            setFormData({ category_name: '', parent_category_id: '', is_active: true });
           }}>
             <Plus className="h-4 w-4 mr-1.5" /> Add Category
           </Button>

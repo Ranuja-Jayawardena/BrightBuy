@@ -51,13 +51,5 @@ export const catalogService = {
       throw new Error('Failed to fetch product');
     }
     return res.json();
-  },
-
-  async getBrands(): Promise<{ brands: string[] }> {
-    const res = await apiFetch('/api/products/brands');
-    if (!res.ok) {
-      throw new Error('Failed to fetch brands');
-    }
-    return res.json();
   }
 };
