@@ -76,13 +76,16 @@ Table products {
 
   indexes {
     product_name
+    product_name [name: 'idx_products_name_trgm', note: 'GIN gin_trgm_ops, WHERE is_active = true']
+    brand [name: 'idx_products_brand_trgm', note: 'GIN gin_trgm_ops, WHERE is_active = true']
+    description [name: 'idx_products_description_trgm', note: 'GIN gin_trgm_ops, WHERE is_active = true']
   }
 }
 
 Table product_images {
   image_id serial [pk]
   product_id int [ref: > products.product_id, delete: cascade, not null]
-  image_data bytea [not null]
+  image_url varchar(500) [not null, note: 'Direct AWS S3 object URL or CDN URL (V26 migration)']
   sort_order int [not null, default: 0]
   is_primary boolean [not null, default: false]
   created_at timestamp [default: `now()`]
@@ -105,6 +108,8 @@ Table product_variants {
 
   indexes {
     product_id
+    (product_id, price) [note: 'partial index WHERE is_active = true']
+    price [note: 'partial index WHERE is_active = true']
   }
 }
 

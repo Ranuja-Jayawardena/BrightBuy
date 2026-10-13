@@ -157,26 +157,30 @@ async function sendPaymentConfirmation(params = {}) {
     let customerName = params.customerName;
     let paymentDate = params.paymentDate;
 
-    if (orderId && (!customerEmail || !amount || !paymentMethod)) {
+    if (orderId) {
       const paymentRes = await db.query(`
-        SELECT o.order_id, o.total_amount, u.email, c.first_name, c.last_name,
+        SELECT o.order_id, u.email, c.first_name, c.last_name,
                p.payment_method, p.amount, p.transaction_id, p.payment_date
         FROM orders o
         JOIN customers c ON c.customer_id = o.customer_id
         JOIN users u ON u.user_id = c.user_id
-        LEFT JOIN payments p ON p.order_id = o.order_id
+        JOIN LATERAL (
+          SELECT payment_method, amount, transaction_id, payment_date
+          FROM payments WHERE order_id = o.order_id AND payment_status = 'completed'
+            AND ($2::text IS NULL OR transaction_id = $2)
+          ORDER BY payment_date DESC, payment_id DESC LIMIT 1
+        ) p ON true
         WHERE o.order_id = $1
-      `, [orderId]);
+      `, [orderId, transactionId || null]);
 
-      if (paymentRes.rows.length > 0) {
-        const row = paymentRes.rows[0];
-        customerEmail = customerEmail || row.email;
-        customerName = customerName || [row.first_name, row.last_name].filter(Boolean).join(' ') || undefined;
-        amount = amount || row.amount || row.total_amount;
-        paymentMethod = paymentMethod || row.payment_method || 'Online Payment';
-        transactionId = transactionId || row.transaction_id || 'N/A';
-        paymentDate = paymentDate || row.payment_date || new Date();
-      }
+      if (!paymentRes.rows.length) return { success: false, error: 'Completed payment not found' };
+      const row = paymentRes.rows[0];
+      customerEmail = row.email;
+      customerName = [row.first_name, row.last_name].filter(Boolean).join(' ') || undefined;
+      amount = row.amount;
+      paymentMethod = row.payment_method;
+      transactionId = row.transaction_id || 'N/A';
+      paymentDate = row.payment_date;
     }
 
     if (!customerEmail) {

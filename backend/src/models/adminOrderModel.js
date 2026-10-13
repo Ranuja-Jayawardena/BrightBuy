@@ -76,7 +76,7 @@ async function updateOrderStatus(orderId, status) {
 }
 
 async function updateDeliveryStatus(deliveryId, deliveryStatus, trackingNumber) {
-  const result = await db.query(`UPDATE deliveries SET delivery_status=$2,tracking_number=CASE WHEN $3::text IS NOT NULL THEN $3 ELSE tracking_number END,updated_at=CURRENT_TIMESTAMP WHERE delivery_id=$1 RETURNING delivery_id,order_id,delivery_mode,delivery_status,tracking_number,updated_at`, [deliveryId, deliveryStatus, trackingNumber !== undefined ? trackingNumber : null]);
+  const result = await db.query(`UPDATE deliveries SET delivery_status=$2,tracking_number=CASE WHEN $3::text IS NOT NULL THEN $3 ELSE tracking_number END,updated_at=CURRENT_TIMESTAMP WHERE delivery_id=$1 AND (delivery_status IS DISTINCT FROM $2 OR ($3::text IS NOT NULL AND tracking_number IS DISTINCT FROM $3)) RETURNING delivery_id,order_id,delivery_mode,delivery_status,tracking_number,updated_at`, [deliveryId, deliveryStatus, trackingNumber !== undefined ? trackingNumber : null]);
   return result.rows[0] || null;
 }
 

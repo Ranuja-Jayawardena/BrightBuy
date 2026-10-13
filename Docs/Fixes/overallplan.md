@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (8 / 14 fix items complete across 5 fix groups)
+**Status:** In Progress (16 / 18 fix items complete across 6 fix groups)
 
 ---
 
@@ -49,15 +49,15 @@ This document is the **master tracker** for all post-development fixes, patches,
 
 ## Fix Progress Tracker
 
-- [ ] **Fix 1: Customer Account & Storefront UX** → [fix1-customer-account-storefront.md](Fix1-Customer-Account-Storefront/fix1-customer-account-storefront.md)
-  - [ ] **1.1** Customer Profile Management & Navigation — **E (API), A (UI)** → [fix1.1-customer-profile-management.md](Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md)
-  - [ ] **1.2** Dynamic Brand Filtering & Seed Catalog Alignment — **C (Seed/API), A (UI)** → [fix1.2-brand-filtering-dynamic-catalog.md](Fix1-Customer-Account-Storefront/fix1.2-brand-filtering-dynamic-catalog.md)
-  - [ ] **1.3** Apparel Variant Matrix Completeness — **C (Seed), A (UI)** → [fix1.3-apparel-variant-matrix.md](Fix1-Customer-Account-Storefront/fix1.3-apparel-variant-matrix.md)
+- [x] **Fix 1: Customer Account & Storefront UX** → [fix1-customer-account-storefront.md](Fix1-Customer-Account-Storefront/fix1-customer-account-storefront.md)
+  - [x] **1.1** Customer Profile Management & Navigation — **E (API), A (UI)** → [fix1.1-customer-profile-management.md](Fix1-Customer-Account-Storefront/fix1.1-customer-profile-management.md)
+  - [x] **1.2** Dynamic Brand Filtering & Seed Catalog Alignment — **C (Seed/API), A (UI)** → [fix1.2-brand-filtering-dynamic-catalog.md](Fix1-Customer-Account-Storefront/fix1.2-brand-filtering-dynamic-catalog.md)
+  - [x] **1.3** Apparel Variant Matrix Completeness — **C (Seed), A (UI)** → [fix1.3-apparel-variant-matrix.md](Fix1-Customer-Account-Storefront/fix1.3-apparel-variant-matrix.md)
   - [x] **1.4** Address Form Cancel Feedback Fix — **B (UI)** → [fix1.4-address-form-cancel-feedback.md](Fix1-Customer-Account-Storefront/fix1.4-address-form-cancel-feedback.md)
 
-- [ ] **Fix 2: Search & Filter Performance** → [fix2-search-filter-performance.md](Fix2-Search-Filter-Performance/fix2-search-filter-performance.md)
-  - [ ] **2.1** Price Range Filtering & Composite Indexing — **C (DB/API), A (UI)** → [fix2.1-price-range-filter-indexing.md](Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md)
-  - [ ] **2.2** Search Autocomplete & pg_trgm GIN Indexing — **C (DB/API), A (UI)** → [fix2.2-search-autocomplete-suggestions.md](Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md)
+- [x] **Fix 2: Search & Filter Performance** → [fix2-search-filter-performance.md](Fix2-Search-Filter-Performance/fix2-search-filter-performance.md)
+  - [x] **2.1** Price Range Filtering & Composite Indexing — **C (DB/API), A (UI)** → [fix2.1-price-range-filter-indexing.md](Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md)
+  - [x] **2.2** Search Autocomplete & pg_trgm GIN Indexing — **C (DB/API), A (UI)** → [fix2.2-search-autocomplete-suggestions.md](Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md)
 
 - [x] **Fix 3: Admin Catalog & Media Management** → [fix3-admin-catalog-media.md](Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md)
   - [x] **3.1** Admin Sticky Sidebar Layout — **B (UI)** → [fix3.1-admin-sidebar-sticky-layout.md](Fix3-Admin-Catalog-Media/fix3.1-admin-sidebar-sticky-layout.md)
@@ -70,8 +70,14 @@ This document is the **master tracker** for all post-development fixes, patches,
   - [x] **4.2** Super Admin Employee Management & Deactivation — **E (DB/API), B (UI)** → [fix4.2-employee-lifecycle-role-management.md](Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md)
   - [x] **4.3** Order Fulfillment: Courier Tracking vs. Store Pickup — **D (API), B (UI)** → [fix4.3-order-delivery-mode-fulfillment.md](Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md)
 
-- [ ] **Fix 5: Analytics & Reports Visuals** → [fix5-analytics-reports-visuals.md](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
-  - [ ] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
+- [x] **Fix 5: Analytics & Reports Visuals** → [fix5-analytics-reports-visuals.md](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
+  - [x] **5.1** Top Performing Products Chart Display — **A (UI), C (API)** → [fix5.1-top-performing-products-chart.md](Fix5-Analytics-Reports-Visuals/fix5.1-top-performing-products-chart.md)
+
+- [ ] **Fix 6: Cloud Object Storage (AWS S3) & Media Delivery** → [fix6-cloud-media-storage-s3.md](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md)
+  - [x] **6.1** AWS S3 Infrastructure, Bucket Security & EC2 IAM Integration — **E (DevOps)** → [fix6.1-s3-infrastructure-bucket-iam.md](Fix6-Cloud-Media-Storage-S3/fix6.1-s3-infrastructure-bucket-iam.md)
+  - [x] **6.2** Database Schema Migration & S3 Seed Cutover — **C (DB), E (Architecture)** → [fix6.2-s3-schema-migration-seed-cutover.md](Fix6-Cloud-Media-Storage-S3/fix6.2-s3-schema-migration-seed-cutover.md)
+  - [ ] **6.3** Backend S3 Service & Pre-signed Upload APIs — **C (API)** → [fix6.3-backend-s3-service-upload-apis.md](Fix6-Cloud-Media-Storage-S3/fix6.3-backend-s3-service-upload-apis.md)
+  - [ ] **6.4** Storefront & Admin Direct Image Delivery & Upload UI — **A (UI), B (UI)** → [fix6.4-storefront-admin-image-delivery-ui.md](Fix6-Cloud-Media-Storage-S3/fix6.4-storefront-admin-image-delivery-ui.md)
 
 ---
 
@@ -101,6 +107,11 @@ Blocks administrators and staff accounts from purchasing or maintaining shopping
 Converts the Top Performing Products report chart to horizontal bars (`layout="vertical"`) with full product name category labels along the Y-axis.  
 **Leads:** A, C | **Priority:** Medium  
 → [Full Details](Fix5-Analytics-Reports-Visuals/fix5-analytics-reports-visuals.md)
+
+### Fix 6: Cloud Object Storage (AWS S3) & Media Delivery
+Lecturer-approved complete cutover from PostgreSQL `BYTEA` binary storage to AWS S3 cloud object storage. Drops the legacy `image_data` binary column completely, migrates seed assets to S3 with direct `image_url` links, provisions secure IAM instance profile roles on EC2 without hardcoding secrets, supports direct pre-signed URL client uploads, and ensures seamless image rendering across Storefront and Admin dashboards.  
+**Leads:** E, C, B, A | **Priority:** High  
+→ [Full Details](Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md)
 
 ---
 

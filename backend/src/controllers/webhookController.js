@@ -38,17 +38,28 @@ const handleLemonSqueezyWebhook = async (req, res) => {
     }
 
     const data = payload.data;
-    const orderId = payload.meta?.custom_data?.order_id
+    const rawOrderId = payload.meta?.custom_data?.order_id
       || payload.meta?.custom?.order_id
       || data?.attributes?.custom_data?.order_id
       || data?.attributes?.first_order_item?.order_id
-      || 'unknown';
-    const transactionId = data.id;
+      || null;
+
+    const orderId = rawOrderId !== null && rawOrderId !== undefined && !isNaN(Number(rawOrderId))
+      ? parseInt(rawOrderId, 10)
+      : null;
+
+    const transactionId = data?.id ? String(data.id) : 'unknown';
 
     if (eventName === 'order_created') {
-      const status = data.attributes.status;
+      const status = data?.attributes?.status;
+      if (!orderId) {
+        console.warn('[LemonSqueezy Webhook] order_created event received without a valid numeric order_id:', payload.meta);
+        if (webhookId) processedWebhooks.add(webhookId);
+        return res.status(200).json({ received: true, warning: 'missing_order_id' });
+      }
+
       if (status === 'paid') {
-        const amount = data.attributes.total;
+        const amount = data?.attributes?.total;
         await handlePaymentSuccess({
           order_id: orderId,
           transaction_id: transactionId,
@@ -56,11 +67,20 @@ const handleLemonSqueezyWebhook = async (req, res) => {
           raw_event: payload
         });
       } else {
-         // handle failure or other status
-         await handlePaymentFailure({
+        await handlePaymentFailure({
           order_id: orderId,
           transaction_id: transactionId,
           reason: `Status is ${status}`,
+          raw_event: payload
+        });
+      }
+    } else if (eventName === 'order_refunded') {
+      console.log(`[LemonSqueezy Webhook] Order ${orderId} refunded, transaction ${transactionId}`);
+      if (orderId) {
+        await handlePaymentFailure({
+          order_id: orderId,
+          transaction_id: transactionId,
+          reason: 'Refunded in Lemon Squeezy',
           raw_event: payload
         });
       }

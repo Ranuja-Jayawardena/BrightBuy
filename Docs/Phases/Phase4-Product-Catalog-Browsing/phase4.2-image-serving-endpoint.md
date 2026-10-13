@@ -49,4 +49,11 @@ Response 404: { error: "Image not found" }
 - **ETag & 304 Handling:** Strong ETags are generated using an MD5 hash over the raw binary data. If the client sends a matching `If-None-Match` header, the server returns `304 Not Modified` with an empty body to save bandwidth.
 - **Strict `image_data` Isolation:** `findImageDataById` in `imageModel.js` is the sole query in the codebase reading `image_data`. All other endpoints (`productModel.js`) only query metadata (`image_id`, `sort_order`, `is_primary`).
 
+---
+
+## Related Fixes & Cloud Migration
+
+- **[Fix 3.4: Product Image Upload & Route Serving Fix](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Aliased `/api/products/images/:id` to `/api/images/:id` and hardened binary multipart parsing.
+- **[Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md):** Lecturer-approved transition to AWS S3. Completely replaces PostgreSQL BYTEA storage with direct S3 object links (`image_url NOT NULL`), dropping the `image_data` binary column and serving direct S3 URLs.
+
 

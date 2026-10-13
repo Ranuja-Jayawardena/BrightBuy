@@ -16,7 +16,7 @@ const handlePaymentSuccess = async ({ order_id, transaction_id, amount, _raw_eve
   try {
     await client.query('BEGIN');
 
-    const orderRes = await client.query('SELECT status FROM orders WHERE order_id = $1 FOR UPDATE', [order_id]);
+    const orderRes = await client.query('SELECT status, total_amount FROM orders WHERE order_id = $1 FOR UPDATE', [order_id]);
     
     if (orderRes.rows.length === 0) {
       throw new Error(`Order ${order_id} not found`);
@@ -35,12 +35,20 @@ const handlePaymentSuccess = async ({ order_id, transaction_id, amount, _raw_eve
     await client.query('UPDATE orders SET status = $1, updated_at = NOW() WHERE order_id = $2', ['paid', order_id]);
 
     // Save transaction_id and set payment_status = 'completed'
-    await client.query(
+    const updatePaymentRes = await client.query(
       `UPDATE payments 
        SET payment_status = 'completed', transaction_id = $1, updated_at = NOW() 
        WHERE order_id = $2`, 
       [transaction_id, order_id]
     );
+
+    if (updatePaymentRes.rowCount === 0) {
+      await client.query(
+        `INSERT INTO payments (order_id, payment_method, payment_status, amount, transaction_id)
+         VALUES ($1, 'card', 'completed', $2, $3)`,
+        [order_id, (amount ? Number(amount) / 100 : Number(order.total_amount || 0)), transaction_id]
+      );
+    }
 
     await client.query('COMMIT');
 

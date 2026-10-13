@@ -67,5 +67,6 @@ Admin operations and inventory workflows are enhanced and resolved by the follow
 - **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Fixes admin multipart file upload binary storage, instant preview rendering, and fixes the `/api/images/:id` routing bug.
 - **[Fix 4.2: Employee Lifecycle & Role Management](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Expands employee management to allow Super Admin deactivation/reactivation, role updates, and migration `V24`.
 - **[Fix 4.3: Order Delivery Mode & Courier Tracking Code Fulfillment](../../Fixes/Fix4-Role-Permissions-Operations/fix4.3-order-delivery-mode-fulfillment.md):** Distinguishes Store Pickup from Courier Home Delivery in admin order fulfillment, enforcing tracking numbers only when dispatching couriers.
+- **[Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md):** Lecturer-approved upgrade from PostgreSQL BYTEA storage to AWS S3 cloud object storage with direct pre-signed URL uploads and clean `image_url` schema.
 
 

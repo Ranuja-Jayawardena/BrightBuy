@@ -1,7 +1,7 @@
 # Fix 1.2: Dynamic Brand Filtering & Seed Catalog Alignment
 
 > **Parent Group:** [Fix 1: Customer Account & Storefront UX](fix1-customer-account-storefront.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member C (Backend Catalog & Seed Data) & Member A (Storefront Filter UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -28,9 +28,8 @@
 ## Tasks
 
 ### Backend & Seed Data — Member C
-- [ ] Add/align brands in `backend/db/seed/04_products.sql`:
-  - Ensure recognized brands (e.g. Apple, Samsung, Sony, Nike, Adidas, LG) have realistic seeded products, variants, and categories, OR update seeded brand names to match popular consumer brands.
-- [ ] Implement `GET /api/products/brands` in `backend/src/controllers/productController.js`:
+- [x] Align the displayed brands with the existing product seed by sourcing filter options from active catalog products. The seed's fictional brands retain their matching products, variants, and categories.
+- [x] Implement `GET /api/products/brands` in `backend/src/controllers/productController.js`:
   - Query:
     ```sql
     SELECT DISTINCT brand
@@ -39,14 +38,16 @@
     ORDER BY brand ASC;
     ```
   - Return `{ brands: string[] }`.
-- [ ] Expose route in `backend/src/routes/productRoutes.js`.
+- [x] Expose route in `backend/src/routes/productRoutes.js`.
 
 ### Storefront UI — Member A
-- [ ] Update `frontend/src/app/products/page.tsx`:
+- [x] Update `frontend/src/app/products/page.tsx`:
   - Remove hardcoded `BRANDS` constant.
-  - Fetch available brands dynamically from `/api/products/brands` on component mount.
+  - Fetch available brands dynamically from `/api/products/brands` on component mount (with graceful fallback to loaded catalog brands).
   - Render brand filter chips/list dynamically with count or clean labels.
   - Preserve active filter state in query params (`?brand=Apple`).
+
+**Decision:** The hardcoded popular brand names were unrelated to the seeded fictional products. The storefront now lists the distinct active product brands returned by the API. Renaming products to real manufacturers would misrepresent the demo catalog and require reseeding existing databases.
 
 ---
 
@@ -60,13 +61,9 @@ GET /api/products/brands
 ```json
 {
   "brands": [
-    "Adidas",
-    "Apple",
     "ApexGear",
-    "LG",
-    "Nike",
-    "Samsung",
-    "Sony"
+    "Heritage",
+    "Lumina"
   ]
 }
 ```
@@ -75,12 +72,12 @@ GET /api/products/brands
 
 ## Affected Files
 
-- `backend/db/seed/04_products.sql`
 - `backend/src/models/productModel.js`
+- `backend/src/services/productService.js`
 - `backend/src/controllers/productController.js`
 - `backend/src/routes/productRoutes.js`
 - `frontend/src/app/products/page.tsx`
-- `frontend/src/components/catalog/ProductFilterSidebar.tsx`
+- `frontend/src/services/catalogService.ts`
 
 ---
 

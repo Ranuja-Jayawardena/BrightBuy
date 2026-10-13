@@ -18,7 +18,7 @@ BrightBuy is a full-stack retail and e-commerce platform designed to support cus
 - **Database:** PostgreSQL (containerized with Docker)
 - **Migrations:** Flyway (versioned SQL migrations `V1__` through `V19__`)
 - **Authentication:** Custom JWT with `HttpOnly` cookies (Access & Refresh tokens)
-- **Media Storage:** Binary Data (`BYTEA`) stored directly in PostgreSQL
+- **Media Storage:** AWS S3 object storage (lecturer-approved) or Binary Data (`BYTEA`) in PostgreSQL
 - **Payments:** Lemon Squeezy integration
 - **Email:** Nodemailer with standard SMTP
 
@@ -29,7 +29,7 @@ For email links sent to customers, configure `FRONTEND_URL` as a public HTTPS or
 ### Strict Architectural Guidelines
 1. **NO ORMs or Query Builders:** Pure, raw parameterized SQL with `pg` driver only.
 2. **NO Third-party Auth Services:** Custom JWT implementation with refresh token rotation.
-3. **NO External Storage (e.g. S3):** Images are stored directly in PostgreSQL.
+3. **Media Storage:** AWS S3 cloud object storage (lecturer-approved) or direct PostgreSQL `BYTEA` binary storage.
 4. **NO TanStack Query:** Standard `fetch()` or `axios` with React `useEffect`.
 
 ---

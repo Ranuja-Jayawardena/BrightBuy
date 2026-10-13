@@ -53,8 +53,8 @@ When writing or modifying code in this project, you MUST strictly adhere to the 
 - **Requirement:** Implement a fully custom JWT (JSON Web Tokens) solution using `HttpOnly` cookies.
 
 ### 4. File & Media Storage
-- **Constraint:** **NO** third-party storage services (like AWS S3 or Cloudinary).
-- **Requirement:** Store files directly in PostgreSQL as Binary Data (`BYTEA` column) or Base64 Strings.
+- **Allowed Options:** AWS S3 (Amazon Simple Storage Service) or direct PostgreSQL Binary Data (`BYTEA` column).
+- **Lecturer Approval:** Lecturer approved the use of AWS S3 for cloud object storage.
 
 ### 5. Frontend Styling & UI
 - **Requirement:** Use **Tailwind CSS** for styling and **shadcn/ui** for UI components.

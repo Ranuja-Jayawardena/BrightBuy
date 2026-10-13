@@ -14,7 +14,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { addItem, isLoading: isCartLoading } = useCartStore();
+  const { addItem, items, fetchCart, isLoading: isCartLoading } = useCartStore();
   
   const productId = params.id as string;
   
@@ -46,7 +46,7 @@ export default function ProductDetailPage() {
       }
       
       if (data.product.variants?.length > 0) {
-        const firstVariant = data.product.variants[0];
+        const firstVariant = data.product.variants.find(variant => variant.stock_quantity > 0) || data.product.variants[0];
         const initialAttrs: Record<string, string> = {};
         firstVariant.attributes.forEach(attr => {
           initialAttrs[attr.attribute_name] = attr.attribute_value;
@@ -65,6 +65,12 @@ export default function ProductDetailPage() {
       loadProduct();
     }
   }, [productId]);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'customer') {
+      fetchCart();
+    }
+  }, [isAuthenticated, user?.role, fetchCart]);
 
   const attributeOptions = useMemo(() => {
     if (!product?.variants) return {};
@@ -94,11 +100,30 @@ export default function ProductDetailPage() {
     ) || null;
   }, [product, selectedAttributes]);
 
+  const cartItem = useMemo(() => {
+    if (!selectedVariant || !items) return null;
+    return items.find(item => Number(item.variant_id) === Number(selectedVariant.variant_id)) || null;
+  }, [items, selectedVariant]);
+
+  const isInCart = Boolean(cartItem);
+
   const handleAttributeSelect = (name: string, value: string) => {
-    setSelectedAttributes(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setSelectedAttributes(prev => {
+      const next = { ...prev, [name]: value };
+      const variants = product?.variants || [];
+      const exact = variants.find(variant =>
+        variant.attributes.every(attr => next[attr.attribute_name] === attr.attribute_value)
+      );
+      if (exact) return next;
+
+      // Preserve the chosen option and switch the other attributes to a real variant.
+      const alternative = variants.find(variant =>
+        variant.stock_quantity > 0 && variant.attributes.some(attr => attr.attribute_name === name && attr.attribute_value === value)
+      ) || variants.find(variant =>
+        variant.attributes.some(attr => attr.attribute_name === name && attr.attribute_value === value)
+      );
+      return alternative ? Object.fromEntries(alternative.attributes.map(attr => [attr.attribute_name, attr.attribute_value])) : next;
+    });
     setQuantity(1); // Reset quantity on variant change
   };
 
@@ -296,14 +321,27 @@ export default function ProductDetailPage() {
                 <div className="flex flex-wrap gap-2">
                   {attributeOptions[attrName].map(val => {
                     const isSelected = selectedAttributes[attrName] === val;
+                    const matchingVariant = product.variants.find(variant =>
+                      variant.attributes.every(attr =>
+                        attr.attribute_name === attrName
+                          ? attr.attribute_value === val
+                          : selectedAttributes[attr.attribute_name] === attr.attribute_value
+                      )
+                    );
+                    const isUnavailable = !matchingVariant;
+                    const isSoldOut = matchingVariant?.stock_quantity === 0;
                     return (
                       <button
                         key={val}
                         onClick={() => handleAttributeSelect(attrName, val)}
+                        aria-pressed={isSelected}
+                        title={isUnavailable ? 'Selecting this option will change other selections' : isSoldOut ? 'Out of stock' : undefined}
                         className={`px-4 py-2 text-sm font-medium rounded-md border transition-all ${
                           isSelected 
                             ? 'bg-primary text-primary-foreground border-primary shadow-sm' 
-                            : 'bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground'
+                            : isUnavailable || isSoldOut
+                              ? 'bg-background text-muted-foreground border-input opacity-50 line-through hover:opacity-75'
+                              : 'bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground'
                         }`}
                       >
                         {val}
@@ -311,6 +349,7 @@ export default function ProductDetailPage() {
                     );
                   })}
                 </div>
+                {attrName === 'Size' && <p className="mt-2 text-xs text-muted-foreground">Faded sizes are sold out or unavailable with the current selection. Choosing an unavailable size may change the color.</p>}
               </div>
             ))}
           </div>
@@ -338,49 +377,63 @@ export default function ProductDetailPage() {
                 <button 
                   className="px-4 h-full text-lg hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={isOutOfStock}
+                  disabled={isOutOfStock || isInCart}
                 >-</button>
-                <div className="flex-1 text-center font-medium">{quantity}</div>
+                <div className="flex-1 text-center font-medium">{isInCart ? cartItem?.quantity : quantity}</div>
                 <button 
                   className="px-4 h-full text-lg hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
                   onClick={() => setQuantity(Math.min(selectedVariant?.stock_quantity || 1, quantity + 1))}
-                  disabled={isOutOfStock || quantity >= (selectedVariant?.stock_quantity || 1)}
+                  disabled={isOutOfStock || isInCart || quantity >= (selectedVariant?.stock_quantity || 1)}
                 >+</button>
               </div>
 
-              <Button 
-                size="lg" 
-                className={`flex-1 h-12 text-base font-semibold gap-2 transition-all duration-200 ${
-                  addedSuccess
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20'
-                    : 'hover:scale-[1.01]'
-                }`}
-                disabled={isOutOfStock || !selectedVariant || isCartLoading}
-                onClick={() => selectedVariant && onAddToCart(selectedVariant.variant_id, quantity)}
-              >
-                {isCartLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Adding...
-                  </>
-                ) : addedSuccess ? (
-                  <>
-                    <Check className="w-5 h-5 stroke-[2.5]" />
-                    Added to Cart!
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5" />
-                    Add to Cart
-                  </>
-                )}
-              </Button>
+              {isInCart ? (
+                <Button 
+                  size="lg" 
+                  className="flex-1 h-12 text-base font-semibold gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 transition-all duration-200 hover:scale-[1.01]"
+                  onClick={() => router.push('/cart')}
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  Go to Cart
+                  <ChevronRight className="w-4 h-4 ml-0.5" />
+                </Button>
+              ) : (
+                <Button 
+                  size="lg" 
+                  className={`flex-1 h-12 text-base font-semibold gap-2 transition-all duration-200 ${
+                    addedSuccess
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20'
+                      : 'hover:scale-[1.01]'
+                  }`}
+                  disabled={isOutOfStock || !selectedVariant || isCartLoading}
+                  onClick={() => selectedVariant && onAddToCart(selectedVariant.variant_id, quantity)}
+                >
+                  {isCartLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5" />
+                      Add to Cart
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
 
-            {addedSuccess && (
+            {addedSuccess ? (
               <div className="flex items-center justify-between p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-emerald-800 dark:text-emerald-200 text-xs font-semibold">
                 <span>{quantity} item{quantity > 1 ? 's' : ''} added to your cart.</span>
                 <Link href="/cart" className="inline-flex items-center text-emerald-700 dark:text-emerald-300 font-bold hover:underline">
+                  View Cart &rarr;
+                </Link>
+              </div>
+            ) : isInCart && (
+              <div className="flex items-center justify-between p-3 bg-muted/60 border border-border rounded-xl text-muted-foreground text-xs font-medium">
+                <span>Item already in cart ({cartItem?.quantity} in cart).</span>
+                <Link href="/cart" className="inline-flex items-center text-primary font-bold hover:underline">
                   View Cart &rarr;
                 </Link>
               </div>

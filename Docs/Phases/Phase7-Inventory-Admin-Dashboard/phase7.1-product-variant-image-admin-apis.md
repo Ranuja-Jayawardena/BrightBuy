@@ -74,5 +74,6 @@ Response 409: { error: "Variant SKU already exists" }
 
 - **[Fix 3.2: Product Status Switch & Reactivation Flow](../../Fixes/Fix3-Admin-Catalog-Media/fix3.2-product-status-toggle.md):** Adds `PATCH /api/admin/products/:id/status` allowing bidirectional activation toggling instead of one-way deletion.
 - **[Fix 3.4: Product Image Upload, Serving & Frontend Preview](../../Fixes/Fix3-Admin-Catalog-Media/fix3.4-product-image-upload-serving.md):** Hardens multipart image upload processing, binary BYTEA storage, and public image URL consistency.
+- **[Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md):** Replaces binary BYTEA admin upload buffering with AWS S3 pre-signed direct upload APIs and direct PostgreSQL `image_url` storage.
 
 
