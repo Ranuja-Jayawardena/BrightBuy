@@ -28,6 +28,7 @@ interface CategoryNode {
 
 interface ImageType {
   image_id: number;
+  image_url: string;
   sort_order: number;
   is_primary: boolean;
 }
@@ -92,6 +93,8 @@ export default function EditProductPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<string>('');
   const [updatingImageId, setUpdatingImageId] = useState<number | null>(null);
   const [imageToDelete, setImageToDelete] = useState<ImageType | null>(null);
   const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
@@ -176,26 +179,93 @@ export default function EditProductPage() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    
-    const formData = new FormData();
-    formData.append('image', file);
-    
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please select a valid image format: JPEG, PNG, or WebP.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size exceeds the 5MB limit.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
     try {
       setIsUploadingImage(true);
-      const res = await apiFetch(`/api/admin/products/${productId}/images`, {
+      setUploadProgress(0);
+      setUploadStatus('Requesting S3 pre-signed upload URL...');
+
+      // 1. Request S3 Pre-signed URL
+      const presignRes = await apiFetch(`/api/admin/products/${productId}/images/presign`, {
         method: 'POST',
-        body: formData,
-        // Don't set Content-Type header; fetch will set it with the boundary for FormData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentType: file.type,
+          fileName: file.name,
+        }),
       });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || 'Failed to upload image');
+
+      if (!presignRes.ok) {
+        const d = await presignRes.json().catch(() => ({}));
+        throw new Error(d.message || d.error || 'Failed to authorize S3 upload');
       }
+
+      const { uploadUrl, publicUrl } = await presignRes.json();
+
+      // 2. Upload file directly to S3 with real-time progress indicator
+      setUploadStatus('Uploading directly to AWS S3...');
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', uploadUrl);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.upload.onprogress = (evt) => {
+          if (evt.lengthComputable) {
+            const percent = Math.round((evt.loaded / evt.total) * 100);
+            setUploadProgress(percent);
+            setUploadStatus(`Uploading to S3: ${percent}%`);
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            reject(new Error(`Direct S3 upload failed with status ${xhr.status}`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Network error during direct S3 upload'));
+        xhr.send(file);
+      });
+
+      // 3. Confirm image record creation in catalog database
+      setUploadStatus('Registering image in catalog...');
+      const sortOrder = product?.images?.length || 0;
+      const isPrimary = !product?.images || product.images.length === 0;
+
+      const confirmRes = await apiFetch(`/api/admin/products/${productId}/images/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image_url: publicUrl,
+          sort_order: sortOrder,
+          is_primary: isPrimary,
+        }),
+      });
+
+      if (!confirmRes.ok) {
+        const d = await confirmRes.json().catch(() => ({}));
+        throw new Error(d.message || d.error || 'Failed to register image in catalog');
+      }
+
       await fetchData();
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'Failed to upload image');
     } finally {
       setIsUploadingImage(false);
+      setUploadProgress(null);
+      setUploadStatus('');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -479,9 +549,12 @@ export default function EditProductPage() {
                 >
                   <div className="relative aspect-square overflow-hidden bg-background">
                     <img 
-                      src={`/api/images/${img.image_id}`} 
+                      src={img.image_url || `/api/images/${img.image_id}`} 
                       alt="Product" 
                       className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                      }}
                     />
                     
                     {img.is_primary && (
@@ -571,16 +644,29 @@ export default function EditProductPage() {
               }}
             >
               {isUploadingImage ? (
-                <>
-                  <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-2" />
-                  <p className="text-sm font-medium">Uploading image...</p>
-                  <p className="text-xs text-muted-foreground mt-1">Processing file buffer</p>
-                </>
+                <div className="space-y-3">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
+                  <p className="text-sm font-medium">
+                    {uploadStatus || 'Uploading image...'}
+                  </p>
+                  {uploadProgress !== null && (
+                    <div className="w-full max-w-xs mx-auto space-y-1">
+                      <div className="bg-muted rounded-full h-2 overflow-hidden border">
+                        <div 
+                          className="bg-primary h-full transition-all duration-150 rounded-full" 
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground font-mono">{uploadProgress}%</p>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">Direct-to-S3 Cloud Storage</p>
+                </div>
               ) : (
                 <>
                   <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
                   <p className="text-sm font-medium">Click to upload image</p>
-                  <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, WebP up to 2MB</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, WebP up to 5MB (Direct S3)</p>
                 </>
               )}
               <input 
@@ -678,9 +764,12 @@ export default function EditProductPage() {
             </p>
             <div className="mt-4 rounded-lg overflow-hidden border aspect-video max-h-36 bg-muted/20 flex items-center justify-center">
               <img 
-                src={`/api/images/${imageToDelete.image_id}`} 
+                src={imageToDelete.image_url || `/api/images/${imageToDelete.image_id}`} 
                 alt="Image to delete" 
                 className="max-h-full max-w-full object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/placeholder-product.svg';
+                }}
               />
             </div>
             <div className="mt-6 flex justify-end gap-2">

@@ -1,7 +1,7 @@
 # Fix 6.4: Storefront & Admin Direct Image Delivery & Upload UI
 
 > **Parent Group:** [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](fix6-cloud-media-storage-s3.md)  
-> **Status:** Planned  
+> **Status:** In Progress  
 > **Assigned To:** Member A (Storefront UI) & Member B (Admin Products UI)  
 > **Depends On:** [Fix 6.3: Backend S3 Service & APIs](fix6.3-backend-s3-service-upload-apis.md)  
 > **Blocks:** —  
@@ -21,13 +21,13 @@
 ## Tasks
 
 ### 1. Admin Direct S3 Upload UI — Member B
-- [ ] In `frontend/src/app/admin/products/[id]/page.tsx`:
+- [x] In `frontend/src/app/admin/products/[id]/page.tsx`:
   - Update `handleImageUpload`:
     1. Call `POST /api/admin/products/${id}/images/presign` with `{ contentType, fileName }`.
-    2. Upload file directly to S3 via `fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })`.
+    2. Upload file directly to S3 via PUT to pre-signed URL with real-time upload progress indicator.
     3. Call `POST /api/admin/products/${id}/images/confirm` with `{ image_url: publicUrl, sort_order, is_primary }`.
-    4. Provide real-time upload progress indicator (0% to 100%) during S3 PUT.
-  - Image gallery renders `img.image_url` directly.
+    4. Provide real-time upload progress indicator (0% to 100%) during direct S3 transfer.
+  - Image gallery renders `img.image_url` directly with graceful placeholder fallback.
   - Display primary image badges, sort order inputs, and deletion confirmation modals (Fix 3.4 parity).
 
 ### 2. Next.js Remote Image Configuration & Storefront Rendering — Member A
