@@ -1,5 +1,9 @@
 const productModel = require('../models/productModel');
 
+async function getActiveBrands() {
+  return { brands: await productModel.findActiveBrands() };
+}
+
 async function getProductSuggestions(query) {
   if (typeof query !== 'string' || query.trim().length < 2 || query.trim().length > 100) {
     const error = new Error('q must contain 2 to 100 characters'); error.status = 400; throw error;
@@ -136,6 +140,7 @@ async function getProductDetails(productId) {
 }
 
 module.exports = {
+  getActiveBrands,
   getProductSuggestions,
   getProductsList,
   getProductDetails,

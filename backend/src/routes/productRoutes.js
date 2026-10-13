@@ -6,6 +6,8 @@ const imageController = require('../controllers/imageController');
 // GET /api/products - List products with pagination, search, category, brand, and sort
 router.get('/', productController.getProducts);
 
+router.get('/brands', productController.getBrands);
+
 // Register before /:id so "suggestions" is not parsed as a product ID.
 router.get('/suggestions', productController.getSuggestions);
 // Compatibility alias for image URLs previously generated under /api/products.
