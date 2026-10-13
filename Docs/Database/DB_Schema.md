@@ -85,7 +85,7 @@ Table products {
 Table product_images {
   image_id serial [pk]
   product_id int [ref: > products.product_id, delete: cascade, not null]
-  image_data bytea [not null]
+  image_url varchar(500) [not null, note: 'Direct AWS S3 object URL or CDN URL (V26 migration)']
   sort_order int [not null, default: 0]
   is_primary boolean [not null, default: false]
   created_at timestamp [default: `now()`]

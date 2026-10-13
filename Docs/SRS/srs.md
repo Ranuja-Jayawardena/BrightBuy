@@ -68,7 +68,7 @@ Modern Look (Material Design principles), Responsive (mobile to desktop), Standa
 *   **Authentication**: Fully custom JWT (JSON Web Tokens) with `HttpOnly` cookies.
 *   **Payment Gateway**: Lemon Squeezy.
 *   **Notifications**: Nodemailer for emails.
-*   **File Storage**: Stored directly in PostgreSQL as `BYTEA` or Base64.
+*   **File Storage**: AWS S3 object storage (approved by lecturer) or PostgreSQL `BYTEA`.
 
 ## 4. System Features
 ### 4.1 Catalog Browsing and Variant Selection

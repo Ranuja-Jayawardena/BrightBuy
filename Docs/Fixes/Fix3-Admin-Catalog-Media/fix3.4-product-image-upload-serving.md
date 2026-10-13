@@ -111,3 +111,9 @@ true
 - Backend multipart tests cover PNG, JPEG, and WebP byte preservation, quoted boundaries, and malformed body rejection.
 - Route tests confirm `/api/images/:id` and `/api/products/images/:id` serve identical image bytes.
 - Backend suite: 116 tests passing.
+
+---
+
+## Cloud Storage Migration
+
+- **[Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md):** Replaces PostgreSQL BYTEA image storage with AWS S3 cloud storage, direct pre-signed URL uploads, and clean `image_url` schema.

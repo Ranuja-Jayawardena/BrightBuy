@@ -52,3 +52,4 @@ graph TD
 - **Product Update Route:** `PUT /api/admin/products/:id` or `PATCH /api/admin/products/:id/status` accepting `{ is_active: boolean }`.
 - **Category Update Route:** `PUT /api/admin/categories/:id` accepts `{ is_active: boolean }` (already supported by backend service).
 - **Image URL Standard:** All product images must be served from `/api/images/:id` consistently across admin and storefront.
+- **Future Cloud Media Storage:** Succeeded by [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) for complete AWS S3 cloud object storage migration.

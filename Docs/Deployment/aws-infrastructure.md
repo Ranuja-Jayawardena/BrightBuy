@@ -37,6 +37,13 @@
 - **Root Volume Size:** 20 GB (gp3)
 - **Persistent Volume:** `db-data` Docker volume on host filesystem
 
+### Cloud Object Storage (S3) — [Fix 6.1](../Fixes/Fix6-Cloud-Media-Storage-S3/fix6.1-s3-infrastructure-bucket-iam.md)
+- **Bucket Name:** `brightbuy-media-storage-695945476492`
+- **Region:** `us-east-1`
+- **Encryption:** SSE-S3 (AES-256)
+- **CORS Allowed Origins:** `http://18.208.53.186`, `http://localhost:3000`
+- **IAM Instance Profile:** `BrightBuy-EC2-Instance-Profile` attached to instance `i-0a19078299834fba2` (Role: `BrightBuy-EC2-S3-Access-Role`)
+
 ---
 
 ## 3. Execution Log (CLI Audit Trail)
