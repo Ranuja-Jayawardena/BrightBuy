@@ -248,7 +248,16 @@ export const reportService = {
       const res = await apiFetch(`/api/reports/customers/geography${query ? `?${query}` : ''}`);
       if (!res.ok) throw new Error('API request failed');
       const json = await res.json();
-      return json.data || json;
+      const data = json.data || json;
+      if (Array.isArray(data)) {
+        return data.map((item: any) => ({
+          region: item.region || item.city_name || 'Unknown',
+          order_count: Number(item.order_count) || 0,
+          total_spend: Number(item.total_spend ?? item.revenue) || 0,
+          percentage: item.percentage !== undefined ? Number(item.percentage) : undefined,
+        }));
+      }
+      return data;
     } catch {
       return MOCK_CUSTOMER_GEOGRAPHY;
     }

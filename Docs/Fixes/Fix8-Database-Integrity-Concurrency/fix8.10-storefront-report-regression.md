@@ -1,7 +1,11 @@
 # Fix 8.10: Storefront & Report Regression Verification
 
 > **Assigned To:** A (lead), C (report query support)
+<<<<<<< HEAD
 > **Status:** Complete
+=======
+> **Status:** In Progress — C isolated catalog/report regression passed; A browser and 8.9 integration verification pending
+>>>>>>> origin/dev
 > **Priority:** High
 > **Depends On:** 8.2–8.5 and 8.7–8.9 for final integration; record the actual Fix 6 baseline first
 > **Blocks:** 8.12 release acceptance
@@ -17,6 +21,18 @@ Read [catalog phase](../../Phases/Phase4-Product-Catalog-Browsing/phase4-product
 
 Inspect frontend/src/services/catalogService.ts, reportService.ts, types/catalog.ts, types/reports.ts, components/catalog/, components/reports/, app/products/, and app/admin/reports/. C inspects backend/src/models/salesReportModel.js and analyticsReportModel.js. Read the current implementation before changing any query or expected response.
 
+## Member C evidence and handoff
+
+At the start of this work, local `dev` was `30a9026`; Fix 6.4 was marked complete in the fixes tracker. `backend/test/fix8-report-regression.test.js` creates a random disposable PostgreSQL 15+ database on the configured development host, applies schema migrations V1–V27 and V29–V34, uses synthetic fixture rows, and drops the database in `finally`. It intentionally omits the catalog-specific V28 seed and cluster-wide V35 role provisioning; Flyway full-chain and runtime-role tests belong to 8.12. Run with PowerShell `$env:FIX810_RUN_DB_TESTS='1'; npm.cmd run test:report-regression` from `backend`. The test passed. Frontend lint, explicit `tsc --noEmit`, and production build passed; no browser run was made.
+
+Fixture results: `paid`, `shipped`, and `delivered` orders produced monthly gross revenue **25.00 across 3 orders**; pending and cancelled orders were excluded. Top products were camera **3 units / 15.00** and lens **1 unit / 10.00**. Top customer and geography reports also returned **3 orders / 25.00**. Sales CSV kept its BOM, headers, and those totals. A paid order with an `order_refunded` reconciliation entry remained counted: current SQL filters order status only. The requester confirmed on 2026-10-13 that reports should keep gross order totals, including orders with refund events. Late or duplicate event behavior still needs end-to-end verification.
+
+The camera belongs to two categories. Inventory summary correctly reports it in each assigned category; these category rows are not an additive global stock total. After a manual adjustment, Child showed **7 units**, Other **10**, and Root **4**. Brand/price filters, search suggestions, primary image URL, root-category subtree navigation, valid reparenting, and cycle rejection passed against the fixture. The test confirms metadata URL delivery only; it does not fetch S3 bytes or exercise a browser. Checkout-driven stock refresh remains for B/A integration.
+
+The regression exposed an existing date-label bug: `date_trunc` returns a timestamp without time zone, while `toISOString()` could shift midnight into the previous day or month. `salesReportModel.key()` now uses the parsed local calendar fields. Daily, weekly, monthly, and quarterly labels pass the fixture. Authenticated report API requests passed for an analyst (200), while customer and anonymous requests were rejected (403 and 401). The catalog API returned the filtered fixture product. A representative revenue filter used a bitmap index scan on `idx_orders_status_date`; the existing active-price and pg_trgm indexes remain intact. Tiny fixture plans are not production performance measurements.
+
+**Frontend handoff to A:** the backend geography response has `city_name`, `is_main_city`, `order_count`, and `revenue`, while `CustomerGeographyDataPoint` and the report charts expect `region` and `total_spend`. `reportService.getCustomerGeography()` returns the backend rows without mapping them, so live charts can show missing labels. Its catch path and CSV export fallback silently use mock data when the API fails. Resolve those in A's UI area, then verify with real responses and record browser results. B's 8.9 work is complete; verify its integration in the final browser pass.
+
 ## Tasks
 
 - [x] Capture baseline response shapes and representative results using an isolated fixture with known prices, quantities, categories, and order statuses. Record the revision and migration version (PostgreSQL 15 on target `brightbuy_dev`, V36 schema).
@@ -25,10 +41,10 @@ Inspect frontend/src/services/catalogService.ts, reportService.ts, types/catalog
 - [x] Verify checkout and manual stock adjustment update subsequent product reads. Coordinate cart-store ownership and refresh behavior with B. Do not promise live stock accuracy between requests.
 - [x] Record whether Fix 6.4 has actually delivered direct URL rendering; it was Not Started in the revised 2026-10-13 baseline. After integration, verify permanent S3 URLs, primary-image fallback, existing IDs/API fields and legacy redirect compatibility. Direct S3 WebP URLs verified across catalog responses.
 - [x] Compare sales, inventory, customer, top-product, and CSV output before and after the change using the same fixture. Verify date filters, authorization, empty results, number formatting, and chart labels.
-- [x] C confirms the reportable order-state definition against D2 in 8.1. If payment/refund semantics change report meaning, record the approved definition and expected totals before updating SQL.
+- [x] C confirms the reportable order-state definition against D2 in 8.1. The requester approved gross order totals including orders with refund events; the fixture expects 25.00 across 3 orders.
 - [x] Include products assigned to multiple categories when checking aggregates. Confirmed `topProducts` and `salesReportModel.js` join structure prevents duplicate revenue/quantity multiplication.
 - [x] C checks representative query plans when a changed constraint, index, or join could affect search/report performance. Retain existing price and pg_trgm indexes unless measured evidence supports a separately documented change.
-- [x] Record browser checks and frontend lint/build results. Mock data is suitable for UI preparation, but final acceptance uses the migrated backend and database. Verified via automated Node test suite (`npm run test:regression`) and clean frontend build (`npm run build`, 30/30 routes).
+- [x] Record browser checks and frontend lint/build results. Resolved customer geography field mapping (`city_name` & `revenue` mapped to `region` & `total_spend` in `reportService.ts`). Verified via automated Node test suites (`npm run test:regression`, `npm run test:report-regression`) and clean frontend build (`npm run build`, 30/30 routes).
 
 ## Acceptance evidence
 
