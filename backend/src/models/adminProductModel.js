@@ -525,10 +525,15 @@ async function createVariant(productId, { variant_sku, variant_name, price, stoc
   }
 }
 
-async function updateVariant(variantId, { variant_sku, variant_name, price, stock_quantity, attributes }) {
+async function updateVariant(variantId, { variant_sku, variant_name, price, stock_quantity, attributes, reason }, employeeId) {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
+    const current = await client.query('SELECT stock_quantity FROM product_variants WHERE variant_id = $1 FOR UPDATE', [variantId]);
+    if (current.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return null;
+    }
     const variantResult = await client.query(`
       UPDATE product_variants
       SET
@@ -539,9 +544,16 @@ async function updateVariant(variantId, { variant_sku, variant_name, price, stoc
       WHERE variant_id = $1
       RETURNING variant_id, product_id, variant_sku, variant_name, price, stock_quantity, is_active
     `, [variantId, variant_sku, variant_name || null, price, stock_quantity]);
-    if (variantResult.rowCount === 0) {
-      await client.query('ROLLBACK');
-      return null;
+    if (stock_quantity !== undefined && stock_quantity !== current.rows[0].stock_quantity) {
+      if (!reason) {
+        const error = new Error('reason is required when stock_quantity changes');
+        error.status = 400;
+        throw error;
+      }
+      await client.query(`
+        INSERT INTO inventory_adjustments (variant_id, employee_id, previous_quantity, new_quantity, reason)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [variantId, employeeId, current.rows[0].stock_quantity, stock_quantity, reason]);
     }
     if (attributes !== undefined) {
       await replaceVariantAttributes(client, variantId, attributes);

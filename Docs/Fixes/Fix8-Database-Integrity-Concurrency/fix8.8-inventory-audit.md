@@ -1,13 +1,17 @@
 # Fix 8.8: Manual Inventory Adjustment Audit
 
 > **Parent:** [Fix 8](fix8-database-integrity-concurrency.md)
-> **Status:** Not Started
+> **Status:** In Progress — backend manual edit path updated; database enforcement and integration evidence pending
 > **Assigned To:** C (implementation), E (privilege/routine review)
 > **Priority:** High, conditional on the audit scope
 > **Depends On:** [8.1](fix8.1-contracts-preflight.md) D5/D8; [8.2](fix8.2-catalog-timestamp-verification.md); 8.3/8.4 lock contract
 > **Blocks:** 8.9 inventory UI, 8.10 reporting checks, 8.11 grants, 8.12
 
 ## Decision boundary and evidence
+
+Implementation started on `dev` after 8.3/8.4 established the variant lock order. Stock writers found: variant creation (initial stock), admin variant edit (manual), dedicated inventory adjustment (manual), checkout deduction (automated), cancellation restoration (automated), and seed/migration inserts (initial stock). The admin variant-edit path now locks the variant and writes one adjustment in the same transaction when its stock changes; the dedicated adjustment path skips a no-op. Both use the authenticated employee ID. A changed stock value on the variant-edit API requires `reason` (maximum 255 characters); the admin product form owned by B must supply it or direct stock changes to the inventory screen. Initial stock is treated as creation, not an adjustment; checkout/cancellation remain automated movements. This is application-path protection only until V34 and runtime grants are designed and verified.
+
+Verification so far: changed-file ESLint passed; 18 database-independent Jest suites passed (147 tests). The full Jest command failed in two existing integration suites because this environment could not connect to the configured PostgreSQL host (`EACCES`); real database race and rollback checks remain open. The repository-wide lint currently has 14 errors in other files.
 
 Read [Phase 7.1 variants](../../Phases/Phase7-Inventory-Admin-Dashboard/phase7.1-product-variant-image-admin-apis.md), [7.4 inventory](../../Phases/Phase7-Inventory-Admin-Dashboard/phase7.4-inventory-employee-admin-apis.md), and [Fix 3 catalog](../Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md).
 

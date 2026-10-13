@@ -391,10 +391,14 @@ async function createVariant(productId, body) {
   return { variant: mapVariant(variant, payload.attributes) };
 }
 
-async function updateVariant(variantId, body) {
+async function updateVariant(variantId, body, employeeId) {
   requireBody(body);
   const payload = normalizeVariantPayload(body, false);
-  const variant = await adminProductModel.updateVariant(variantId, payload);
+  if (payload.stock_quantity !== undefined) {
+    if (!Number.isSafeInteger(employeeId) || employeeId <= 0) throw createHttpError(403, 'Employee identity is required');
+    payload.reason = body.reason === undefined ? null : normalizeString(body.reason, 'reason', { maxLength: 255 });
+  }
+  const variant = await adminProductModel.updateVariant(variantId, payload, employeeId);
   return variant ? { variant: mapVariant(variant, payload.attributes) } : null;
 }
 

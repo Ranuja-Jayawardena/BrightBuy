@@ -129,7 +129,7 @@ async function createVariant(req, res, next) {
 
 async function updateVariant(req, res, next) {
   try {
-    const result = await adminProductService.updateVariant(parseId(req.params.id), req.body);
+    const result = await adminProductService.updateVariant(parseId(req.params.id), req.body, req.user.employee_id);
     if (!result) {
       return res.status(404).json({ error: 'not_found', message: 'Variant not found', statusCode: 404 });
     }
