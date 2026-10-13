@@ -1,7 +1,7 @@
 # Fix 6.4: Storefront & Admin Direct Image Delivery & Upload UI
 
 > **Parent Group:** [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](fix6-cloud-media-storage-s3.md)  
-> **Status:** Planned  
+> **Status:** In Progress (Member A complete)  
 > **Assigned To:** Member A (Storefront UI) & Member B (Admin Products UI)  
 > **Depends On:** [Fix 6.3: Backend S3 Service & APIs](fix6.3-backend-s3-service-upload-apis.md)  
 > **Blocks:** —  
@@ -31,7 +31,7 @@
   - Display primary image badges, sort order inputs, and deletion confirmation modals (Fix 3.4 parity).
 
 ### 2. Next.js Remote Image Configuration & Storefront Rendering — Member A
-- [ ] In `frontend/next.config.ts` (or `next.config.js`):
+- [x] In `frontend/next.config.ts` (or `next.config.js`):
   - Add AWS S3 domain to `images.remotePatterns`:
     ```typescript
     remotePatterns: [
@@ -45,7 +45,7 @@
       },
     ],
     ```
-- [ ] Storefront Image Rendering (`/products`, `/products/[id]`, `/cart`):
+- [x] Storefront Image Rendering (`/products`, `/products/[id]`, `/cart`):
   - Update product components to render `product.image_url` directly.
   - Implement graceful `onError` fallback to `/placeholder-product.svg` if an image fails to load.
 
