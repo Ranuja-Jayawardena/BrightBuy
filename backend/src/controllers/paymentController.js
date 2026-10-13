@@ -1,3 +1,4 @@
+const { URL } = require('node:url');
 const db = require('../config/db');
 
 function isPositiveInt(value) {
@@ -89,7 +90,9 @@ const createSession = async (req, res) => {
                         customerEmail = userRes.rows[0].email;
                         customerName = [userRes.rows[0].first_name, userRes.rows[0].last_name].filter(Boolean).join(' ') || undefined;
                     }
-                } catch (_) {}
+                } catch {
+                    // Ignore customer lookup failure and proceed without prefill
+                }
 
                 const clientOrigin = req.get('origin') || req.get('referer');
                 let frontendBaseUrl = 'http://localhost:3000';
@@ -106,7 +109,7 @@ const createSession = async (req, res) => {
                         } else if (configuredOrigins.length > 0) {
                             frontendBaseUrl = configuredOrigins[0];
                         }
-                    } catch (_) {
+                    } catch {
                         frontendBaseUrl = configuredOrigins[0] || 'http://localhost:3000';
                     }
                 } else if (configuredOrigins.length > 0) {
