@@ -22,6 +22,8 @@ export const catalogService = {
     category_id?: number;
     brand?: string;
     sort?: string;
+    min_price?: number | string;
+    max_price?: number | string;
   }): Promise<GetProductsResponse> {
     const query = new URLSearchParams();
     
@@ -31,6 +33,8 @@ export const catalogService = {
     if (params.category_id) query.set('category_id', params.category_id.toString());
     if (params.brand && params.brand !== 'All') query.set('brand', params.brand);
     if (params.sort) query.set('sort', params.sort);
+    if (params.min_price !== undefined && params.min_price !== '') query.set('min_price', params.min_price.toString());
+    if (params.max_price !== undefined && params.max_price !== '') query.set('max_price', params.max_price.toString());
 
     const queryString = query.toString();
     const url = `/api/products${queryString ? `?${queryString}` : ''}`;

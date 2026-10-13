@@ -1,7 +1,7 @@
 # Fix 2.1: Price Range Filtering & Composite Indexing
 
 > **Parent Group:** [Fix 2: Search & Filter Performance](fix2-search-filter-performance.md)
-> **Status:** In Progress (C backend complete; A UI pending)
+> **Status:** Complete
 > **Assigned To:** Member C (Backend Models & DB Migration) & Member A (Storefront Filter UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -60,11 +60,11 @@ In `backend/src/models/productModel.js`, support `min_price` and `max_price`:
 - [x] Update `Docs/Database/DB_Schema.md` with the new indexes.
 
 ### Storefront UI — Member A
-- [ ] In `frontend/src/components/catalog/ProductFilterSidebar.tsx`:
+- [x] In `frontend/src/components/catalog/ProductFilterSidebar.tsx`:
   - Add a Price Range filter component with Min and Max input fields and/or a dual slider.
   - Debounce input updates or provide an "Apply" button.
   - Sync with URL query parameters (`?min_price=25&max_price=150`).
-- [ ] In `frontend/src/app/products/page.tsx`:
+- [x] In `frontend/src/app/products/page.tsx`:
   - Pass `min_price` and `max_price` from URL query to `productService.getProducts()`.
   - Display active price filter pill with clear button.
 

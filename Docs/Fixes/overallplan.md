@@ -3,7 +3,7 @@
 **Project:** Retail Inventory and Online Order Management System  
 **Prepared By:** Group 16  
 **Date:** October 2026  
-**Status:** In Progress (12 / 14 fix items complete across 5 fix groups)
+**Status:** In Progress (13 / 14 fix items complete across 5 fix groups)
 
 ---
 
@@ -56,7 +56,7 @@ This document is the **master tracker** for all post-development fixes, patches,
   - [x] **1.4** Address Form Cancel Feedback Fix — **B (UI)** → [fix1.4-address-form-cancel-feedback.md](Fix1-Customer-Account-Storefront/fix1.4-address-form-cancel-feedback.md)
 
 - [ ] **Fix 2: Search & Filter Performance** → [fix2-search-filter-performance.md](Fix2-Search-Filter-Performance/fix2-search-filter-performance.md)
-  - [ ] **2.1** Price Range Filtering & Composite Indexing — **C (DB/API), A (UI)** → [fix2.1-price-range-filter-indexing.md](Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md)
+  - [x] **2.1** Price Range Filtering & Composite Indexing — **C (DB/API), A (UI)** → [fix2.1-price-range-filter-indexing.md](Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md)
   - [ ] **2.2** Search Autocomplete & pg_trgm GIN Indexing — **C (DB/API), A (UI)** → [fix2.2-search-autocomplete-suggestions.md](Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md)
 
 - [x] **Fix 3: Admin Catalog & Media Management** → [fix3-admin-catalog-media.md](Fix3-Admin-Catalog-Media/fix3-admin-catalog-media.md)
