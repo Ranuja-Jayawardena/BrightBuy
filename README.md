@@ -244,20 +244,20 @@ Database responsibilities across BrightBuy were split among all 5 team members. 
 
 ### Team Overview & DB Ownership Matrix
 
-| Member | Name | Role | Subphase | Tables Owned | Flyway Migrations | Seed Scripts |
-|--------|------|------|----------|--------------|-------------------|--------------|
-| **A** | **Rithmi** | Frontend – Storefront | [1.5](Docs/Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md) | `categories`, `product_categories`, `variant_attributes`, `variant_attribute_values` | `V7`, `V8`, `V12`, `V13` | `03_taxonomy.sql`, `05_catalog_links.sql` |
-| **B** | **Thinura** | Frontend – Admin/Cart | [1.4](Docs/Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md) | `customers`, `addresses`, `carts`, `cart_items` | `V5`, `V6`, `V14`, `V15`, `V29` | `02_customers.sql`, `06_carts.sql` |
-| **C** | **Kavindu** | Backend – Products | [1.6](Docs/Phases/Phase1-Project-Foundation/phase1.6-product-schema.md) | `products`, `product_variants`, `product_images`, `inventory_adjustments` | `V9`, `V10`, `V11`, `V20`, `V22`, `V23`, `V26`, `V27`, `V28`, `V34` | `04_products.sql` (40 products / 70+ variants) |
-| **D** | **Mayura** | Backend – Orders | [1.7](Docs/Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md) | `orders`, `order_items`, `payments`, `deliveries`, `email_jobs` | `V16`, `V17`, `V18`, `V19`, `V25`, `V30`, `V31` | `07_orders.sql` |
-| **E** | **Ranuja** | DevOps + Architecture | [1.1](Docs/Phases/Phase1-Project-Foundation/phase1.1-project-scaffolding.md), [1.2](Docs/Phases/Phase1-Project-Foundation/phase1.2-database-tooling.md), [1.3](Docs/Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md), [1.8](Docs/Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md) | `users`, `employees`, `super_admin_guard`, `refresh_tokens`, `cities`, `media_uploads`, `media_cleanup_ledger` | `V1`, `V2`, `V3`, `V4`, `V21`, `V24`, `V32`, `V33`, `V35`, `V36` | `01_identity.sql` |
+| Team Member | Role | Schema Domain | Tables Owned | Flyway Migrations | Seed Scripts |
+|-------------|------|---------------|--------------|-------------------|--------------|
+| **Rithmi** | Frontend – Storefront | [Catalog Taxonomy](Docs/Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md) | `categories`, `product_categories`, `variant_attributes`, `variant_attribute_values` | `V7`, `V8`, `V12`, `V13` | `03_taxonomy.sql`, `05_catalog_links.sql` |
+| **Thinura** | Frontend – Admin/Cart | [Customer & Cart](Docs/Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md) | `customers`, `addresses`, `carts`, `cart_items` | `V5`, `V6`, `V14`, `V15`, `V29` | `02_customers.sql`, `06_carts.sql` |
+| **Kavindu** | Backend – Products | [Product Catalog & Inventory](Docs/Phases/Phase1-Project-Foundation/phase1.6-product-schema.md) | `products`, `product_variants`, `product_images`, `inventory_adjustments` | `V9`, `V10`, `V11`, `V20`, `V22`, `V23`, `V26`, `V27`, `V28`, `V34` | `04_products.sql` (40 products / 70+ variants) |
+| **Mayura** | Backend – Orders | [Orders, Payments & Deliveries](Docs/Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md) | `orders`, `order_items`, `payments`, `deliveries`, `email_jobs` | `V16`, `V17`, `V18`, `V19`, `V25`, `V30`, `V31` | `07_orders.sql` |
+| **Ranuja** | DevOps + Architecture | [Identity, Tooling & Scaffolding](Docs/Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md) | `users`, `employees`, `super_admin_guard`, `refresh_tokens`, `cities`, `media_uploads`, `media_cleanup_ledger` | `V1`, `V2`, `V3`, `V4`, `V21`, `V24`, `V32`, `V33`, `V35`, `V36` | `01_identity.sql` |
 
 ---
 
-### Detailed Contributions by Member
+### Detailed Contributions by Team Member
 
-#### Member A — Rithmi (Storefront & Catalog Taxonomy)
-* **Schema Subphase:** [Phase 1.5 – Catalog Taxonomy Schema](Docs/Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md)
+#### Rithmi (Storefront & Catalog Taxonomy)
+* **Schema Domain:** [Phase 1.5 – Catalog Taxonomy Schema](Docs/Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md)
 * **Owned Tables:**
   - `categories`: Self-referencing hierarchical product categories (`parent_category_id`).
   - `product_categories`: Many-to-many junction connecting products to multiple categories.
@@ -275,8 +275,8 @@ Database responsibilities across BrightBuy were split among all 5 team members. 
   - Recursive self-referential category parent-child hierarchy.
   - Foreign key indexing on category and taxonomy lookup paths.
 
-#### Member B — Thinura (Admin UI, Customer & Shopping Cart)
-* **Schema Subphase:** [Phase 1.4 – Customer & Cart Schema](Docs/Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md)
+#### Thinura (Admin UI, Customer & Shopping Cart)
+* **Schema Domain:** [Phase 1.4 – Customer & Cart Schema](Docs/Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md)
 * **Owned Tables:**
   - `customers`: Customer profiles linked 1-to-1 with `users`.
   - `addresses`: Shipping and billing addresses linked to cities.
@@ -296,8 +296,8 @@ Database responsibilities across BrightBuy were split among all 5 team members. 
   - Strict composite uniqueness constraint `UNIQUE(cart_id, variant_id)` on `cart_items` to prevent duplicate line items.
   - Concurrency control and optimistic row locking during checkout cart state transitions.
 
-#### Member C — Kavindu (Product Catalog & Inventory)
-* **Schema Subphase:** [Phase 1.6 – Product Schema](Docs/Phases/Phase1-Project-Foundation/phase1.6-product-schema.md)
+#### Kavindu (Product Catalog & Inventory)
+* **Schema Domain:** [Phase 1.6 – Product Schema](Docs/Phases/Phase1-Project-Foundation/phase1.6-product-schema.md)
 * **Owned Tables:**
   - `products`: Master product catalog records, base SKUs, descriptions, and brands.
   - `product_variants`: Product variant SKUs, pricing, and stock levels.
@@ -322,8 +322,8 @@ Database responsibilities across BrightBuy were split among all 5 team members. 
   - Inventory audit triggers (`V34`) automatically recording stock quantity deltas into `inventory_adjustments`.
   - Automated `updated_at` triggers updating catalog modification timestamps.
 
-#### Member D — Mayura (Orders, Payments & Deliveries)
-* **Schema Subphase:** [Phase 1.7 – Order, Payment & Delivery Schema](Docs/Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md)
+#### Mayura (Orders, Payments & Deliveries)
+* **Schema Domain:** [Phase 1.7 – Order, Payment & Delivery Schema](Docs/Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md)
 * **Owned Tables:**
   - `orders`: Order headers, order statuses, totals, and address snapshots.
   - `order_items`: Order line item snapshots with historical unit prices at time of purchase.
@@ -345,8 +345,8 @@ Database responsibilities across BrightBuy were split among all 5 team members. 
   - Unique payment transaction constraints preventing double-charges and duplicate payment webhooks.
   - High-concurrency background job queue using `SELECT ... FOR UPDATE SKIP LOCKED` for transactional email processing (`email_jobs`).
 
-#### Member E — Ranuja (DevOps, Architecture & Identity)
-* **Schema Subphases:** [Phase 1.1 Scaffolding](Docs/Phases/Phase1-Project-Foundation/phase1.1-project-scaffolding.md), [Phase 1.2 DB Tooling](Docs/Phases/Phase1-Project-Foundation/phase1.2-database-tooling.md), [Phase 1.3 Identity & Location](Docs/Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md), [Phase 1.8 Integration](Docs/Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md)
+#### Ranuja (DevOps, Architecture & Identity)
+* **Schema Domains:** [Phase 1.1 Scaffolding](Docs/Phases/Phase1-Project-Foundation/phase1.1-project-scaffolding.md), [Phase 1.2 DB Tooling](Docs/Phases/Phase1-Project-Foundation/phase1.2-database-tooling.md), [Phase 1.3 Identity & Location](Docs/Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md), [Phase 1.8 Integration](Docs/Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md)
 * **Owned Tables:**
   - `users`: Core authentication table, bcrypt hashes, and primary system roles.
   - `employees`: Internal staff profiles with granular RBAC sub-roles.
