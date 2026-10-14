@@ -324,6 +324,33 @@ describe('Member E Fixes: Profile Management (Fix 1.1) & Employee Lifecycle (Fix
       expect(res.body.message).toBe('Cannot demote the last active super admin');
     });
 
+    it('should map DB trigger P0001 rejection during role update to HTTP 400', async () => {
+      const p0001Err = new Error('Cannot remove the last active super admin');
+      p0001Err.code = 'P0001';
+
+      db.query
+        .mockResolvedValueOnce({
+          rows: [{ employee_id: 10, role: 'super_admin', is_active: true }],
+        }) // requireAuth
+        .mockResolvedValueOnce({
+          rows: [{ employee_id: 1, user_id: 1, role: 'super_admin', first_name: 'Root', last_name: 'Admin', phone: null, is_active: true }],
+        }) // getEmployeeById
+        .mockResolvedValueOnce({
+          rows: [{ count: 2 }],
+        }) // countActiveSuperAdmins passed
+        .mockRejectedValueOnce(p0001Err); // DB update throws P0001 from trigger
+
+      const res = await request(app)
+        .put('/api/admin/employees/1')
+        .set('Cookie', [`access_token=${superAdminToken}`])
+        .send({
+          role: 'analyst',
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe('Cannot demote the last active super admin');
+    });
+
     it('should toggle employee active status (PATCH /api/admin/employees/:id/status) (200)', async () => {
       db.query
         .mockResolvedValueOnce({
@@ -369,6 +396,33 @@ describe('Member E Fixes: Profile Management (Fix 1.1) & Employee Lifecycle (Fix
 
       expect(res.status).toBe(400);
       expect(res.body.message).toBe('Super admins cannot deactivate their own account');
+    });
+
+    it('should map DB trigger P0001 rejection during employee deactivation to HTTP 400', async () => {
+      const p0001Err = new Error('Cannot remove the last active super admin');
+      p0001Err.code = 'P0001';
+
+      db.query
+        .mockResolvedValueOnce({
+          rows: [{ employee_id: 10, role: 'super_admin', is_active: true }],
+        }) // requireAuth
+        .mockResolvedValueOnce({
+          rows: [{ employee_id: 2, role: 'super_admin', is_active: true }],
+        }) // getEmployeeById
+        .mockResolvedValueOnce({
+          rows: [{ count: 2 }],
+        }) // countActiveSuperAdmins passed
+        .mockRejectedValueOnce(p0001Err); // DB update throws P0001 from trigger
+
+      const res = await request(app)
+        .patch('/api/admin/employees/2/status')
+        .set('Cookie', [`access_token=${superAdminToken}`])
+        .send({
+          is_active: false,
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe('Cannot deactivate the last active super admin');
     });
 
     it('should prevent non-super admin staff from accessing employee management endpoints (403)', async () => {

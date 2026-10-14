@@ -14,11 +14,11 @@ const variants = [
     { sku: 'SPH-001-BLK-128', price: 799.00 },
     { sku: 'LAP-001-16G-512', price: 1299.00 },
     { sku: 'AUD-001-BLK', price: 299.00 },
-    { sku: 'HAP-001-WHT', price: 179.99 },
-    { sku: 'KIT-001-BLK', price: 99.99 },
-    { sku: 'CLN-001-WHT', price: 399.00 },
-    { sku: 'APP-001-BLK', price: 69.00 },
-    { sku: 'MCL-001-WHT-M', price: 49.50 }
+    { sku: 'PER-003-BLK', price: 179.99 },
+    { sku: 'AUD-003-BLK', price: 99.99 },
+    { sku: 'DSP-003-25-BLK', price: 399.00 },
+    { sku: 'IOT-002-5M-RGB', price: 69.00 },
+    { sku: 'PER-002-BLK', price: 49.50 }
 ];
 
 const statuses = ['pending', 'paid', 'shipped', 'delivered', 'cancelled'];
@@ -93,13 +93,13 @@ INSERT INTO orders (customer_id, order_date, status, total_amount) VALUES (
 );
 `;
 
+    const deliveryMode = Math.random() > 0.5 ? 'home_delivery' : 'store_pickup';
+
     // Deliveries
     let deliveryStatus = 'pending';
-    if (status === 'shipped') deliveryStatus = 'in_transit';
-    if (status === 'delivered') deliveryStatus = 'delivered';
+    if (status === 'shipped') deliveryStatus = deliveryMode === 'store_pickup' ? 'ready_for_pickup' : 'shipped';
+    if (status === 'delivered') deliveryStatus = deliveryMode === 'store_pickup' ? 'collected' : 'delivered';
     if (status === 'cancelled') deliveryStatus = 'cancelled';
-    
-    const deliveryMode = Math.random() > 0.5 ? 'home_delivery' : 'store_pickup';
     
     deliveriesSql += `INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, delivery_city_id, delivery_zip_code, delivery_status) VALUES (
     (SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1 OFFSET ${numOrders - i}),

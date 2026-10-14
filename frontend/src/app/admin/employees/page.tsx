@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { apiFetch } from '@/services/api';
+import { sanitizeConflictError } from '@/lib/errorUtils';
+import { useAuthStore } from '@/store/useAuthStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import {
   Users,
   UserPlus,
@@ -15,7 +18,8 @@ import {
   RefreshCw,
   X,
   Lock,
-  User
+  User,
+  Pencil,
 } from 'lucide-react';
 
 interface EmployeeItem {
@@ -26,6 +30,7 @@ interface EmployeeItem {
   last_name: string;
   phone: string | null;
   role?: string;
+  is_active?: boolean;
 }
 
 const STAFF_ROLES = [
@@ -37,12 +42,14 @@ const STAFF_ROLES = [
 ];
 
 export default function AdminEmployeesPage() {
+  const { user: currentUser } = useAuthStore();
   const [employees, setEmployees] = useState<EmployeeItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [togglingId, setTogglingId] = useState<number | null>(null);
 
-  // Modal / Form state
+  // Create Modal / Form state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     first_name: '',
@@ -54,6 +61,26 @@ export default function AdminEmployeesPage() {
   });
   const [formError, setFormError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Edit Modal / Form state
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<EmployeeItem | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    first_name: '',
+    last_name: '',
+    phone: '',
+    role: 'inventory_manager',
+  });
+  const [editFormError, setEditFormError] = useState('');
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+
+  const isSelf = (emp: EmployeeItem) => {
+    if (!currentUser) return false;
+    return (
+      (currentUser.employee_id !== undefined && currentUser.employee_id === emp.employee_id) ||
+      (currentUser.user_id !== undefined && currentUser.user_id === emp.user_id)
+    );
+  };
 
   const fetchEmployees = async () => {
     try {
@@ -139,11 +166,129 @@ export default function AdminEmployeesPage() {
 
       setSuccess(`Employee ${formData.first_name} ${formData.last_name} (${formData.email}) registered as ${STAFF_ROLES.find(r => r.value === formData.role)?.label || formData.role} successfully.`);
       closeCreateModal();
-      fetchEmployees();
+      await fetchEmployees();
     } catch (err: any) {
-      setFormError(err.message);
+      setFormError(sanitizeConflictError(err, 'Failed to register new employee'));
+      await fetchEmployees();
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleToggleStatus = async (emp: EmployeeItem) => {
+    if (isSelf(emp)) {
+      setError('You cannot deactivate your own account.');
+      return;
+    }
+
+    const nextStatus = !(emp.is_active ?? true);
+    setTogglingId(emp.employee_id);
+    setError('');
+    setSuccess('');
+
+    try {
+      const res = await apiFetch(`/api/admin/employees/${emp.employee_id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: nextStatus }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.message || data.error || 'Failed to update employee status');
+      }
+
+      setEmployees((prev) =>
+        prev.map((item) =>
+          item.employee_id === emp.employee_id ? { ...item, is_active: nextStatus } : item
+        )
+      );
+      setSuccess(data.message || `Employee ${nextStatus ? 'activated' : 'deactivated'} successfully.`);
+    } catch (err: any) {
+      setError(sanitizeConflictError(err, 'Failed to update employee status'));
+      // Authoritative state refetch: Revert any optimistic drift or database rollback
+      await fetchEmployees();
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const openEditModal = (emp: EmployeeItem) => {
+    setEditingEmployee(emp);
+    setEditFormData({
+      first_name: emp.first_name || '',
+      last_name: emp.last_name || '',
+      phone: emp.phone || '',
+      role: emp.role || 'inventory_manager',
+    });
+    setEditFormError('');
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingEmployee(null);
+    setEditFormError('');
+  };
+
+  const handleUpdateEmployee = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEmployee) return;
+    setEditFormError('');
+
+    if (!editFormData.first_name.trim()) {
+      setEditFormError('First name is required.');
+      return;
+    }
+    if (!editFormData.last_name.trim()) {
+      setEditFormError('Last name is required.');
+      return;
+    }
+
+    try {
+      setIsEditSubmitting(true);
+      const res = await apiFetch(`/api/admin/employees/${editingEmployee.employee_id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: editFormData.first_name.trim(),
+          last_name: editFormData.last_name.trim(),
+          phone: editFormData.phone.trim() || undefined,
+          role: editFormData.role,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.message || data.error || 'Failed to update employee');
+      }
+
+      const updatedEmp = data.employee;
+      setEmployees((prev) =>
+        prev.map((item) =>
+          item.employee_id === editingEmployee.employee_id
+            ? {
+                ...item,
+                first_name: updatedEmp?.first_name ?? editFormData.first_name.trim(),
+                last_name: updatedEmp?.last_name ?? editFormData.last_name.trim(),
+                phone: updatedEmp?.phone ?? (editFormData.phone.trim() || null),
+                role: updatedEmp?.role ?? editFormData.role,
+                is_active: updatedEmp?.is_active ?? item.is_active,
+              }
+            : item
+        )
+      );
+
+      setSuccess(`Employee ${editFormData.first_name.trim()} ${editFormData.last_name.trim()} updated successfully.`);
+      closeEditModal();
+      await fetchEmployees();
+    } catch (err: any) {
+      setEditFormError(sanitizeConflictError(err, 'Failed to update employee'));
+      await fetchEmployees();
+    } finally {
+      setIsEditSubmitting(false);
     }
   };
 
@@ -205,13 +350,14 @@ export default function AdminEmployeesPage() {
                 <th className="p-4 font-semibold">Email</th>
                 <th className="p-4 font-semibold">Phone</th>
                 <th className="p-4 font-semibold">Role</th>
-                <th className="p-4 font-semibold text-right">Status</th>
+                <th className="p-4 font-semibold">Status</th>
+                <th className="p-4 font-semibold text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="p-12 text-center text-muted-foreground">
+                  <td colSpan={7} className="p-12 text-center text-muted-foreground">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <RefreshCw className="w-6 h-6 animate-spin text-primary" />
                       <span>Loading team members...</span>
@@ -220,58 +366,93 @@ export default function AdminEmployeesPage() {
                 </tr>
               ) : employees.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-12 text-center text-muted-foreground">
+                  <td colSpan={7} className="p-12 text-center text-muted-foreground">
                     <p className="font-medium text-foreground">No employee accounts registered</p>
                     <p className="text-xs mt-1">Click "Add Employee" above to grant staff access.</p>
                   </td>
                 </tr>
               ) : (
-                employees.map((emp) => (
-                  <tr key={emp.employee_id} className="hover:bg-muted/30 transition-colors">
-                    <td className="p-4 font-mono font-medium text-muted-foreground text-xs">
-                      #{emp.employee_id}
-                    </td>
-                    <td className="p-4">
-                      <div className="font-semibold text-foreground flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase">
-                          {emp.first_name[0]}{emp.last_name[0]}
+                employees.map((emp) => {
+                  const selfAccount = isSelf(emp);
+                  const isActive = emp.is_active ?? true;
+
+                  return (
+                    <tr key={emp.employee_id} className="hover:bg-muted/30 transition-colors">
+                      <td className="p-4 font-mono font-medium text-muted-foreground text-xs">
+                        #{emp.employee_id}
+                      </td>
+                      <td className="p-4">
+                        <div className="font-semibold text-foreground flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase">
+                            {emp.first_name[0]}{emp.last_name[0]}
+                          </div>
+                          <span>{emp.first_name} {emp.last_name}</span>
+                          {selfAccount && (
+                            <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
+                              You
+                            </span>
+                          )}
                         </div>
-                        <span>{emp.first_name} {emp.last_name}</span>
-                      </div>
-                    </td>
-                    <td className="p-4 text-muted-foreground">
-                      <div className="flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                        <span>{emp.email}</span>
-                      </div>
-                    </td>
-                    <td className="p-4 text-muted-foreground">
-                      {emp.phone ? (
+                      </td>
+                      <td className="p-4 text-muted-foreground">
                         <div className="flex items-center gap-1.5">
-                          <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                          <span>{emp.phone}</span>
+                          <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span>{emp.email}</span>
                         </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground/60 italic">—</span>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      {(() => {
-                        const matched = STAFF_ROLES.find((r) => r.value === emp.role);
-                        return (
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${matched?.badge || 'bg-primary/10 text-primary'}`}>
-                            <ShieldCheck className="w-3.5 h-3.5" /> {matched?.label || emp.role || 'Admin'}
+                      </td>
+                      <td className="p-4 text-muted-foreground">
+                        {emp.phone ? (
+                          <div className="flex items-center gap-1.5">
+                            <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                            <span>{emp.phone}</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground/60 italic">—</span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        {(() => {
+                          const matched = STAFF_ROLES.find((r) => r.value === emp.role);
+                          return (
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${matched?.badge || 'bg-primary/10 text-primary'}`}>
+                              <ShieldCheck className="w-3.5 h-3.5" /> {matched?.label || emp.role || 'Admin'}
+                            </span>
+                          );
+                        })()}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={isActive}
+                            disabled={selfAccount || togglingId === emp.employee_id}
+                            onCheckedChange={() => handleToggleStatus(emp)}
+                            title={selfAccount ? 'You cannot deactivate your own account' : isActive ? 'Deactivate employee' : 'Activate employee'}
+                          />
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                              isActive
+                                ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300'
+                                : 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
+                            }`}
+                          >
+                            {isActive ? 'Active' : 'Deactivated'}
                           </span>
-                        );
-                      })()}
-                    </td>
-                    <td className="p-4 text-right">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
-                        Active
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                        </div>
+                      </td>
+                      <td className="p-4 text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditModal(emp)}
+                          className="h-8 px-2.5 text-xs"
+                        >
+                          <Pencil className="w-3.5 h-3.5 mr-1" />
+                          Edit
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -415,6 +596,137 @@ export default function AdminEmployeesPage() {
           </div>
         </div>
       )}
+
+      {/* Edit Employee Modal */}
+      {isEditModalOpen && editingEmployee && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm overflow-y-auto">
+          <div
+            className="bg-card border rounded-xl shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-6 border-b flex items-start justify-between bg-muted/20">
+              <div>
+                <h2 className="text-xl font-bold tracking-tight">Edit Employee</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Update employee contact details and operational staff role.
+                </p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={closeEditModal} className="rounded-full">
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleUpdateEmployee}>
+              <div className="p-6 space-y-4">
+                {editFormError && (
+                  <div className="p-3 bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-400 rounded-lg flex items-center gap-2 border border-red-200 text-sm">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{editFormError}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium">First Name</label>
+                    <div className="relative">
+                      <User className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
+                      <Input
+                        required
+                        placeholder="e.g. Marcus"
+                        value={editFormData.first_name}
+                        onChange={(e) => setEditFormData({ ...editFormData, first_name: e.target.value })}
+                        className="pl-9 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium">Last Name</label>
+                    <div className="relative">
+                      <User className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
+                      <Input
+                        required
+                        placeholder="e.g. Vance"
+                        value={editFormData.last_name}
+                        onChange={(e) => setEditFormData({ ...editFormData, last_name: e.target.value })}
+                        className="pl-9 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium">Email Address (Read-only)</label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      disabled
+                      value={editingEmployee.email}
+                      className="pl-9 text-sm bg-muted/50 cursor-not-allowed opacity-80"
+                    />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Employee login emails are bound to the primary identity account and cannot be modified directly.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium">Phone Number (Optional)</label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
+                    <Input
+                      type="tel"
+                      placeholder="e.g. +1 555-0812"
+                      value={editFormData.phone}
+                      onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                      className="pl-9 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium">Assigned Operational Role</label>
+                  <select
+                    value={editFormData.role}
+                    disabled={isSelf(editingEmployee)}
+                    onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value })}
+                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {STAFF_ROLES.map((r) => (
+                      <option key={r.value} value={r.value} className="bg-popover text-popover-foreground">
+                        {r.label}
+                      </option>
+                    ))}
+                  </select>
+                  {isSelf(editingEmployee) ? (
+                    <p className="text-[11px] text-amber-600 dark:text-amber-400">
+                      Super Administrators cannot change or demote their own account role.
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      Controls which management modules and API endpoints this employee is permitted to access.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-4 border-t bg-muted/20 flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={closeEditModal} disabled={isEditSubmitting}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isEditSubmitting}>
+                  {isEditSubmitting ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

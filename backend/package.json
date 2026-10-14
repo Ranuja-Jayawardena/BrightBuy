@@ -8,10 +8,22 @@
     "dev": "nodemon src/index.js",
     "lint": "eslint src/",
     "test": "jest --runInBand",
-    "test:product": "node --test test/product-validation.test.js"
+    "test:product": "node --test test/product-validation.test.js",
+    "test:s3": "node --test test/s3-infrastructure.test.js",
+    "test:staff-protection": "node --test test/super-admin-protection.test.js",
+    "test:catalog-timestamp": "node --test test/catalog-timestamp-integration.test.js",
+    "test:media-concurrency": "node --test test/s3-media-concurrency.test.js",
+    "test:db-accounts": "node --test test/database-account-separation.test.js",
+    "test:inventory-audit": "node --test test/inventory-audit-integration.test.js",
+    "test:concurrency": "node --test test/fix8-concurrency-harness.test.js",
+    "test:report-regression": "node --test test/fix8-report-regression.test.js",
+    "test:regression": "node --test test/storefront-report-regression.test.js",
+    "test:stock-race": "node --test test/fix8-stock-race-integration.test.js"
   },
   "jest": {
-    "testMatch": ["**/tests/**/*.test.js"]
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
   },
   "keywords": [
     "brightbuy",
@@ -22,6 +34,8 @@
   "author": "BrightBuy Team",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1150.0",
+    "@aws-sdk/s3-request-presigner": "^3.1150.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -34,6 +48,8 @@
     "pg": "^8.13.3"
   },
   "devDependencies": {
+    "@emnapi/core": "^1.11.3",
+    "@emnapi/runtime": "^1.11.3",
     "@eslint/js": "^9.21.0",
     "eslint": "^9.21.0",
     "jest": "^30.5.2",

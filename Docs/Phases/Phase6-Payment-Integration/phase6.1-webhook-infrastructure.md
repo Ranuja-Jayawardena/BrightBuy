@@ -51,3 +51,10 @@ Response 401: { error: "Invalid signature" }
 - Stubbed `handlePaymentSuccess` and `handlePaymentFailure` in `paymentService.js` for **D** to implement in Phase 6.3.
 - **Testing Webhooks Locally:** To test webhooks locally, developers can use [ngrok](https://ngrok.com/) to create a public URL (e.g. `ngrok http 5000`) and set that URL as the webhook endpoint in the Lemon Squeezy Test Mode dashboard. Ensure `LEMON_SQUEEZY_WEBHOOK_SECRET` matches the one set in the Lemon Squeezy settings.
 
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.4: Order Transitions & Payment Event Consistency](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

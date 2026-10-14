@@ -1,9 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import { Button } from '@/components/ui/button';
 import { 
   Trash2, 
@@ -20,6 +23,37 @@ import {
 } from 'lucide-react';
 
 export default function CartPage() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      const timer = setTimeout(() => {
+        router.replace('/admin');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [user, router]);
+
+  if (user?.role === 'admin') {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-24 text-center">
+        <div className="w-16 h-16 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+          <AlertCircle className="h-8 w-8" />
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight mb-2">Staff Account Restricted</h2>
+        <p className="text-muted-foreground mb-6 text-sm leading-relaxed">
+          Employees and administrators cannot maintain shopping carts or make store purchases. Redirecting you to the admin management dashboard...
+        </p>
+        <Link href="/admin">
+          <Button className="gap-2">
+            Go to Admin Dashboard <ArrowRight className="w-4 h-4" />
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <ProtectedRoute>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -80,7 +114,9 @@ function CartContent() {
     try {
       await updateItem(cartItemId, newQty);
     } catch (err: any) {
-      setCartError(err.message || 'Unable to update item quantity.');
+      // Refetch authoritative cart state to clear stale or rolled back numbers
+      await useCartStore.getState().fetchCart();
+      setCartError(sanitizeConflictError(err, 'Unable to update item quantity.'));
     } finally {
       setUpdatingItemId(null);
     }
@@ -92,7 +128,8 @@ function CartContent() {
     try {
       await removeItem(cartItemId);
     } catch (err: any) {
-      setCartError(err.message || 'Unable to remove item from cart.');
+      await useCartStore.getState().fetchCart();
+      setCartError(sanitizeConflictError(err, 'Unable to remove item from cart.'));
     } finally {
       setRemovingId(null);
     }
@@ -130,10 +167,15 @@ function CartContent() {
                 >
                   {/* Thumbnail */}
                   <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border bg-muted/30 flex items-center justify-center relative">
-                    {item.primary_image_id ? (
+                    {(item.primary_image_url || item.primary_image_id) ? (
                       <img
-                        src={`/api/products/images/${item.primary_image_id}`}
+                        key={item.primary_image_url || item.primary_image_id || item.variant_id}
+                        src={item.primary_image_url || `/api/images/${item.primary_image_id}`}
                         alt={item.product_name}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = '/placeholder-product.svg';
+                        }}
                         className="h-full w-full object-cover object-center"
                       />
                     ) : (

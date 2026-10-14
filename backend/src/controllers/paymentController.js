@@ -1,3 +1,4 @@
+const { URL } = require('node:url');
 const db = require('../config/db');
 
 function isPositiveInt(value) {
@@ -42,21 +43,117 @@ const createSession = async (req, res) => {
             return res.status(400).json({ error: 'invalid_order_status', message: 'Order is not pending payment', statusCode: 400 });
         }
 
+        // Check if payment is already completed
+        const existingPayment = await db.query(
+            'SELECT payment_id, payment_status FROM payments WHERE order_id = $1',
+            [oid]
+        );
+        if (existingPayment.rows.length > 0 && existingPayment.rows[0].payment_status === 'completed') {
+            return res.status(400).json({ error: 'already_paid', message: 'Order has already been paid', statusCode: 400 });
+        }
+
+        const upsertPayment = async (method, status) => {
+            const query = `
+                INSERT INTO payments (order_id, payment_method, payment_status, amount)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (order_id) DO UPDATE
+                SET payment_method = EXCLUDED.payment_method,
+                    payment_status = CASE 
+                        WHEN payments.payment_status = 'completed' THEN 'completed' 
+                        ELSE EXCLUDED.payment_status 
+                    END,
+                    amount = EXCLUDED.amount,
+                    updated_at = NOW()
+                RETURNING payment_id, payment_status
+            `;
+            const result = await db.query(query, [oid, method, status, order.total_amount]);
+            return result.rows[0].payment_id;
+        };
+
         if (payment_method === 'cod') {
-            const insertResult = await db.query(
-                `INSERT INTO payments (order_id, payment_method, payment_status, amount)
-                 VALUES ($1, $2, $3, $4) RETURNING payment_id`,
-                [oid, 'cod', 'cod_pending', order.total_amount]
-            );
+            const payment_id = await upsertPayment('cod', 'cod_pending');
 
             return res.status(200).json({
                 message: 'COD order confirmed',
-                payment_id: insertResult.rows[0].payment_id
+                payment_id
             });
         } else if (payment_method === 'card') {
             let checkout_url = 'https://checkout.lemonsqueezy.com/test-url'; // Fallback for testing without env vars
 
             if (process.env.LEMON_SQUEEZY_API_KEY && process.env.LEMON_SQUEEZY_STORE_ID && process.env.LEMON_SQUEEZY_VARIANT_ID) {
+                // Fetch customer details to prefill Lemon Squeezy checkout if available
+                let customerEmail = undefined;
+                let customerName = undefined;
+                try {
+                    const userRes = await db.query(
+                        'SELECT u.email, c.first_name, c.last_name FROM users u JOIN customers c ON c.user_id = u.user_id WHERE c.customer_id = $1',
+                        [customer_id]
+                    );
+                    if (userRes.rows.length > 0) {
+                        customerEmail = userRes.rows[0].email;
+                        customerName = [userRes.rows[0].first_name, userRes.rows[0].last_name].filter(Boolean).join(' ') || undefined;
+                    }
+                } catch {
+                    // Ignore customer lookup failure and proceed without prefill
+                }
+
+                const clientOrigin = req.get('origin') || req.get('referer');
+                let frontendBaseUrl = 'http://localhost:3000';
+                const configuredOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+                    .split(',')
+                    .map(url => url.trim().replace(/\/+$/, ''))
+                    .filter(Boolean);
+
+                if (clientOrigin) {
+                    try {
+                        const parsed = new URL(clientOrigin).origin;
+                        if (configuredOrigins.includes(parsed)) {
+                            frontendBaseUrl = parsed;
+                        } else if (configuredOrigins.length > 0) {
+                            frontendBaseUrl = configuredOrigins[0];
+                        }
+                    } catch {
+                        frontendBaseUrl = configuredOrigins[0] || 'http://localhost:3000';
+                    }
+                } else if (configuredOrigins.length > 0) {
+                    frontendBaseUrl = configuredOrigins[0];
+                }
+
+                const redirectUrl = `${frontendBaseUrl}/checkout/return?order_id=${oid}`;
+
+                const checkoutPayload = {
+                    data: {
+                        type: "checkouts",
+                        attributes: {
+                            custom_price: Math.round(Number(order.total_amount) * 100),
+                            product_options: {
+                                redirect_url: redirectUrl
+                            },
+                            checkout_data: {
+                                email: customerEmail,
+                                name: customerName,
+                                custom: {
+                                    order_id: oid.toString()
+                                }
+                            }
+                        },
+                        relationships: {
+                            store: {
+                                data: {
+                                    type: "stores",
+                                    id: String(process.env.LEMON_SQUEEZY_STORE_ID)
+                                }
+                            },
+                            variant: {
+                                data: {
+                                    type: "variants",
+                                    id: String(process.env.LEMON_SQUEEZY_VARIANT_ID)
+                                }
+                            }
+                        }
+                    }
+                };
+
                 const lsResponse = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
                     method: 'POST',
                     headers: {
@@ -64,32 +161,7 @@ const createSession = async (req, res) => {
                         'Content-Type': 'application/vnd.api+json',
                         'Authorization': `Bearer ${process.env.LEMON_SQUEEZY_API_KEY}`
                     },
-                    body: JSON.stringify({
-                        data: {
-                            type: "checkouts",
-                            attributes: {
-                                checkout_data: {
-                                    custom: {
-                                        order_id: oid.toString()
-                                    }
-                                }
-                            },
-                            relationships: {
-                                store: {
-                                    data: {
-                                        type: "stores",
-                                        id: process.env.LEMON_SQUEEZY_STORE_ID
-                                    }
-                                },
-                                variant: {
-                                    data: {
-                                        type: "variants",
-                                        id: process.env.LEMON_SQUEEZY_VARIANT_ID
-                                    }
-                                }
-                            }
-                        }
-                    })
+                    body: JSON.stringify(checkoutPayload)
                 });
 
                 const lsResult = await lsResponse.json();
@@ -97,19 +169,26 @@ const createSession = async (req, res) => {
                     checkout_url = lsResult.data.attributes.url;
                 } else {
                     console.error('Lemon Squeezy API Error:', lsResult);
-                    return res.status(502).json({ error: 'bad_gateway', message: 'Failed to create payment session with Lemon Squeezy', statusCode: 502 });
+                    return res.status(502).json({
+                        error: 'bad_gateway',
+                        message: 'Failed to create payment session with Lemon Squeezy',
+                        details: lsResult.errors || lsResult.message,
+                        statusCode: 502
+                    });
                 }
             }
 
-            const insertResult = await db.query(
-                `INSERT INTO payments (order_id, payment_method, payment_status, amount)
-                 VALUES ($1, $2, $3, $4) RETURNING payment_id`,
-                [oid, 'card', 'pending', order.total_amount]
-            );
+            // Re-verify order state post-network call before upserting payment
+            const currentOrder = await db.query('SELECT order_id, status, total_amount FROM orders WHERE order_id = $1', [oid]);
+            if (!currentOrder || !currentOrder.rows || currentOrder.rows.length === 0 || currentOrder.rows[0].status !== 'pending') {
+                return res.status(400).json({ error: 'invalid_order_status', message: 'Order is no longer pending payment', statusCode: 400 });
+            }
+
+            const payment_id = await upsertPayment('card', 'pending');
 
             return res.status(200).json({
                 checkout_url,
-                payment_id: insertResult.rows[0].payment_id
+                payment_id
             });
         }
     } catch (error) {

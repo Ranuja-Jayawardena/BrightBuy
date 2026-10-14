@@ -55,3 +55,10 @@ Create the tables for customer profiles, saved addresses, and shopping carts, pl
 
 _Record any implementation decisions, trade-offs, or deviations from the plan here._
 
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.3: Cart Uniqueness & Checkout Concurrency](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

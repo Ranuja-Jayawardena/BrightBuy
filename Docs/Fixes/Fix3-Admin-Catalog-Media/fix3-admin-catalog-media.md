@@ -1,6 +1,6 @@
 # Fix 3: Admin Catalog & Media Management
 
-> **Status:** Not Started (0 / 4 fix items complete)
+> **Status:** Complete (4 / 4 fix items complete)
 > **Members:** B (Frontend Admin UI), C (Backend Catalog & Image APIs)
 > **Priority:** High
 > **Related Phases:** Phase 7 (Admin Dashboard & Inventory), Phase 1.3 (Images & Categories)
@@ -16,7 +16,11 @@ Fix 3 focuses on the admin management console. It resolves layout usability issu
 
 ## What's Done
 
-- (nothing yet)
+- **3.1 Admin Sticky Sidebar Layout (B):** Updated desktop `<aside>` classes in `frontend/src/app/admin/layout.tsx` with `sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto` so the admin navigation remains fixed and independently scrollable while main dashboard content scrolls.
+- **3.2 Product Active/Inactive Switch & Reactivation API (C, B):** Added backend support for updating `is_active` in `adminProductModel.js`, `adminProductService.js`, `adminProductController.js`, and added route `PATCH /api/admin/products/:id/status`. Replaced the table delete button in `frontend/src/app/admin/products/page.tsx` and product edit header with an interactive `Switch` toggle with optimistic state updates and error revert.
+- **3.3 Category Active/Inactive Switch (B):** In `frontend/src/app/admin/categories/page.tsx`, replaced the delete button with an interactive `Switch` toggle component in the category taxonomy tree and added active status controls in the edit modal, supporting immediate toggling between Active and Inactive states with optimistic recursive tree updates and error reverting via `PUT /api/admin/categories/:id`.
+- **3.4 Product Image Upload & Route Serving UI (B):** Corrected image URLs across admin edit page (`/admin/products/[id]`) and cart (`/cart`) to use standard `/api/images/:id`, added upload loading state with spinner, added primary image badges, inline sort order inputs, a dedicated deletion confirmation modal, and an informational media configuration note on `/admin/products/new`.
+- **3.4 Backend (C):** Multipart uploads now preserve binary bytes, including trailing CRLF, and accept quoted boundaries. The product router also serves the legacy `/api/products/images/:id` image URL.
 
 ---
 
@@ -24,10 +28,10 @@ Fix 3 focuses on the admin management console. It resolves layout usability issu
 
 | # | Fix Item | Assigned | Depends On | Priority | Status |
 |---|----------|----------|------------|----------|--------|
-| 3.1 | [Admin Sticky Sidebar Layout](fix3.1-admin-sidebar-sticky-layout.md) | B (Frontend) | — | Medium | Not Started |
-| 3.2 | [Product Active/Inactive Switch & Reactivation API](fix3.2-product-status-toggle.md) | C (Backend), B (Frontend) | — | High | Not Started |
-| 3.3 | [Category Active/Inactive Switch](fix3.3-category-status-toggle.md) | B (Frontend) | — | Medium | Not Started |
-| 3.4 | [Product Image Upload & Route Serving Fix](fix3.4-product-image-upload-serving.md) | C (Backend), B (Frontend) | — | High | Not Started |
+| 3.1 | [Admin Sticky Sidebar Layout](fix3.1-admin-sidebar-sticky-layout.md) | B (Frontend) | — | Medium | Complete |
+| 3.2 | [Product Active/Inactive Switch & Reactivation API](fix3.2-product-status-toggle.md) | C (Backend), B (Frontend) | — | High | Complete |
+| 3.3 | [Category Active/Inactive Switch](fix3.3-category-status-toggle.md) | B (Frontend) | — | Medium | Complete |
+| 3.4 | [Product Image Upload & Route Serving Fix](fix3.4-product-image-upload-serving.md) | C (Backend), B (Frontend) | — | High | Complete |
 
 ---
 
@@ -48,3 +52,15 @@ graph TD
 - **Product Update Route:** `PUT /api/admin/products/:id` or `PATCH /api/admin/products/:id/status` accepting `{ is_active: boolean }`.
 - **Category Update Route:** `PUT /api/admin/categories/:id` accepts `{ is_active: boolean }` (already supported by backend service).
 - **Image URL Standard:** All product images must be served from `/api/images/:id` consistently across admin and storefront.
+- **Future Cloud Media Storage:** Succeeded by [Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) for complete AWS S3 cloud object storage migration.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.2: Catalog Timestamp Migration Verification](../Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+- [Fix 8.7: Category Hierarchy Integrity](../Fix8-Database-Integrity-Concurrency/fix8.7-category-cycle-protection.md)
+- [Fix 8.8: Manual Inventory Adjustment Audit](../Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
+- [Fix 8.9: Checkout & Admin Conflict Handling](../Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'brightbuy-media-storage-695945476492.s3.us-east-1.amazonaws.com',
+        pathname: '/products/**',
+      },
+    ],
+  },
   // Hot reload inside Docker: file-change events from Windows/macOS bind mounts don't
   // reach the container, so we must poll. Turbopack does not support polling, so
   // docker-compose overrides the command to use Webpack (`next dev --webpack`) and

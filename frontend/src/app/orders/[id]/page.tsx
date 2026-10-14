@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { apiFetch } from '@/services/api';
 import { Button } from '@/components/ui/button';
-import { Package, Truck, Calendar, ArrowLeft, CreditCard } from 'lucide-react';
+import { Package, Truck, Calendar, ArrowLeft, CreditCard, Store } from 'lucide-react';
 import Link from 'next/link';
 
 interface OrderDetail {
@@ -70,6 +70,8 @@ export default function OrderDetailPage() {
     );
   }
 
+  const isStorePickup = order.delivery.delivery_mode === 'store_pickup';
+
   return (
     <ProtectedRoute>
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -122,32 +124,69 @@ export default function OrderDetailPage() {
             {/* Delivery Info */}
             <div className="bg-card border rounded-lg p-5 shadow-sm">
               <h3 className="font-semibold flex items-center mb-4 border-b pb-2">
-                <Truck className="w-4 h-4 mr-2" /> Delivery Details
+                {isStorePickup ? (
+                  <>
+                    <Store className="w-4 h-4 mr-2 text-primary" /> Store Pickup Details
+                  </>
+                ) : (
+                  <>
+                    <Truck className="w-4 h-4 mr-2 text-primary" /> Delivery Details
+                  </>
+                )}
               </h3>
               <div className="space-y-3 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Method</p>
-                  <p className="font-medium capitalize">{order.delivery.delivery_mode.replace('_', ' ')}</p>
+                  <p className="text-muted-foreground">Fulfillment Method</p>
+                  <p className="font-medium capitalize">
+                    {isStorePickup ? 'Store Pickup / Gate Collection' : order.delivery.delivery_mode.replace('_', ' ')}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Status</p>
-                  <p className="font-medium capitalize">{order.delivery.delivery_status}</p>
+                  <p className="font-medium capitalize">{order.delivery.delivery_status.replace(/_/g, ' ')}</p>
                 </div>
-                {order.delivery.tracking_number && (
-                  <div>
-                    <p className="text-muted-foreground">Tracking Number</p>
-                    <p className="font-medium text-blue-600">{order.delivery.tracking_number}</p>
-                  </div>
+
+                {isStorePickup ? (
+                  <>
+                    <div>
+                      <p className="text-muted-foreground">Pickup Location</p>
+                      <p className="font-medium">BrightBuy Retail Store & Main Warehouse Gate</p>
+                    </div>
+                    {order.delivery.delivery_status === 'ready_for_pickup' ? (
+                      <div className="mt-2 bg-green-50 text-green-800 dark:bg-green-950/50 dark:text-green-300 p-2.5 rounded-md border border-green-200 text-xs font-medium">
+                        ✓ Ready for Collection: Present your <strong>Order ID #{order.order_id}</strong> at the counter to collect your items.
+                      </div>
+                    ) : order.delivery.delivery_status === 'collected' ? (
+                      <div className="mt-2 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 p-2.5 rounded-md border border-emerald-200 text-xs">
+                        ✓ Package has been collected from the store.
+                      </div>
+                    ) : (
+                      <div className="mt-2 bg-muted/50 p-2.5 rounded-md text-xs text-muted-foreground">
+                        Your items are being prepared for store pickup. We will notify you when ready.
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {order.delivery.tracking_number && (
+                      <div>
+                        <p className="text-muted-foreground">Tracking Number</p>
+                        <p className="font-medium text-blue-600">{order.delivery.tracking_number}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-muted-foreground">Shipping Address</p>
+                      <p className="font-medium">{order.delivery.delivery_address_line1}</p>
+                      <p className="font-medium">{order.delivery.city_name}</p>
+                    </div>
+                    {order.delivery.estimated_delivery_days ? (
+                      <div className="mt-2 bg-blue-50 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300 p-2 rounded flex items-center">
+                        <Calendar className="w-4 h-4 mr-2 shrink-0" />
+                        ETA: {order.delivery.estimated_delivery_days} days
+                      </div>
+                    ) : null}
+                  </>
                 )}
-                <div>
-                  <p className="text-muted-foreground">Shipping Address</p>
-                  <p className="font-medium">{order.delivery.delivery_address_line1}</p>
-                  <p className="font-medium">{order.delivery.city_name}</p>
-                </div>
-                <div className="mt-2 bg-blue-50 text-blue-800 p-2 rounded flex items-center">
-                  <Calendar className="w-4 h-4 mr-2 shrink-0" />
-                  ETA: {order.delivery.estimated_delivery_days} days
-                </div>
               </div>
             </div>
 

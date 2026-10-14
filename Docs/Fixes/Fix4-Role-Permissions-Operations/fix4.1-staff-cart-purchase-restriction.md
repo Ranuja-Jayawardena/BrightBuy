@@ -1,7 +1,7 @@
 # Fix 4.1: Staff Cart & Purchase Policy Enforcement
 
 > **Parent Group:** [Fix 4: Role Permissions & Operations](fix4-role-permissions-operations.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member B (Frontend Cart UI & Navbar) & Member D (Backend Cart API)
 > **Depends On:** —
 > **Blocks:** —
@@ -45,16 +45,16 @@ In `frontend/src/app/products/[id]/page.tsx`:
 ## Tasks
 
 ### Backend — Member D
-- [ ] In `backend/src/controllers/cartController.js`:
-  - Verify all cart endpoints (`GET /api/cart`, `POST /api/cart/items`, `PUT /api/cart/items/:id`, `DELETE /api/cart/items/:id`) enforce customer-only access and return 403 Forbidden for staff accounts.
+- [x] In `backend/src/controllers/cartController.js`:
+  - [x] Verify all cart endpoints (`GET /api/cart`, `POST /api/cart/items`, `PUT /api/cart/items/:id`, `DELETE /api/cart/items/:id`) enforce customer-only access and return 403 Forbidden for staff accounts.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/components/Navbar.tsx`:
-  - Conditionally render the cart icon only when `user?.role !== 'admin'`.
-- [ ] In `frontend/src/app/products/[id]/page.tsx`:
-  - Add `StaffPurchaseRestrictedModal` triggered whenever a staff user attempts to add items to cart.
-- [ ] In `frontend/src/app/cart/page.tsx`:
-  - Add route protection redirecting staff to `/admin` or displaying the restriction banner.
+- [x] In `frontend/src/components/Navbar.tsx`:
+  - [x] Conditionally render the cart icon only when `user?.role !== 'admin'`.
+- [x] In `frontend/src/app/products/[id]/page.tsx`:
+  - [x] Add `StaffPurchaseRestrictedModal` triggered whenever a staff user attempts to add items to cart.
+- [x] In `frontend/src/app/cart/page.tsx`:
+  - [x] Add route protection redirecting staff to `/admin` or displaying the restriction banner.
 
 ---
 
@@ -72,3 +72,12 @@ In `frontend/src/app/products/[id]/page.tsx`:
 1. Administrators and staff members never see a cart icon anywhere in the storefront navigation.
 2. Clicking "Add to Cart" while authenticated as staff displays the explanatory modal dialog and prevents request dispatch.
 3. Attempting to directly load `/cart` as staff blocks checkout actions.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.3: Cart Uniqueness & Checkout Concurrency](../Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
+- [Fix 8.9: Checkout & Admin Conflict Handling](../Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

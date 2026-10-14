@@ -1,7 +1,7 @@
 # Fix 4.2: Super Admin Employee Management & Deactivation
 
 > **Parent Group:** [Fix 4: Role Permissions & Operations](fix4-role-permissions-operations.md)
-> **Status:** In Progress
+> **Status:** Complete
 > **Assigned To:** Member E (DevOps/Architecture & Auth Backend) & Member B (Admin Employees UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -72,11 +72,11 @@
 - [x] Update `Docs/Database/DB_Schema.md`.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/employees/page.tsx`:
-  - Add Active/Inactive toggle switch per employee row.
-  - Add "Edit Employee" action opening an edit modal.
-  - Implement form submission to `PUT /api/admin/employees/:id`.
-  - Disable editing/toggling of the current logged-in user's own status.
+- [x] In `frontend/src/app/admin/employees/page.tsx`:
+  - [x] Add Active/Inactive toggle switch per employee row.
+  - [x] Add "Edit Employee" action opening an edit modal.
+  - [x] Implement form submission to `PUT /api/admin/employees/:id`.
+  - [x] Disable editing/toggling of the current logged-in user's own status.
 
 ---
 
@@ -150,3 +150,12 @@ Cookie: access_token=...
 3. Deactivated employees cannot log into the system; login returns 403 Forbidden.
 4. Non-super admin staff cannot access the employee page or execute employee update APIs.
 5. Super admin cannot deactivate their own account.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.6: Concurrent Super Admin Protection](../Fix8-Database-Integrity-Concurrency/fix8.6-super-admin-protection.md)
+- [Fix 8.9: Checkout & Admin Conflict Handling](../Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

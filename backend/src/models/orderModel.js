@@ -1,145 +1,241 @@
 const db = require('../config/db');
 
-const createOrder = async (customer_id, address_id, delivery_mode) => {
-    const client = await db.connect();
-    try {
-        await client.query('BEGIN');
+const createOrder = async (customer_id, address_id, delivery_mode, idempotency_key = null, request_hash = null) => {
+    const maxRetries = 3;
+    let attempt = 0;
 
-        // 1. Get cart
-        const cartResult = await client.query('SELECT cart_id FROM carts WHERE customer_id = $1', [customer_id]);
-        if (cartResult.rows.length === 0) {
-            await client.query('ROLLBACK');
-            throw new Error('Cart is empty');
-        }
-        const cart_id = cartResult.rows[0].cart_id;
+    while (attempt < maxRetries) {
+        attempt++;
+        const client = await db.connect();
+        try {
+            await client.query('BEGIN');
 
-        // 2. Get cart items
-        const cartItemsResult = await client.query('SELECT variant_id, quantity FROM cart_items WHERE cart_id = $1', [cart_id]);
-        const cartItems = cartItemsResult.rows;
-        if (cartItems.length === 0) {
-            await client.query('ROLLBACK');
-            throw new Error('Cart is empty');
-        }
+            // 0. Idempotency Check (D3 Request Identity Contract)
+            if (idempotency_key) {
+                const existingKey = await client.query(
+                    `SELECT idempotency_key, request_hash, response_body, order_id 
+                     FROM order_idempotency_keys 
+                     WHERE customer_id = $1 AND idempotency_key = $2 FOR UPDATE`,
+                    [customer_id, idempotency_key]
+                );
 
-        // 3. Lock variant rows & check stock
-        let total_amount = 0;
-        const itemsWithDetails = [];
-        const outOfStockNames = [];
+                if (existingKey.rows.length > 0) {
+                    const record = existingKey.rows[0];
+                    if (record.request_hash !== request_hash) {
+                        await client.query('ROLLBACK');
+                        const err = new Error('Idempotency key reused with different request parameters');
+                        err.code = 'IDEMPOTENCY_CONFLICT';
+                        throw err;
+                    }
+                    await client.query('COMMIT');
+                    return {
+                        ...record.response_body,
+                        is_replay: true
+                    };
+                }
+            }
 
-        // Sort variant_ids to prevent deadlocks
-        const sortedItems = [...cartItems].sort((a, b) => a.variant_id - b.variant_id);
+            // 1. Lock customer cart (Canonical Lock Order Step 1: SELECT ... FOR UPDATE)
+            const cartResult = await client.query('SELECT cart_id FROM carts WHERE customer_id = $1 FOR UPDATE', [customer_id]);
+            if (cartResult.rows.length === 0) {
+                await client.query('ROLLBACK');
+                throw new Error('Cart is empty');
+            }
+            const cart_id = cartResult.rows[0].cart_id;
 
-        for (const item of sortedItems) {
-            const variantResult = await client.query(`
-                SELECT v.stock_quantity, v.price, v.variant_name, p.product_name 
-                FROM product_variants v
-                JOIN products p ON v.product_id = p.product_id
-                WHERE v.variant_id = $1 FOR UPDATE
-            `, [item.variant_id]);
+            // 2. Get cart items
+            const cartItemsResult = await client.query('SELECT variant_id, quantity FROM cart_items WHERE cart_id = $1', [cart_id]);
+            const cartItems = cartItemsResult.rows;
+            if (cartItems.length === 0) {
+                await client.query('ROLLBACK');
+                throw new Error('Cart is empty');
+            }
 
-            if (variantResult.rows.length === 0) {
-                outOfStockNames.push(`Unknown Variant ${item.variant_id}`);
+            // 3. Lock variant rows & check stock in ascending numerical order (avoiding product table escalation)
+            let total_amount = 0;
+            const itemsWithDetails = [];
+            const outOfStockNames = [];
+
+            // Sort variant_ids ascending to guarantee deterministic lock acquisition
+            const sortedItems = [...cartItems].sort((a, b) => a.variant_id - b.variant_id);
+
+            for (const item of sortedItems) {
+                const variantResult = await client.query(`
+                    SELECT v.variant_id, v.stock_quantity, v.price, v.variant_name, p.product_name 
+                    FROM product_variants v
+                    JOIN products p ON v.product_id = p.product_id
+                    WHERE v.variant_id = $1 FOR UPDATE OF v
+                `, [item.variant_id]);
+
+                if (variantResult.rows.length === 0) {
+                    outOfStockNames.push(`Unknown Variant ${item.variant_id}`);
+                    continue;
+                }
+
+                const variant = variantResult.rows[0];
+                const name = variant.variant_name ? `${variant.product_name} - ${variant.variant_name}` : variant.product_name;
+
+                if (variant.stock_quantity < item.quantity) {
+                    outOfStockNames.push(name);
+                } else {
+                    const unit_price = parseFloat(variant.price);
+                    total_amount += unit_price * item.quantity;
+                    itemsWithDetails.push({
+                        ...item,
+                        unit_price,
+                        name,
+                        product_name: variant.product_name,
+                        variant_name: variant.variant_name
+                    });
+                }
+            }
+
+            if (outOfStockNames.length > 0) {
+                await client.query('ROLLBACK');
+                throw new Error(`Insufficient stock for: ${outOfStockNames.join(', ')}`);
+            }
+
+            // 4. Get Address and ETA
+            let address_line1;
+            let address_line2 = null;
+            let city_id;
+            let zip_code;
+            let estimated_delivery_days;
+
+            if (address_id) {
+                const addressResult = await client.query(`
+                    SELECT a.address_line1, a.address_line2, a.city_id, a.zip_code, c.is_main_city, c.city_name
+                    FROM addresses a
+                    JOIN cities c ON a.city_id = c.city_id
+                    WHERE a.address_id = $1 AND a.customer_id = $2
+                `, [address_id, customer_id]);
+
+                if (addressResult.rows.length === 0) {
+                    await client.query('ROLLBACK');
+                    throw new Error('Address not found or does not belong to customer');
+                }
+
+                const address = addressResult.rows[0];
+                address_line1 = address.address_line1;
+                address_line2 = address.address_line2;
+                city_id = address.city_id;
+                zip_code = address.zip_code;
+                estimated_delivery_days = delivery_mode === 'store_pickup' ? 2 : (address.is_main_city ? 5 : 7);
+            } else if (delivery_mode === 'store_pickup') {
+                const cityResult = await client.query(`SELECT city_id FROM cities ORDER BY is_main_city DESC, city_id ASC LIMIT 1`);
+                const defaultCityId = cityResult.rows.length > 0 ? cityResult.rows[0].city_id : 1;
+
+                address_line1 = 'BrightBuy Central Retail Store & Pickup Gate';
+                address_line2 = '100 Main Street';
+                city_id = defaultCityId;
+                zip_code = '78701';
+                estimated_delivery_days = 2;
+            } else {
+                await client.query('ROLLBACK');
+                throw new Error('Address not found or does not belong to customer');
+            }
+
+            // 5. Create Order
+            const orderResult = await client.query(`
+                INSERT INTO orders (customer_id, total_amount, status)
+                VALUES ($1, $2, 'pending')
+                RETURNING order_id, order_date, status, total_amount
+            `, [customer_id, total_amount]);
+            const order = orderResult.rows[0];
+
+            // 6. Create Order Items and Update Stock
+            for (const item of itemsWithDetails) {
+                await client.query(`
+                    INSERT INTO order_items (order_id, variant_id, quantity, unit_price)
+                    VALUES ($1, $2, $3, $4)
+                `, [order.order_id, item.variant_id, item.quantity, item.unit_price]);
+
+                await client.query(`
+                    UPDATE product_variants
+                    SET stock_quantity = stock_quantity - $1
+                    WHERE variant_id = $2
+                `, [item.quantity, item.variant_id]);
+            }
+
+            // 7. Create Delivery
+            const deliveryResult = await client.query(`
+                INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, delivery_address_line2, delivery_city_id, delivery_zip_code, estimated_delivery_days)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                RETURNING delivery_id, delivery_mode, delivery_address_line1, delivery_address_line2, delivery_city_id as city_id, delivery_zip_code as zip_code, estimated_delivery_days, delivery_status, tracking_number
+            `, [
+                order.order_id,
+                delivery_mode,
+                address_line1,
+                address_line2,
+                city_id,
+                zip_code,
+                estimated_delivery_days
+            ]);
+            const delivery = deliveryResult.rows[0];
+
+            // 8. Clear Cart
+            await client.query('DELETE FROM cart_items WHERE cart_id = $1', [cart_id]);
+
+            const orderPayload = {
+                ...order,
+                total_amount: parseFloat(order.total_amount),
+                items: itemsWithDetails.map(i => ({
+                    variant_id: i.variant_id,
+                    quantity: i.quantity,
+                    unit_price: i.unit_price
+                })),
+                delivery: delivery
+            };
+
+            // 9. Store Idempotency Mapping (D3 durable record)
+            if (idempotency_key) {
+                await client.query(
+                    `INSERT INTO order_idempotency_keys (customer_id, idempotency_key, request_hash, order_id, response_body)
+                     VALUES ($1, $2, $3, $4, $5)
+                     ON CONFLICT (customer_id, idempotency_key) DO UPDATE 
+                     SET order_id = EXCLUDED.order_id, response_body = EXCLUDED.response_body`,
+                    [customer_id, idempotency_key, request_hash, order.order_id, JSON.stringify(orderPayload)]
+                );
+            }
+
+            await client.query('COMMIT');
+
+            return {
+                ...orderPayload,
+                is_replay: false
+            };
+        } catch (e) {
+            try {
+                if (client && typeof client.query === 'function') {
+                    await client.query('ROLLBACK');
+                }
+            } catch {
+                /* ignore rollback error */
+            }
+
+            try {
+                if (client && typeof client.release === 'function') {
+                    client.release();
+                }
+            } catch {
+                /* ignore release error */
+            }
+
+            // Bounded retry for transient serialization errors or deadlocks
+            if ((e.code === '40P01' || e.code === '40001') && attempt < maxRetries) {
+                await new Promise(res => global.setTimeout(res, 25 * attempt + Math.floor(Math.random() * 25)));
                 continue;
             }
-
-            const variant = variantResult.rows[0];
-            const name = variant.variant_name ? `${variant.product_name} - ${variant.variant_name}` : variant.product_name;
-
-            if (variant.stock_quantity < item.quantity) {
-                outOfStockNames.push(name);
-            } else {
-                const unit_price = parseFloat(variant.price);
-                total_amount += unit_price * item.quantity;
-                itemsWithDetails.push({
-                    ...item,
-                    unit_price,
-                    name,
-                    product_name: variant.product_name,
-                    variant_name: variant.variant_name
-                });
+            throw e;
+        } finally {
+            try {
+                if (client && typeof client.release === 'function') {
+                    client.release();
+                }
+            } catch {
+                /* ignore release error */
             }
         }
-
-        if (outOfStockNames.length > 0) {
-            await client.query('ROLLBACK');
-            throw new Error(`Insufficient stock for: ${outOfStockNames.join(', ')}`);
-        }
-
-        // 4. Get Address and ETA
-        const addressResult = await client.query(`
-            SELECT a.address_line1, a.address_line2, a.city_id, a.zip_code, c.is_main_city, c.city_name
-            FROM addresses a
-            JOIN cities c ON a.city_id = c.city_id
-            WHERE a.address_id = $1 AND a.customer_id = $2
-        `, [address_id, customer_id]);
-
-        if (addressResult.rows.length === 0) {
-            await client.query('ROLLBACK');
-            throw new Error('Address not found or does not belong to customer');
-        }
-
-        const address = addressResult.rows[0];
-        const estimated_delivery_days = address.is_main_city ? 5 : 7;
-
-        // 5. Create Order
-        const orderResult = await client.query(`
-            INSERT INTO orders (customer_id, total_amount, status)
-            VALUES ($1, $2, 'pending')
-            RETURNING order_id, order_date, status, total_amount
-        `, [customer_id, total_amount]);
-        const order = orderResult.rows[0];
-
-        // 6. Create Order Items and Update Stock
-        for (const item of itemsWithDetails) {
-            await client.query(`
-                INSERT INTO order_items (order_id, variant_id, quantity, unit_price)
-                VALUES ($1, $2, $3, $4)
-            `, [order.order_id, item.variant_id, item.quantity, item.unit_price]);
-
-            await client.query(`
-                UPDATE product_variants
-                SET stock_quantity = stock_quantity - $1, updated_at = NOW()
-                WHERE variant_id = $2
-            `, [item.quantity, item.variant_id]);
-        }
-
-        // 7. Create Delivery
-        const deliveryResult = await client.query(`
-            INSERT INTO deliveries (order_id, delivery_mode, delivery_address_line1, delivery_address_line2, delivery_city_id, delivery_zip_code, estimated_delivery_days)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING delivery_id, delivery_mode, delivery_address_line1, delivery_address_line2, delivery_city_id as city_id, delivery_zip_code as zip_code, estimated_delivery_days, delivery_status, tracking_number
-        `, [
-            order.order_id,
-            delivery_mode,
-            address.address_line1,
-            address.address_line2,
-            address.city_id,
-            address.zip_code,
-            estimated_delivery_days
-        ]);
-        const delivery = deliveryResult.rows[0];
-
-        // 8. Clear Cart
-        await client.query('DELETE FROM cart_items WHERE cart_id = $1', [cart_id]);
-
-        await client.query('COMMIT');
-
-        return {
-            ...order,
-            total_amount: parseFloat(order.total_amount),
-            items: itemsWithDetails.map(i => ({
-                variant_id: i.variant_id,
-                quantity: i.quantity,
-                unit_price: i.unit_price
-            })),
-            delivery: delivery
-        };
-
-    } catch (e) {
-        await client.query('ROLLBACK');
-        throw e;
-    } finally {
-        client.release();
     }
 };
 

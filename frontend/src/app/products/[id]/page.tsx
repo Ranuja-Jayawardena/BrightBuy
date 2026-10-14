@@ -13,8 +13,8 @@ import { Button } from '@/components/ui/button';
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
-  const { addItem, isLoading: isCartLoading } = useCartStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const { addItem, items, fetchCart, isLoading: isCartLoading } = useCartStore();
   
   const productId = params.id as string;
   
@@ -26,6 +26,7 @@ export default function ProductDetailPage() {
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [addedSuccess, setAddedSuccess] = useState(false);
+  const [showStaffRestrictedModal, setShowStaffRestrictedModal] = useState(false);
 
   const loadProduct = async () => {
     try {
@@ -45,7 +46,7 @@ export default function ProductDetailPage() {
       }
       
       if (data.product.variants?.length > 0) {
-        const firstVariant = data.product.variants[0];
+        const firstVariant = data.product.variants.find(variant => variant.stock_quantity > 0) || data.product.variants[0];
         const initialAttrs: Record<string, string> = {};
         firstVariant.attributes.forEach(attr => {
           initialAttrs[attr.attribute_name] = attr.attribute_value;
@@ -64,6 +65,12 @@ export default function ProductDetailPage() {
       loadProduct();
     }
   }, [productId]);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'customer') {
+      fetchCart();
+    }
+  }, [isAuthenticated, user?.role, fetchCart]);
 
   const attributeOptions = useMemo(() => {
     if (!product?.variants) return {};
@@ -93,6 +100,13 @@ export default function ProductDetailPage() {
     ) || null;
   }, [product, selectedAttributes]);
 
+  const cartItem = useMemo(() => {
+    if (!selectedVariant || !items) return null;
+    return items.find(item => Number(item.variant_id) === Number(selectedVariant.variant_id)) || null;
+  }, [items, selectedVariant]);
+
+  const isInCart = Boolean(cartItem);
+
   const handleAttributeSelect = (name: string, value: string) => {
     setSelectedAttributes(prev => ({
       ...prev,
@@ -106,6 +120,11 @@ export default function ProductDetailPage() {
       router.push(`/login?redirect=/products/${productId}`);
       return;
     }
+
+    if (user?.role === 'admin') {
+      setShowStaffRestrictedModal(true);
+      return;
+    }
     
     try {
       await addItem(variantId, qty);
@@ -113,8 +132,13 @@ export default function ProductDetailPage() {
       setTimeout(() => {
         setAddedSuccess(false);
       }, 3000);
-    } catch (error: any) {
-      alert(error.message || 'Failed to add item to cart');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to add item to cart';
+      if (message.toLowerCase().includes('staff') || message.toLowerCase().includes('customer') || message.toLowerCase().includes('forbidden')) {
+        setShowStaffRestrictedModal(true);
+      } else {
+        alert(message);
+      }
     }
   };
 
@@ -225,8 +249,16 @@ export default function ProductDetailPage() {
             {selectedImageId ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img 
-                src={`/api/images/${selectedImageId}`} 
+                key={selectedImageId}
+                src={
+                  product.images?.find(img => img.image_id === selectedImageId)?.image_url ||
+                  `/api/images/${selectedImageId}`
+                } 
                 alt={product.product_name}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/placeholder-product.svg';
+                }}
                 className="object-cover w-full h-full"
               />
             ) : (
@@ -246,8 +278,13 @@ export default function ProductDetailPage() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
-                    src={`/api/images/${img.image_id}`} 
+                    key={img.image_url || img.image_id}
+                    src={img.image_url || `/api/images/${img.image_id}`} 
                     alt="Thumbnail"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = '/placeholder-product.svg';
+                    }}
                     className="object-cover w-full h-full bg-muted"
                   />
                 </button>
@@ -288,8 +325,10 @@ export default function ProductDetailPage() {
                     return (
                       <button
                         key={val}
+                        type="button"
                         onClick={() => handleAttributeSelect(attrName, val)}
-                        className={`px-4 py-2 text-sm font-medium rounded-md border transition-all ${
+                        aria-pressed={isSelected}
+                        className={`px-4 py-2 text-sm font-medium rounded-md border transition-all cursor-pointer ${
                           isSelected 
                             ? 'bg-primary text-primary-foreground border-primary shadow-sm' 
                             : 'bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground'
@@ -327,49 +366,63 @@ export default function ProductDetailPage() {
                 <button 
                   className="px-4 h-full text-lg hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={isOutOfStock}
+                  disabled={isOutOfStock || isInCart}
                 >-</button>
-                <div className="flex-1 text-center font-medium">{quantity}</div>
+                <div className="flex-1 text-center font-medium">{isInCart ? cartItem?.quantity : quantity}</div>
                 <button 
                   className="px-4 h-full text-lg hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
                   onClick={() => setQuantity(Math.min(selectedVariant?.stock_quantity || 1, quantity + 1))}
-                  disabled={isOutOfStock || quantity >= (selectedVariant?.stock_quantity || 1)}
+                  disabled={isOutOfStock || isInCart || quantity >= (selectedVariant?.stock_quantity || 1)}
                 >+</button>
               </div>
 
-              <Button 
-                size="lg" 
-                className={`flex-1 h-12 text-base font-semibold gap-2 transition-all duration-200 ${
-                  addedSuccess
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20'
-                    : 'hover:scale-[1.01]'
-                }`}
-                disabled={isOutOfStock || !selectedVariant || isCartLoading}
-                onClick={() => selectedVariant && onAddToCart(selectedVariant.variant_id, quantity)}
-              >
-                {isCartLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Adding...
-                  </>
-                ) : addedSuccess ? (
-                  <>
-                    <Check className="w-5 h-5 stroke-[2.5]" />
-                    Added to Cart!
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5" />
-                    Add to Cart
-                  </>
-                )}
-              </Button>
+              {isInCart ? (
+                <Button 
+                  size="lg" 
+                  className="flex-1 h-12 text-base font-semibold gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 transition-all duration-200 hover:scale-[1.01]"
+                  onClick={() => router.push('/cart')}
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  Go to Cart
+                  <ChevronRight className="w-4 h-4 ml-0.5" />
+                </Button>
+              ) : (
+                <Button 
+                  size="lg" 
+                  className={`flex-1 h-12 text-base font-semibold gap-2 transition-all duration-200 ${
+                    addedSuccess
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20'
+                      : 'hover:scale-[1.01]'
+                  }`}
+                  disabled={isOutOfStock || !selectedVariant || isCartLoading}
+                  onClick={() => selectedVariant && onAddToCart(selectedVariant.variant_id, quantity)}
+                >
+                  {isCartLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5" />
+                      Add to Cart
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
 
-            {addedSuccess && (
+            {addedSuccess ? (
               <div className="flex items-center justify-between p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-emerald-800 dark:text-emerald-200 text-xs font-semibold">
                 <span>{quantity} item{quantity > 1 ? 's' : ''} added to your cart.</span>
                 <Link href="/cart" className="inline-flex items-center text-emerald-700 dark:text-emerald-300 font-bold hover:underline">
+                  View Cart &rarr;
+                </Link>
+              </div>
+            ) : isInCart && (
+              <div className="flex items-center justify-between p-3 bg-muted/60 border border-border rounded-xl text-muted-foreground text-xs font-medium">
+                <span>Item already in cart ({cartItem?.quantity} in cart).</span>
+                <Link href="/cart" className="inline-flex items-center text-primary font-bold hover:underline">
                   View Cart &rarr;
                 </Link>
               </div>
@@ -379,9 +432,46 @@ export default function ProductDetailPage() {
               SKU: {selectedVariant ? selectedVariant.variant_sku : product.base_sku}
             </p>
           </div>
-
         </div>
       </div>
+
+      {/* Staff Purchase Restricted Modal */}
+      {showStaffRestrictedModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card border rounded-2xl max-w-md w-full p-6 shadow-xl animate-in fade-in-50 zoom-in-95 duration-150">
+            <div className="flex items-center gap-3.5 mb-4">
+              <div className="p-3 rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                <AlertCircle className="w-6 h-6 shrink-0" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-foreground">Staff Account Restricted</h3>
+                <p className="text-xs text-muted-foreground">Store Purchasing Policy</p>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Employees and administrators cannot make store purchases or add items to cart. Please log out and sign in with a standard customer account to place orders.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row justify-end gap-2.5">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowStaffRestrictedModal(false)}
+              >
+                Continue Browsing
+              </Button>
+              <Button 
+                variant="destructive"
+                onClick={async () => {
+                  setShowStaffRestrictedModal(false);
+                  await logout();
+                  router.push('/login');
+                }}
+              >
+                Log Out
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

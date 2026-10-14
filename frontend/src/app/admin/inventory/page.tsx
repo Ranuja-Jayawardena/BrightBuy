@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { apiFetch } from '@/services/api';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -123,18 +124,20 @@ export default function AdminInventoryPage() {
         })
       });
 
+      const d = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || 'Failed to update stock quantity');
+        throw new Error(d.message || d.error || 'Failed to update stock quantity');
       }
 
       setSuccess(
         `Successfully adjusted SKU ${adjustingItem.variant_sku} from ${adjustingItem.stock_quantity} to ${newQuantity} units.`
       );
       closeAdjustModal();
-      fetchInventory();
+      await fetchInventory();
     } catch (err: any) {
-      setModalError(err.message);
+      setModalError(sanitizeConflictError(err, 'Failed to update stock quantity'));
+      // Authoritative state refetch on error so stale quantities are replaced with server state
+      await fetchInventory();
     } finally {
       setIsSubmittingAdjust(false);
     }

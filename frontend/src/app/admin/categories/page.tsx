@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { apiFetch } from '@/services/api';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { 
   Plus, 
-  Trash2, 
   Edit, 
   FolderTree, 
   AlertCircle, 
@@ -35,11 +36,12 @@ export default function AdminCategoriesPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState({
     category_name: '',
-    parent_category_id: ''
+    parent_category_id: '',
+    is_active: true
   });
   const [fieldErrors, setFieldErrors] = useState<{ category_name?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [togglingId, setTogglingId] = useState<number | null>(null);
 
   const fetchCategories = async () => {
     try {
@@ -49,8 +51,8 @@ export default function AdminCategoriesPage() {
       if (!res.ok) throw new Error('Failed to load category taxonomy');
       const data = await res.json();
       setCategories(data.categories || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load category taxonomy');
     } finally {
       setLoading(false);
     }
@@ -59,6 +61,19 @@ export default function AdminCategoriesPage() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // Recursively update active status in tree
+  const updateCategoryInTree = (nodes: CategoryNode[], id: number, isActive: boolean): CategoryNode[] => {
+    return nodes.map((node) => {
+      if (node.category_id === id) {
+        return { ...node, is_active: isActive };
+      }
+      if (node.children && node.children.length > 0) {
+        return { ...node, children: updateCategoryInTree(node.children, id, isActive) };
+      }
+      return node;
+    });
+  };
 
   // Flattened categories for parent selection
   const flattenCategories = (nodes: CategoryNode[]): { id: number; name: string }[] => {
@@ -86,12 +101,17 @@ export default function AdminCategoriesPage() {
 
     try {
       setIsSubmitting(true);
-      const payload = {
+      const payload: {
+        category_name: string;
+        parent_category_id: number | null;
+        is_active?: boolean;
+      } = {
         category_name: formData.category_name.trim(),
         parent_category_id: formData.parent_category_id ? Number(formData.parent_category_id) : null
       };
 
       if (editingCategory) {
+        payload.is_active = formData.is_active;
         const res = await apiFetch(`/api/admin/categories/${editingCategory.category_id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -117,28 +137,46 @@ export default function AdminCategoriesPage() {
 
       setIsCreating(false);
       setEditingCategory(null);
-      setFormData({ category_name: '', parent_category_id: '' });
-      fetchCategories();
-    } catch (err: any) {
-      setError(err.message);
+      setFormData({ category_name: '', parent_category_id: '', is_active: true });
+      await fetchCategories();
+    } catch (err: unknown) {
+      setError(sanitizeConflictError(err, 'Failed to save category'));
+      // Retain form input so user does not lose changes, but refetch authoritative category list
+      await fetchCategories();
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDelete = async (id: number) => {
-    setDeletingId(id);
+  const handleToggleCategoryStatus = async (id: number, currentStatus: boolean, categoryName: string) => {
+    const nextStatus = !currentStatus;
+    setTogglingId(id);
     setError('');
     setSuccess('');
+
+    // Optimistically update local tree state
+    setCategories((prev) => updateCategoryInTree(prev, id, nextStatus));
+
     try {
-      const res = await apiFetch(`/api/admin/categories/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to deactivate category');
-      setSuccess('Category successfully deactivated.');
-      fetchCategories();
-    } catch (err: any) {
-      setError(err.message);
+      const res = await apiFetch(`/api/admin/categories/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: nextStatus }),
+      });
+
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.message || d.error || 'Failed to update category status');
+      }
+
+      setSuccess(`Category "${categoryName}" marked as ${nextStatus ? 'Active' : 'Inactive'}.`);
+    } catch (err: unknown) {
+      // Revert optimistic update and refetch authoritative state
+      setCategories((prev) => updateCategoryInTree(prev, id, currentStatus));
+      setError(sanitizeConflictError(err, 'Failed to update category status'));
+      await fetchCategories();
     } finally {
-      setDeletingId(null);
+      setTogglingId(null);
     }
   };
 
@@ -154,12 +192,23 @@ export default function AdminCategoriesPage() {
                   {node.category_name}
                 </span>
                 {!node.is_active && (
-                  <span className="text-[10px] uppercase font-bold bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-1.5 py-0.5 rounded shrink-0">
+                  <span className="text-[10px] uppercase font-bold bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 px-1.5 py-0.5 rounded shrink-0">
                     Inactive
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={node.is_active}
+                    disabled={togglingId === node.category_id}
+                    onCheckedChange={() => handleToggleCategoryStatus(node.category_id, node.is_active, node.category_name)}
+                    aria-label={`Toggle active status for ${node.category_name}`}
+                  />
+                  <span className={`text-xs font-medium hidden sm:inline ${node.is_active ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                    {node.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
                 <Button 
                   variant="ghost" 
                   size="sm"
@@ -169,26 +218,13 @@ export default function AdminCategoriesPage() {
                     setIsCreating(false);
                     setFormData({
                       category_name: node.category_name,
-                      parent_category_id: node.parent_category_id ? String(node.parent_category_id) : ''
+                      parent_category_id: node.parent_category_id ? String(node.parent_category_id) : '',
+                      is_active: node.is_active
                     });
                   }}
                   title="Edit Category"
                 >
                   <Edit className="h-3.5 w-3.5" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40"
-                  disabled={deletingId === node.category_id}
-                  onClick={() => handleDelete(node.category_id)}
-                  title="Deactivate Category"
-                >
-                  {deletingId === node.category_id ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-3.5 w-3.5" />
-                  )}
                 </Button>
               </div>
             </div>
@@ -219,7 +255,7 @@ export default function AdminCategoriesPage() {
           <Button onClick={() => {
             setIsCreating(true);
             setEditingCategory(null);
-            setFormData({ category_name: '', parent_category_id: '' });
+            setFormData({ category_name: '', parent_category_id: '', is_active: true });
           }}>
             <Plus className="h-4 w-4 mr-1.5" /> Add Category
           </Button>
@@ -300,6 +336,26 @@ export default function AdminCategoriesPage() {
                 }
               </select>
             </div>
+            {editingCategory && (
+              <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/20">
+                <div className="space-y-0.5">
+                  <label className="text-xs font-semibold">Active Status</label>
+                  <p className="text-xs text-muted-foreground">
+                    Active categories appear on customer browsing menus and filters.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                    aria-label="Category active status"
+                  />
+                  <span className="text-xs font-medium">
+                    {formData.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              </div>
+            )}
             <div className="flex gap-2 justify-end pt-3 border-t">
               <Button 
                 type="button" 

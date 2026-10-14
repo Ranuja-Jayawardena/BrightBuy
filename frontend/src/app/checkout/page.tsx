@@ -21,6 +21,7 @@ import {
   X
 } from 'lucide-react';
 import { apiFetch } from '@/services/api';
+import { sanitizeConflictError } from '@/lib/errorUtils';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -33,6 +34,14 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cod'>('card');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // D3 Request Identity Contract: generate and preserve checkout idempotency key across retries
+  const [idempotencyKey, setIdempotencyKey] = useState<string>(() => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return `chk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  });
 
   useEffect(() => {
     fetchAddresses();
@@ -58,11 +67,12 @@ export default function CheckoutPage() {
   }, [deliveryMode, selectedAddress, cities]);
 
   const handlePlaceOrder = async () => {
+    if (isPlacingOrder) return;
     if (items.length === 0) {
       setError("Your cart is empty. Please add items before checking out.");
       return;
     }
-    if (!selectedAddressId) {
+    if (deliveryMode === 'home_delivery' && !selectedAddressId) {
       setError("Please select or add a delivery address to proceed.");
       return;
     }
@@ -71,25 +81,50 @@ export default function CheckoutPage() {
     setError(null);
 
     try {
-      // 1. Create the Order
-      const res = await apiFetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          address_id: selectedAddressId,
-          delivery_mode: deliveryMode
-        })
-      });
-
-      const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to place order');
+      // 1. Create the Order with preserved request identity
+      const payload: { delivery_mode: string; address_id?: number } = {
+        delivery_mode: deliveryMode
+      };
+      if (deliveryMode === 'home_delivery' && selectedAddressId) {
+        payload.address_id = selectedAddressId;
       }
 
-      // Order placed successfully!
+      const res = await apiFetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': idempotencyKey
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(() => ({}));
+      
+      if (!res.ok) {
+        // Refetch authoritative cart state on conflict or stock validation failure
+        if (res.status === 409 || res.status === 400) {
+          await useCartStore.getState().fetchCart();
+          // Generate a fresh idempotency key for the next attempt after cart reload
+          const nextKey = typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `chk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+          setIdempotencyKey(nextKey);
+        }
+        throw new Error(data.message || data.error || 'Failed to place order');
+      }
+
+      // Order placed or replayed successfully!
       useCartStore.getState().clearCart();
-      const orderId = data.order.order_id;
+      const orderId = data.order?.order_id;
+      if (!orderId) {
+        throw new Error('Order was confirmed but no order identifier was returned.');
+      }
+
+      // Refresh key for any subsequent new cart session
+      const freshKey = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `chk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      setIdempotencyKey(freshKey);
 
       // 2. Create the Payment Session
       const paymentRes = await apiFetch('/api/payments/create-session', {
@@ -101,10 +136,10 @@ export default function CheckoutPage() {
         })
       });
       
-      const paymentData = await paymentRes.json();
+      const paymentData = await paymentRes.json().catch(() => ({}));
       
       if (!paymentRes.ok) {
-        throw new Error(paymentData.error || 'Order placed but failed to initialize payment');
+        throw new Error(paymentData.message || paymentData.error || 'Order placed but failed to initialize payment');
       }
 
       // 3. Handle Redirect based on payment mode
@@ -115,7 +150,7 @@ export default function CheckoutPage() {
       }
 
     } catch (err: any) {
-      setError(err.message);
+      setError(sanitizeConflictError(err));
       setIsPlacingOrder(false);
     }
   };
@@ -230,74 +265,115 @@ export default function CheckoutPage() {
               </div>
             </section>
 
-            {/* Address Selection */}
-            <section className="bg-card border rounded-xl p-5 shadow-xs space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-primary" /> Shipping Address
-                </h2>
-                <Link href="/addresses">
-                  <Button variant="outline" size="sm" className="text-xs h-8">
-                    Manage Addresses
-                  </Button>
-                </Link>
-              </div>
+            {/* Address Selection or Store Pickup Location */}
+            {deliveryMode === 'store_pickup' ? (
+              <section className="bg-card border rounded-xl p-5 shadow-xs space-y-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
+                    <Store className="w-5 h-5 text-primary" /> Store Pickup Location
+                  </h2>
+                  <span className="text-xs bg-primary/10 text-primary font-semibold px-2.5 py-0.5 rounded-full">
+                    Direct Gate Collection
+                  </span>
+                </div>
 
-              {addresses.length === 0 ? (
-                <div className="border border-dashed rounded-lg p-8 text-center bg-muted/20 space-y-3">
-                  <MapPin className="w-8 h-8 text-muted-foreground/60 mx-auto" />
-                  <div>
-                    <p className="font-semibold text-sm text-foreground">No saved addresses</p>
-                    <p className="text-xs text-muted-foreground">Add an address to complete your order dispatch.</p>
+                <div className="border border-primary/20 bg-primary/5 rounded-lg p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
+                      <Store className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-semibold text-sm text-foreground">
+                        BrightBuy Central Retail Store &amp; Pickup Gate
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        100 Main Street, Suite 100, Austin, TX 78701
+                      </p>
+                      <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary pt-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Ready for pickup in 2 business days</span>
+                      </div>
+                    </div>
                   </div>
-                  <Link href="/addresses" className="inline-block pt-1">
-                    <Button size="sm" className="gap-1.5 text-xs font-semibold">
-                      <Plus className="w-3.5 h-3.5" /> Add New Address
+                </div>
+
+                <div className="text-xs text-muted-foreground bg-muted/40 p-3.5 rounded-lg border space-y-1.5 leading-relaxed">
+                  <p className="font-semibold text-foreground flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-primary" /> Collection Requirements:
+                  </p>
+                  <p>&bull; Present your order confirmation email or Order ID at the customer pickup counter.</p>
+                  <p>&bull; Bring a valid photo ID matching your account name.</p>
+                </div>
+              </section>
+            ) : (
+              <section className="bg-card border rounded-xl p-5 shadow-xs space-y-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-primary" /> Shipping Address
+                  </h2>
+                  <Link href="/addresses">
+                    <Button variant="outline" size="sm" className="text-xs h-8">
+                      Manage Addresses
                     </Button>
                   </Link>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  {addresses.map((addr: import('@/store/useAddressStore').Address) => {
-                    const isSelected = selectedAddressId === addr.address_id;
-                    return (
-                      <label 
-                        key={addr.address_id}
-                        className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${
-                          isSelected 
-                            ? 'border-primary ring-1 ring-primary bg-primary/5' 
-                            : 'hover:bg-muted/40 border-input'
-                        }`}
-                      >
-                        <input 
-                          type="radio" 
-                          name="selectedAddress" 
-                          className="mt-1 mr-3 text-primary focus:ring-primary"
-                          checked={isSelected}
-                          onChange={() => setSelectedAddressId(addr.address_id)}
-                        />
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm flex items-center gap-2">
-                            <span>{addr.address_line1}</span>
-                            {addr.is_default && (
-                              <span className="text-[10px] uppercase font-bold tracking-wider bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                                Default
-                              </span>
+
+                {addresses.length === 0 ? (
+                  <div className="border border-dashed rounded-lg p-8 text-center bg-muted/20 space-y-3">
+                    <MapPin className="w-8 h-8 text-muted-foreground/60 mx-auto" />
+                    <div>
+                      <p className="font-semibold text-sm text-foreground">No saved addresses</p>
+                      <p className="text-xs text-muted-foreground">Add an address to complete your order dispatch.</p>
+                    </div>
+                    <Link href="/addresses" className="inline-block pt-1">
+                      <Button size="sm" className="gap-1.5 text-xs font-semibold">
+                        <Plus className="w-3.5 h-3.5" /> Add New Address
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {addresses.map((addr: import('@/store/useAddressStore').Address) => {
+                      const isSelected = selectedAddressId === addr.address_id;
+                      return (
+                        <label 
+                          key={addr.address_id}
+                          className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${
+                            isSelected 
+                              ? 'border-primary ring-1 ring-primary bg-primary/5' 
+                              : 'hover:bg-muted/40 border-input'
+                          }`}
+                        >
+                          <input 
+                            type="radio" 
+                            name="selectedAddress" 
+                            className="mt-1 mr-3 text-primary focus:ring-primary"
+                            checked={isSelected}
+                            onChange={() => setSelectedAddressId(addr.address_id)}
+                          />
+                          <div className="flex-1">
+                            <div className="font-semibold text-sm flex items-center gap-2">
+                              <span>{addr.address_line1}</span>
+                              {addr.is_default && (
+                                <span className="text-[10px] uppercase font-bold tracking-wider bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            {addr.address_line2 && (
+                              <div className="text-xs text-muted-foreground mt-0.5">{addr.address_line2}</div>
                             )}
+                            <div className="text-xs text-muted-foreground mt-0.5 font-medium">
+                              {addr.city_name}, {addr.state} {addr.zip_code}
+                            </div>
                           </div>
-                          {addr.address_line2 && (
-                            <div className="text-xs text-muted-foreground mt-0.5">{addr.address_line2}</div>
-                          )}
-                          <div className="text-xs text-muted-foreground mt-0.5 font-medium">
-                            {addr.city_name}, {addr.state} {addr.zip_code}
-                          </div>
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+            )}
 
             {/* Payment Method Selection */}
             <section className="bg-card border rounded-xl p-5 shadow-xs space-y-4">
@@ -401,7 +477,7 @@ export default function CheckoutPage() {
                 size="lg" 
                 className="w-full font-bold shadow-sm" 
                 onClick={handlePlaceOrder}
-                disabled={isPlacingOrder || !selectedAddressId}
+                disabled={isPlacingOrder || (deliveryMode === 'home_delivery' && !selectedAddressId)}
               >
                 {isPlacingOrder ? (
                   <>

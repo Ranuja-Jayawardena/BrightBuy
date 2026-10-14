@@ -1,7 +1,7 @@
 # Fix 3.2: Product Active/Inactive Switch & Reactivation API
 
 > **Parent Group:** [Fix 3: Admin Catalog & Media Management](fix3-admin-catalog-media.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member C (Backend Admin Product Service & Model) & Member B (Admin Products UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -29,17 +29,17 @@ In the admin products management table (`/admin/products`), when an admin clicks
 ## Tasks
 
 ### Backend — Member C
-- [ ] In `backend/src/models/adminProductModel.js`:
+- [x] In `backend/src/models/adminProductModel.js`:
   - Update `updateProduct` query to support updating `is_active`.
   - Or add `setProductActiveStatus(productId, isActive)`.
-- [ ] In `backend/src/services/adminProductService.js`:
+- [x] In `backend/src/services/adminProductService.js`:
   - Allow `is_active` (boolean) in `updateProduct(productId, body)`.
   - Or implement `setProductStatus(productId, isActive)`.
-- [ ] In `backend/src/routes/adminRoutes.js`:
+- [x] In `backend/src/routes/adminRoutes.js`:
   - Ensure `PUT /api/admin/products/:id` supports `{ is_active: boolean }` and/or add `PATCH /api/admin/products/:id/status`.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/products/page.tsx`:
+- [x] In `frontend/src/app/admin/products/page.tsx`:
   - Replace the red delete button with a shadcn/ui `Switch` toggle component (or an Active/Inactive toggle button).
   - Handle toggle click with an optimistic update and call `PUT /api/admin/products/:id` with `{ is_active: newStatus }`.
   - Provide toast/alert feedback on status toggle success and revert on error.
@@ -88,3 +88,12 @@ Cookie: access_token=...
 1. Deactivating an active product marks it inactive and removes it from the public storefront catalog.
 2. Toggling an inactive product back to active reactivates it immediately and restores it to the public catalog.
 3. The admin products table displays a responsive toggle switch with immediate visual feedback.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.2: Catalog Timestamp Migration Verification](../Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+- [Fix 8.8: Manual Inventory Adjustment Audit](../Fix8-Database-Integrity-Concurrency/fix8.8-inventory-audit.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

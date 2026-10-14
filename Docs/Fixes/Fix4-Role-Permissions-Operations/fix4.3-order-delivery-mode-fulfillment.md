@@ -1,7 +1,7 @@
 # Fix 4.3: Order Fulfillment: Courier Tracking vs. Store Pickup
 
 > **Parent Group:** [Fix 4: Role Permissions & Operations](fix4-role-permissions-operations.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member D (Backend Orders & Deliveries) & Member B (Admin Orders UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -38,19 +38,19 @@ However, BrightBuy supports two distinct fulfillment modes:
 ## Tasks
 
 ### Backend — Member D
-- [ ] In `backend/src/services/adminOrderService.js`:
+- [x] In `backend/src/services/adminOrderService.js`:
   - When updating delivery status for `store_pickup`, support `ready_for_pickup` and `collected` status transitions.
   - Optional validation: Do not require or enforce tracking number format on `store_pickup`.
-- [ ] In `backend/src/controllers/adminOrderController.js`:
+- [x] In `backend/src/controllers/adminOrderController.js`:
   - Return `delivery_mode` clearly in order summary and details.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/orders/[id]/page.tsx`:
-  - Check `order.delivery.delivery_mode`:
+- [x] In `frontend/src/app/admin/orders/[id]/page.tsx`:
+  - [x] Check `order.delivery.delivery_mode`:
     - If `store_pickup`: Adjust title to "Store Pickup & Gate Fulfillment". Hide the courier tracking code input. Show pickup status options.
     - If `home_delivery`: Show "Courier & Shipping Management" with tracking number input and courier status options.
-- [ ] In `frontend/src/app/admin/orders/page.tsx`:
-  - Add a "Fulfillment Mode" badge in the orders list table (`Home Delivery` vs. `Store Pickup`).
+- [x] In `frontend/src/app/admin/orders/page.tsx`:
+  - [x] Add a "Fulfillment Mode" badge in the orders list table (`Home Delivery` vs. `Store Pickup`).
 
 ---
 
@@ -69,3 +69,13 @@ However, BrightBuy supports two distinct fulfillment modes:
 1. Store pickup orders clearly display as gate pickups without prompting for courier tracking numbers.
 2. Dispatchers can mark pickup orders as `ready_for_pickup` and `collected`.
 3. Courier home delivery orders continue to track third-party courier codes seamlessly.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.4: Order Transitions & Payment Event Consistency](../Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
+- [Fix 8.5: Delivery Cardinality & Value Constraints](../Fix8-Database-Integrity-Concurrency/fix8.5-delivery-value-constraints.md)
+- [Fix 8.9: Checkout & Admin Conflict Handling](../Fix8-Database-Integrity-Concurrency/fix8.9-checkout-admin-ui.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

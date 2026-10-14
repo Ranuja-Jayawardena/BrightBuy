@@ -151,6 +151,7 @@ function LoginFormContent() {
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-3 pt-3 border-t">
+          <Link href="/forgot-password" className="text-sm text-primary hover:underline">Forgot your password?</Link>
           <div className="text-sm text-center text-muted-foreground w-full">
             Don&apos;t have an account yet?{' '}
             <Link href="/register" className="text-primary font-semibold hover:underline">
@@ -176,4 +177,3 @@ export default function LoginPage() {
     </Suspense>
   );
 }
-

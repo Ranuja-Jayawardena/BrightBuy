@@ -144,5 +144,16 @@ This foundational schema and seed framework is extended by the following post-de
 - **[Fix 2.1: Price Range Filter & Composite Index](../../Fixes/Fix2-Search-Filter-Performance/fix2.1-price-range-filter-indexing.md):** Adds Flyway migration `V22__add_product_price_index.sql` (`idx_products_is_active_base_price`).
 - **[Fix 2.2: Search Autocomplete & GIN Trigram Indexing](../../Fixes/Fix2-Search-Filter-Performance/fix2.2-search-autocomplete-suggestions.md):** Adds Flyway migration `V23__add_product_trgm_index.sql` enabling `pg_trgm` extension and trigram GIN indexes.
 - **[Fix 4.2: Employee Lifecycle & Role Management](../../Fixes/Fix4-Role-Permissions-Operations/fix4.2-employee-lifecycle-role-management.md):** Adds Flyway migration `V24__add_employee_is_active.sql` adding `is_active` column to `employees`.
+- **[Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../../Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md):** Adds Flyway migration `V26__replace_image_data_with_image_url.sql` retiring BYTEA and cutting over seed assets to AWS S3.
+- **[Fix 7: Consumer Technology Catalog Specialization](../../Fixes/Fix7-Tech-Catalog-Specialization/fix7-tech-catalog-specialization.md):** Overhauls database seed files (`03_taxonomy.sql`, `04_products.sql`, `05_catalog_links.sql`, `07_orders.sql`) to specialize the catalog strictly for consumer technology items (laptops, phones, earbuds, peripherals).
 
+## Fix 8 follow-up
 
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.1: Contracts, Data Preflight & Migration Coordination](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md)
+- [Fix 8.2: Catalog Timestamp Migration Verification](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.2-catalog-timestamp-verification.md)
+- [Fix 8.5: Delivery Cardinality & Value Constraints](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.5-delivery-value-constraints.md)
+- [Fix 8.11: Application & Migration Database Accounts](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.11-database-account-separation.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

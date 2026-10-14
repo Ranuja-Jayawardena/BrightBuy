@@ -1,7 +1,7 @@
 # Fix 3.3: Category Active/Inactive Switch
 
 > **Parent Group:** [Fix 3: Admin Catalog & Media Management](fix3-admin-catalog-media.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member B (Frontend Admin Categories UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -26,12 +26,12 @@ In the category management tree (`/admin/categories`), when a category is deacti
 ## Tasks
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/categories/page.tsx`:
-  - In `renderTree()`, replace or augment the delete icon button with an active/inactive `Switch` toggle component (or Toggle Button).
-  - When the switch is clicked:
-    - Send `PUT /api/admin/categories/:id` with `{ is_active: !node.is_active }`.
-    - Refresh the category tree or update local node state optimistically.
-    - Provide a toast or alert confirming status change.
+- [x] In `frontend/src/app/admin/categories/page.tsx`:
+  - [x] In `renderTree()`, replace or augment the delete icon button with an active/inactive `Switch` toggle component (or Toggle Button).
+  - [x] When the switch is clicked:
+    - [x] Send `PUT /api/admin/categories/:id` with `{ is_active: !node.is_active }`.
+    - [x] Refresh the category tree or update local node state optimistically.
+    - [x] Provide a toast or alert confirming status change.
 
 ---
 
@@ -72,3 +72,11 @@ Cookie: access_token=...
 1. Administrators can toggle any category between active and inactive with a switch control.
 2. Inactive categories reactivated via the switch immediately reappear in the storefront categories navigation.
 3. Subcategories under inactive parents maintain consistent hierarchy validation.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.7: Category Hierarchy Integrity](../Fix8-Database-Integrity-Concurrency/fix8.7-category-cycle-protection.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

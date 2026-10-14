@@ -246,12 +246,13 @@ export default function AdminReportsOverviewPage() {
           <ReportBarChart
             data={topProducts}
             xKey="product_name"
+            layout="vertical"
             bars={[
               { key: 'total_revenue', name: 'Revenue ($)', fill: '#10b981' },
             ]}
             title="Top Performing Products"
             description="Best sellers ranked by total generated revenue"
-            height={320}
+            height={360}
             formatYAxis={(val) => `$${(val / 1000).toFixed(0)}k`}
             formatTooltip={(val) => [`$${Number(val).toLocaleString()}`, 'Revenue']}
             isLoading={loading}

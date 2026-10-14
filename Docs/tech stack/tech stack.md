@@ -24,8 +24,8 @@
 - **Constraint:** Fully custom implementation. No third-party authentication services or libraries like Supabase or Better Auth are permitted.
 
 ## File & Media Storage
-- **Method:** Directly in PostgreSQL
-- **Format:** Binary Data (`BYTEA` column) or Base64 Strings. No third-party storage (like AWS S3 or Cloudinary) is permitted.
+- **Method:** AWS S3 (Amazon Simple Storage Service) or directly in PostgreSQL.
+- **Format:** AWS S3 object storage (approved by lecturer) or Binary Data (`BYTEA` column).
 
 ## Payments
 - **Gateway:** Lemon Squeezy

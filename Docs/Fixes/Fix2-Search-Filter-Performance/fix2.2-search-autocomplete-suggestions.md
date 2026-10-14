@@ -1,7 +1,7 @@
 # Fix 2.2: Search Autocomplete & pg_trgm GIN Indexing
 
 > **Parent Group:** [Fix 2: Search & Filter Performance](fix2-search-filter-performance.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member C (Backend Models & Search Index) & Member A (Storefront Search Dropdown UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -28,6 +28,10 @@ ON products USING gin (product_name gin_trgm_ops);
 
 CREATE INDEX idx_products_brand_trgm 
 ON products USING gin (brand gin_trgm_ops);
+
+-- The main catalog search also uses description ILIKE, so index it too.
+CREATE INDEX idx_products_description_trgm
+ON products USING gin (description gin_trgm_ops);
 ```
 
 ### 2. Suggestions API Query
@@ -57,16 +61,16 @@ LIMIT 6;
 ## Tasks
 
 ### Backend & DB — Member C
-- [ ] Create Flyway migration `backend/db/migrations/V23__add_search_trgm_index.sql`.
-- [ ] Implement `getSuggestions(query)` in `backend/src/models/productModel.js`.
-- [ ] Implement `GET /api/products/suggestions` in `backend/src/controllers/productController.js`:
+- [x] Create Flyway migration `backend/db/migrations/V23__add_search_trgm_index.sql`.
+- [x] Implement `getSuggestions(query)` in `backend/src/models/productModel.js`.
+- [x] Implement `GET /api/products/suggestions` in `backend/src/controllers/productController.js`:
   - Validate minimum query length (>= 2 characters).
   - Return `{ suggestions: { product_id, product_name, brand, category_name }[] }`.
-- [ ] Wire route into `backend/src/routes/productRoutes.js`.
-- [ ] Update `Docs/Database/DB_Schema.md`.
+- [x] Wire route into `backend/src/routes/productRoutes.js`.
+- [x] Update `Docs/Database/DB_Schema.md`.
 
 ### Storefront UI — Member A
-- [ ] In `frontend/src/components/Navbar.tsx` and/or storefront search input:
+- [x] In `frontend/src/components/Navbar.tsx` and/or storefront search input:
   - Add debounced input hook (250ms).
   - Fetch suggestions from `/api/products/suggestions?q={query}` when query >= 2 chars.
   - Display elegant floating suggestions dropdown menu (product title, brand, category tag).
@@ -120,3 +124,15 @@ GET /api/products/suggestions?q=phon
 1. Migration runs and creates `pg_trgm` extension and GIN indexes without error.
 2. Typing 2 or more letters in search bar displays relevant autocomplete suggestions in < 50ms.
 3. Clicking a suggestion navigates to the target product.
+
+## Implementation Note
+
+The backend route is ready and covered by request tests. The `V23` migration adds partial GIN indexes for active product names, brands, and descriptions; it has not been applied to a database in this checkout. Member A's dropdown and the UI latency check remain open.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.10: Storefront & Report Regression Verification](../Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

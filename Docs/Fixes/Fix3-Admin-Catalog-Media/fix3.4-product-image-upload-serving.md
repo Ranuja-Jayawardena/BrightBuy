@@ -1,7 +1,9 @@
 # Fix 3.4: Product Image Upload & Route Serving Fix
 
+> **Fix 6 status correction (2026-10-13):** Historical BYTEA completion: the multipart endpoint/middleware and binary-body tests below describe the previous implementation. Current S3 backend removes that upload endpoint while the admin UI still calls it; upload integration is open in F6-01. Preserve this history, but follow Fix 6.3/6.4 for current contracts and acceptance. [Active Fix 6 guidance](../Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md).
+
 > **Parent Group:** [Fix 3: Admin Catalog & Media Management](fix3-admin-catalog-media.md)
-> **Status:** Not Started
+> **Status:** Complete
 > **Assigned To:** Member C (Backend Middleware & Image Routes) & Member B (Admin Products UI)
 > **Depends On:** —
 > **Blocks:** —
@@ -37,22 +39,22 @@
 ## Tasks
 
 ### Backend — Member C
-- [ ] In `backend/src/middleware/multipartImageUpload.js`:
+- [x] In `backend/src/middleware/multipartImageUpload.js`:
   - Sanitize boundary extraction: `const boundary = boundaryMatch[1].replace(/^["']|["']$/g, '');`.
   - Fix multipart binary buffer slicing to preserve exact binary bytes without string trimming corruption.
   - Test upload of PNG, JPEG, and WebP binary files.
-- [ ] In `backend/src/routes/productRoutes.js`:
+- [x] In `backend/src/routes/productRoutes.js`:
   - Add route alias `GET /images/:id` (redirecting or forwarding to `imageController.getImage`) so both `/api/images/:id` and `/api/products/images/:id` resolve cleanly.
 
 ### Frontend — Member B
-- [ ] In `frontend/src/app/admin/products/[id]/page.tsx`:
-  - Update image src to standard path: `/api/images/${img.image_id}`.
-  - Show proper loading spinner during image upload.
-  - Add primary image badge, sort order inputs, and deletion confirmation modal.
-- [ ] In `frontend/src/app/cart/page.tsx`:
-  - Update cart item image src from `/api/products/images/...` to `/api/images/...`.
-- [ ] (Optional Enhancement) In `frontend/src/app/admin/products/new/page.tsx`:
-  - Add informational notice explaining that product media galleries are configured after initial product creation, or allow primary image attachment on create.
+- [x] In `frontend/src/app/admin/products/[id]/page.tsx`:
+  - [x] Update image src to standard path: `/api/images/${img.image_id}`.
+  - [x] Show proper loading spinner during image upload.
+  - [x] Add primary image badge, sort order inputs, and deletion confirmation modal.
+- [x] In `frontend/src/app/cart/page.tsx`:
+  - [x] Update cart item image src from `/api/products/images/...` to `/api/images/...`.
+- [x] (Optional Enhancement) In `frontend/src/app/admin/products/new/page.tsx`:
+  - [x] Add informational notice explaining that product media galleries are configured after initial product creation, or allow primary image attachment on create.
 
 ---
 
@@ -105,3 +107,23 @@ true
 1. Uploading PNG, JPEG, and WebP images succeeds without corruption or 400 errors.
 2. Uploaded images display immediately in the product gallery and storefront.
 3. Setting an image as primary or deleting an image works reliably.
+
+## Verification
+
+- Backend multipart tests cover PNG, JPEG, and WebP byte preservation, quoted boundaries, and malformed body rejection.
+- Route tests confirm `/api/images/:id` and `/api/products/images/:id` serve identical image bytes.
+- Backend suite: 116 tests passing.
+
+---
+
+## Cloud Storage Migration
+
+- **[Fix 6: Cloud Object Storage (AWS S3) & Media Delivery](../Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md):** Replaces PostgreSQL BYTEA image storage with AWS S3 cloud storage, direct pre-signed URL uploads, and clean `image_url` schema.
+
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.10: Storefront & Report Regression Verification](../Fix8-Database-Integrity-Concurrency/fix8.10-storefront-report-regression.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

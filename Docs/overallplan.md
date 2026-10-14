@@ -94,7 +94,7 @@ Each phase is split into subphases. Tick a subphase when **all** tasks in its do
   - [x] 10.6 Production Deployment — **E** → [phase10.6-production-deployment.md](Phases/Phase10-Polish-Testing-Deployment/phase10.6-production-deployment.md)
   - [x] 10.7 Staff Role-Based Access Control (RBAC) — **E** → [phase10.7-staff-rbac.md](Phases/Phase10-Polish-Testing-Deployment/phase10.7-staff-rbac.md)
 
-- [ ] **Fixes & Patches Track:** Post-testing bug fixes & refinements (Fix 1 to Fix 5) → [overallplan.md](Fixes/overallplan.md)
+- [x] **Fixes & Patches Track:** Post-testing bug fixes, cloud media migration, technology catalog specialization & refinements (Fix 1 to Fix 8) → [overallplan.md](Fixes/overallplan.md)
 
 ---
 
@@ -208,3 +208,20 @@ BrightBuy/
 └── README.md
 ```
 
+## Cloud media follow-up and corrected acceptance status
+
+[Fix 6](Fixes/Fix6-Cloud-Media-Storage-S3/fix6-cloud-media-storage-s3.md) is **In Progress, 0/4 items verified complete under revised gates**. Infrastructure provisioning is recorded; V26, seed URLs, S3 API and direct-upload UI code exist. The generic migration mapping and upload lifecycle still need correction; browser, runtime-container and target migration evidence remain unverified. 6.1–6.4 are In Progress.
+
+Use the [shared contracts, verification and rollout guide](Fixes/Fix6-Cloud-Media-Storage-S3/fix6-contracts-verification-rollout.md) and [fix tracker](Fixes/overallplan.md). Owners: E infrastructure/migrations/release; C catalog/image backend and data preservation; B admin/cart UI; A storefront; D cart URL read support. Completed phase checkboxes describe historical delivery and do not certify the current S3 integration. The Fix 6 issue ledger distinguishes existing work, defects and missing evidence. This documentation update does not change code, apply migrations or deploy. Recheck on merged dev `99fdeb2`: backend lint passes (0 errors / 5 warnings), the obsolete product image test still fails, and two V27 migrations block Flyway until F6-12 is resolved against target history.
+
+## Database integrity and concurrency follow-up
+
+[Fix 8 overview](Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md) turns the [database discussion](db_improvements/Db_improvements_discussion.md) into twelve assigned implementation and verification items. Track completion in the [Fixes master tracker](Fixes/overallplan.md); completed phase checkboxes remain historical and do not certify the new protections.
+
+- **A:** Storefront and report regression (8.10).
+- **B:** Checkout and admin conflict handling (8.9).
+- **C:** Catalog timestamps (8.2), category integrity (8.7), inventory audit (8.8); reporting support.
+- **D:** Cart/checkout (8.3), order/payment consistency (8.4), delivery/value constraints (8.5).
+- **E:** Contracts and migration coordination (8.1), super-admin protection (8.6), database accounts (8.11), integration/rollout (8.12).
+
+**Status:** 10/12 complete (8.1–8.9 and 8.11); 8.10 In Progress with C's isolated catalog/report regression passing. A's remaining browser and 8.9 integration checks, and E's 8.12 rollout remain. Preflight decisions are in [8.1](Fixes/Fix8-Database-Integrity-Concurrency/fix8.1-contracts-preflight.md).

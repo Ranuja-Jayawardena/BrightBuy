@@ -34,3 +34,12 @@
   - `tests/orderFlowIntegration.test.js` (23 tests): Integration tests covering complete COD and Card checkout flows, input validation error shapes, Lemon Squeezy webhook signature verification and processing, and non-blocking email notification triggers on order events.
 - **Node 25 test environment:** Updated `package.json` test script with `--localstorage-file=:memory:` to ensure seamless Jest execution on modern Node environments. All 6 Jest test suites (69 tests) and Node product tests pass with 0 ESLint errors.
 
+## Fix 8 follow-up
+
+Database integrity and concurrency work is tracked separately in [Fix 8](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8-database-integrity-concurrency.md). The existing completion status above describes the original scope; it does not certify these follow-up protections.
+
+- [Fix 8.3: Cart Uniqueness & Checkout Concurrency](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.3-cart-checkout-concurrency.md)
+- [Fix 8.4: Order Transitions & Payment Event Consistency](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.4-order-payment-consistency.md)
+- [Fix 8.12: PostgreSQL Integration Tests & Controlled Rollout](../../Fixes/Fix8-Database-Integrity-Concurrency/fix8.12-integration-rollout.md)
+
+Read the Fix 8 contracts and prerequisites before implementation. Preserve the existing API and UI behavior unless an explicit contract decision documents a change; update both trackers only after verification.

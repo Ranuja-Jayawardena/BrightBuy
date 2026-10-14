@@ -179,6 +179,47 @@ describe('Order Placement & Atomic Stock Deduction Logic (Unit Tests)', () => {
       expect(result.delivery.estimated_delivery_days).toBe(7);
       expect(mockClient.query).toHaveBeenCalledWith('COMMIT');
     });
+
+    it('should create store_pickup order with default store address and 2-day ETA when address_id is null', async () => {
+      mockClient.query.mockResolvedValueOnce({}); // BEGIN
+      mockClient.query.mockResolvedValueOnce({ rows: [{ cart_id: 25 }] }); // cart
+      mockClient.query.mockResolvedValueOnce({
+        rows: [{ variant_id: 1, quantity: 2 }],
+      }); // cart items
+      mockClient.query.mockResolvedValueOnce({
+        rows: [{ stock_quantity: 10, price: '48.00', variant_name: 'Classic Black / S', product_name: 'Yoga Leggings' }],
+      }); // variant check
+      mockClient.query.mockResolvedValueOnce({
+        rows: [{ city_id: 1 }],
+      }); // cities query for store pickup fallback
+      mockClient.query.mockResolvedValueOnce({
+        rows: [{ order_id: 505, order_date: '2026-10-13T10:00:00Z', status: 'pending', total_amount: '96.00' }],
+      }); // order insert
+      mockClient.query.mockResolvedValueOnce({}); // order_item insert
+      mockClient.query.mockResolvedValueOnce({}); // update variant stock
+      mockClient.query.mockResolvedValueOnce({
+        rows: [{
+          delivery_id: 705,
+          delivery_mode: 'store_pickup',
+          delivery_address_line1: 'BrightBuy Central Retail Store & Pickup Gate',
+          delivery_address_line2: '100 Main Street',
+          city_id: 1,
+          zip_code: '78701',
+          estimated_delivery_days: 2,
+          delivery_status: 'pending',
+          tracking_number: null,
+        }],
+      }); // delivery insert
+      mockClient.query.mockResolvedValueOnce({}); // delete cart items
+      mockClient.query.mockResolvedValueOnce({}); // COMMIT
+
+      const result = await orderModel.createOrder(100, null, 'store_pickup');
+
+      expect(result.delivery.delivery_mode).toBe('store_pickup');
+      expect(result.delivery.estimated_delivery_days).toBe(2);
+      expect(result.delivery.delivery_address_line1).toContain('Pickup Gate');
+      expect(mockClient.query).toHaveBeenCalledWith('COMMIT');
+    });
   });
 
   describe('Deadlock Prevention & Concurrency Protection', () => {
@@ -215,7 +256,7 @@ describe('Order Placement & Atomic Stock Deduction Logic (Unit Tests)', () => {
 
       // Verify that FOR UPDATE was called in strict ascending order: 3, then 9, then 15
       const forUpdateCalls = mockClient.query.mock.calls.filter(call =>
-        typeof call[0] === 'string' && call[0].includes('FOR UPDATE')
+        typeof call[0] === 'string' && call[0].includes('product_variants') && call[0].includes('FOR UPDATE')
       );
 
       expect(forUpdateCalls).toHaveLength(3);
