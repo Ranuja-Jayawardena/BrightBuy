@@ -4,13 +4,26 @@ const { signAccessToken, signRefreshToken, verifyRefreshToken, verifyAccessToken
 const notificationService = require('../services/notificationService');
 const accountEmailService = require('../services/accountEmailService');
 
-const isProduction = process.env.NODE_ENV === 'production';
-const cookieOptions = {
-  httpOnly: true,
-  secure: isProduction,
-  sameSite: 'strict',
-  path: '/',
-};
+function getCookieOptions(req) {
+  let isSecure = false;
+  if (process.env.COOKIE_SECURE === 'true') {
+    isSecure = true;
+  } else if (process.env.COOKIE_SECURE === 'false') {
+    isSecure = false;
+  } else {
+    // Auto-detect: only set secure if the incoming request is actually over HTTPS.
+    // If running on plain HTTP (e.g. AWS EC2 Elastic IP http://18.208.53.186),
+    // browsers drop any cookie marked Secure, causing 401 unauthenticated errors.
+    isSecure = Boolean(req && (req.secure || req.headers?.['x-forwarded-proto'] === 'https'));
+  }
+
+  return {
+    httpOnly: true,
+    secure: isSecure,
+    sameSite: 'lax',
+    path: '/',
+  };
+}
 
 const register = async (req, res, next) => {
   const client = await db.connect();
@@ -60,8 +73,9 @@ const register = async (req, res, next) => {
     accountEmailService.issueToken(user.user_id, user.email, 'verify')
       .catch(err => console.error('[Auth] Failed to queue verification email:', err));
 
-    res.cookie('access_token', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
-    res.cookie('refresh_token', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
+    const cookieOpts = getCookieOptions(req);
+    res.cookie('access_token', accessToken, { ...cookieOpts, maxAge: 15 * 60 * 1000 });
+    res.cookie('refresh_token', refreshToken, { ...cookieOpts, maxAge: 7 * 24 * 60 * 60 * 1000 });
 
     res.status(201).json({
       message: "Registration successful",
@@ -123,8 +137,9 @@ const login = async (req, res, next) => {
       [user.user_id, refreshHash, expiresAt]
     );
 
-    res.cookie('access_token', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
-    res.cookie('refresh_token', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
+    const cookieOpts = getCookieOptions(req);
+    res.cookie('access_token', accessToken, { ...cookieOpts, maxAge: 15 * 60 * 1000 });
+    res.cookie('refresh_token', refreshToken, { ...cookieOpts, maxAge: 7 * 24 * 60 * 60 * 1000 });
 
     res.status(200).json({
       message: "Login successful",
@@ -201,8 +216,9 @@ const refresh = async (req, res, next) => {
       [payload.user_id, newRefreshHash, expiresAt]
     );
 
-    res.cookie('access_token', newAccessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
-    res.cookie('refresh_token', newRefreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
+    const cookieOpts = getCookieOptions(req);
+    res.cookie('access_token', newAccessToken, { ...cookieOpts, maxAge: 15 * 60 * 1000 });
+    res.cookie('refresh_token', newRefreshToken, { ...cookieOpts, maxAge: 7 * 24 * 60 * 60 * 1000 });
 
     res.status(200).json({ message: "Token refreshed" });
   } catch (error) {
@@ -233,8 +249,9 @@ const logout = async (req, res, next) => {
       }
     }
 
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    const cookieOpts = getCookieOptions(req);
+    res.clearCookie('access_token', cookieOpts);
+    res.clearCookie('refresh_token', cookieOpts);
     res.status(200).json({ message: "Logged out" });
   } catch (error) {
     next(error);

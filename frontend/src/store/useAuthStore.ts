@@ -40,6 +40,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
+        credentials: 'include',
       });
 
       if (!res.ok) {
@@ -63,6 +64,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
 
       if (!res.ok) {
