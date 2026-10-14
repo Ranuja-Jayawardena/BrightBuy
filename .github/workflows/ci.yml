@@ -49,6 +49,16 @@ jobs:
         working-directory: ./backend
         run: npm run lint
 
+      - name: Setup CI Database Schema & Seed Data
+        working-directory: ./backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: BrightBuy2026SecurePass!
+          DB_NAME: brightbuy_test
+        run: node scripts/setup-ci-database.js
+
       - name: Run Backend Tests
         working-directory: ./backend
         env:
@@ -60,6 +70,10 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: BrightBuy2026SecurePass!
           DB_NAME: brightbuy_test
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: mock_access_key_for_ci_presigning
+          AWS_SECRET_ACCESS_KEY: mock_secret_key_for_ci_presigning
+          AWS_S3_BUCKET_NAME: brightbuy-media-storage-695945476492
         run: npm test
 
       - name: Run Product Validation Tests
@@ -68,6 +82,12 @@ jobs:
 
       - name: Run Database Account Separation Tests (Fix 8.11)
         working-directory: ./backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: BrightBuy2026SecurePass!
+          DB_NAME: brightbuy_test
         run: npm run test:db-accounts
 
       - name: Run PostgreSQL Concurrency Integration Tests (Fix 8.12)
