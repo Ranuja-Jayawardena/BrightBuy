@@ -24,14 +24,17 @@ jobs:
 
             echo "=== Pulling Latest Changes from origin/main ==="
             git fetch origin main
-            git checkout main
-            git pull origin main
+            git reset --hard HEAD
+            git clean -fd -e .env*
+            git checkout -f main
+            git reset --hard origin/main
+            git clean -fd -e .env*
 
             echo "=== Rebuilding and Launching Production Containers ==="
             docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build --remove-orphans
 
             echo "=== Verifying Stack Health ==="
-            sleep 8
+            sleep 15
             curl -f http://localhost/api/health || (echo "Health check failed!" && exit 1)
 
             echo "=== Deployment Succeeded! ==="
