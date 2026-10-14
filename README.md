@@ -238,5 +238,147 @@ DB_NAME=brightbuy_dev
 
 ---
 
-## 👥 Team Assignments & Phase Tracking
-See [Docs/overallplan.md](Docs/overallplan.md) for full phase plans, subphases, and assigned team members.
+## 👥 Team Members & Database Responsibilities (Who Did What)
+
+Database responsibilities across BrightBuy were split among all 5 team members. Each member took end-to-end ownership of their schema domain: authoring the Flyway DDL migration files, foreign-key relationships, constraints, indexes, triggers, and corresponding seed datasets.
+
+### Team Overview & DB Ownership Matrix
+
+| Member | Name | Role | Subphase | Tables Owned | Flyway Migrations | Seed Scripts |
+|--------|------|------|----------|--------------|-------------------|--------------|
+| **A** | **Rithmi** | Frontend – Storefront | [1.5](Docs/Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md) | `categories`, `product_categories`, `variant_attributes`, `variant_attribute_values` | `V7`, `V8`, `V12`, `V13` | `03_taxonomy.sql`, `05_catalog_links.sql` |
+| **B** | **Thinura** | Frontend – Admin/Cart | [1.4](Docs/Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md) | `customers`, `addresses`, `carts`, `cart_items` | `V5`, `V6`, `V14`, `V15`, `V29` | `02_customers.sql`, `06_carts.sql` |
+| **C** | **Kavindu** | Backend – Products | [1.6](Docs/Phases/Phase1-Project-Foundation/phase1.6-product-schema.md) | `products`, `product_variants`, `product_images`, `inventory_adjustments` | `V9`, `V10`, `V11`, `V20`, `V22`, `V23`, `V26`, `V27`, `V28`, `V34` | `04_products.sql` (40 products / 70+ variants) |
+| **D** | **Mayura** | Backend – Orders | [1.7](Docs/Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md) | `orders`, `order_items`, `payments`, `deliveries`, `email_jobs` | `V16`, `V17`, `V18`, `V19`, `V25`, `V30`, `V31` | `07_orders.sql` |
+| **E** | **Ranuja** | DevOps + Architecture | [1.1](Docs/Phases/Phase1-Project-Foundation/phase1.1-project-scaffolding.md), [1.2](Docs/Phases/Phase1-Project-Foundation/phase1.2-database-tooling.md), [1.3](Docs/Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md), [1.8](Docs/Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md) | `users`, `employees`, `super_admin_guard`, `refresh_tokens`, `cities`, `media_uploads`, `media_cleanup_ledger` | `V1`, `V2`, `V3`, `V4`, `V21`, `V24`, `V32`, `V33`, `V35`, `V36` | `01_identity.sql` |
+
+---
+
+### Detailed Contributions by Member
+
+#### Member A — Rithmi (Storefront & Catalog Taxonomy)
+* **Schema Subphase:** [Phase 1.5 – Catalog Taxonomy Schema](Docs/Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md)
+* **Owned Tables:**
+  - `categories`: Self-referencing hierarchical product categories (`parent_category_id`).
+  - `product_categories`: Many-to-many junction connecting products to multiple categories.
+  - `variant_attributes`: Attribute dimension definitions (e.g., Color, Size, Storage, Material).
+  - `variant_attribute_values`: Normalized attribute-value assignments for individual product variants.
+* **Flyway Migrations Authored:**
+  - `V7__create_categories.sql`
+  - `V8__create_variant_attributes.sql`
+  - `V12__create_product_categories.sql`
+  - `V13__create_variant_attribute_values.sql`
+* **Seed Scripts Authored:**
+  - `03_taxonomy.sql`: Category hierarchy tree and attribute dimension seed data.
+  - `05_catalog_links.sql`: Product-category linkages and variant attribute-value mappings.
+* **Key Database Logic & Optimization:**
+  - Recursive self-referential category parent-child hierarchy.
+  - Foreign key indexing on category and taxonomy lookup paths.
+
+#### Member B — Thinura (Admin UI, Customer & Shopping Cart)
+* **Schema Subphase:** [Phase 1.4 – Customer & Cart Schema](Docs/Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md)
+* **Owned Tables:**
+  - `customers`: Customer profiles linked 1-to-1 with `users`.
+  - `addresses`: Shipping and billing addresses linked to cities.
+  - `carts`: Active customer shopping carts.
+  - `cart_items`: Cart line items with variant associations and quantities.
+* **Flyway Migrations Authored:**
+  - `V5__create_customers.sql`
+  - `V6__create_addresses.sql`
+  - `V14__create_carts.sql`
+  - `V15__create_cart_items.sql`
+  - `V29__cart_uniqueness_and_checkout_concurrency.sql`
+* **Seed Scripts Authored:**
+  - `02_customers.sql`: Customer users, personal profiles, and addresses across multiple cities.
+  - `06_carts.sql`: Sample active shopping carts and cart items.
+* **Key Database Logic & Optimization:**
+  - Partial unique index `idx_addresses_default` enforcing at most one default address per customer (`WHERE is_default = true`).
+  - Strict composite uniqueness constraint `UNIQUE(cart_id, variant_id)` on `cart_items` to prevent duplicate line items.
+  - Concurrency control and optimistic row locking during checkout cart state transitions.
+
+#### Member C — Kavindu (Product Catalog & Inventory)
+* **Schema Subphase:** [Phase 1.6 – Product Schema](Docs/Phases/Phase1-Project-Foundation/phase1.6-product-schema.md)
+* **Owned Tables:**
+  - `products`: Master product catalog records, base SKUs, descriptions, and brands.
+  - `product_variants`: Product variant SKUs, pricing, and stock levels.
+  - `product_images`: Primary and secondary product image associations.
+  - `inventory_adjustments`: Historical stock adjustment audit trail.
+* **Flyway Migrations Authored:**
+  - `V9__create_products.sql`
+  - `V10__create_product_variants.sql`
+  - `V11__create_product_images.sql`
+  - `V20__create_inventory_adjustments.sql`
+  - `V22__add_product_price_index.sql`
+  - `V23__add_search_trgm_index.sql`
+  - `V26__replace_image_data_with_image_url.sql`
+  - `V27__set_catalog_updated_at_on_update.sql`
+  - `V28__apparel_variant_matrix_seed.sql`
+  - `V34__inventory_adjustment_audit_trigger.sql`
+* **Seed Scripts Authored:**
+  - `04_products.sql`: Heaviest dataset in the system — 40 comprehensive products across 8 categories with 70+ variants, SKUs, and cloud image URLs.
+* **Key Database Logic & Optimization:**
+  - GIN Trigram indexes (`pg_trgm`) on `product_name` and `brand` for high-performance fuzzy text search.
+  - B-tree price index on `product_variants(price)` for fast range-based catalog filtering.
+  - Inventory audit triggers (`V34`) automatically recording stock quantity deltas into `inventory_adjustments`.
+  - Automated `updated_at` triggers updating catalog modification timestamps.
+
+#### Member D — Mayura (Orders, Payments & Deliveries)
+* **Schema Subphase:** [Phase 1.7 – Order, Payment & Delivery Schema](Docs/Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md)
+* **Owned Tables:**
+  - `orders`: Order headers, order statuses, totals, and address snapshots.
+  - `order_items`: Order line item snapshots with historical unit prices at time of purchase.
+  - `payments`: Payment transaction records, gateway references, and payment methods.
+  - `deliveries`: Shipment tracking numbers, carriers, and delivery stages.
+  - `email_jobs`: Transactional email queue table for asynchronous reliable delivery.
+* **Flyway Migrations Authored:**
+  - `V16__create_orders.sql`
+  - `V17__create_order_items.sql`
+  - `V18__create_payments.sql`
+  - `V19__create_deliveries.sql`
+  - `V25__email_jobs_and_auth_tokens.sql`
+  - `V30__order_transitions_and_payment_uniqueness.sql`
+  - `V31__delivery_cardinality_and_mode_constraints.sql`
+* **Seed Scripts Authored:**
+  - `07_orders.sql`: Historical orders with items, payments, and delivery tracking.
+* **Key Database Logic & Optimization:**
+  - Order state machine transitions (`V30`) enforcing valid status lifecycles (`pending` → `processing` → `shipped` → `delivered` / `cancelled`).
+  - Unique payment transaction constraints preventing double-charges and duplicate payment webhooks.
+  - High-concurrency background job queue using `SELECT ... FOR UPDATE SKIP LOCKED` for transactional email processing (`email_jobs`).
+
+#### Member E — Ranuja (DevOps, Architecture & Identity)
+* **Schema Subphases:** [Phase 1.1 Scaffolding](Docs/Phases/Phase1-Project-Foundation/phase1.1-project-scaffolding.md), [Phase 1.2 DB Tooling](Docs/Phases/Phase1-Project-Foundation/phase1.2-database-tooling.md), [Phase 1.3 Identity & Location](Docs/Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md), [Phase 1.8 Integration](Docs/Phases/Phase1-Project-Foundation/phase1.8-migration-integration-verification.md)
+* **Owned Tables:**
+  - `users`: Core authentication table, bcrypt hashes, and primary system roles.
+  - `employees`: Internal staff profiles with granular RBAC sub-roles.
+  - `super_admin_guard`: Dedicated concurrency serialization gate preventing accidental super-admin lockout.
+  - `refresh_tokens`: Hashed JWT refresh tokens with rotation and expiration timestamps.
+  - `cities`: Geographical locations, states, and main-city shipping flags.
+  - `media_uploads` & `media_cleanup_ledger`: S3 cloud media upload registry and orphan cleanup tracking.
+* **Flyway Migrations Authored:**
+  - `V1__create_users.sql`
+  - `V2__create_cities.sql`
+  - `V3__create_employees.sql`
+  - `V4__create_refresh_tokens.sql`
+  - `V21__add_employee_role.sql`
+  - `V24__add_employee_active_status.sql`
+  - `V32__super_admin_protection_trigger.sql`
+  - `V33__category_cycle_prevention_trigger.sql`
+  - `V35__app_database_role_and_grants.sql`
+  - `V36__media_uploads_and_cleanup_ledger.sql`
+* **Seed Scripts Authored:**
+  - `01_identity.sql`: Supported cities, initial super admin, and department employee staff accounts.
+* **Key Database Infrastructure & Logic:**
+  - Dual-environment PostgreSQL architecture on AWS EC2 (`brightbuy_prod` for live site, `brightbuy_dev` for team remote development).
+  - Flyway migration tooling, automated CI/CD database runners (`scripts/setup-ci-database.js`), and schema verification checks.
+  - Strict PL/pgSQL triggers (`V32`) guaranteeing that at least one active `super_admin` always exists in the database.
+  - Category cyclic dependency prevention trigger (`V33`) ensuring no circular parent-child loops occur in taxonomies.
+  - Least-privilege application database role and permission grants (`V35`).
+
+---
+
+## 📖 Master Documentation
+For complete requirements, phase breakdowns, and architecture specifications, refer to:
+- [Docs/overallplan.md](Docs/overallplan.md) — Master phase tracker, milestones, and status.
+- [Docs/Database/DB_Schema.md](Docs/Database/DB_Schema.md) — Single source of truth for all database tables, columns, indexes, and constraints.
+- [Docs/Deployment/aws-infrastructure.md](Docs/Deployment/aws-infrastructure.md) — AWS EC2 infrastructure, S3 bucket configuration, and audit trail.
+
