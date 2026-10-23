@@ -8,26 +8,26 @@
 
 ## Team Members & Responsibilities
 
-| Member | Role | Primary Focus | Phases Active In |
-|--------|------|---------------|------------------|
-| **A** | Frontend – Storefront | Customer-facing pages: product browsing, search, categories, reports UI | 1, 4, 9, 10 |
-| **B** | Frontend – Admin/Cart | Auth pages, admin dashboard UI, cart/checkout/payment pages | 1, 3, 5, 6, 7, 10 |
-| **C** | Backend – Products | Product/category/image APIs, admin CRUD APIs, report queries | 1, 4, 7, 9, 10 |
-| **D** | Backend – Orders | Cart/order/payment/delivery APIs, email notifications | 1, 5, 6, 8, 10 |
-| **E** | DevOps + Architecture | Docker, Flyway, scaffolding, auth system (JWT/middleware), deployment, integration | 1, 2, 3, 6, 10 |
+| Member | Name | Role | Primary Focus | Phases Active In |
+|--------|------|------|---------------|------------------|
+| **A** | **Rithmi** | Frontend – Storefront | Customer-facing pages: product browsing, search, categories, reports UI | 1, 4, 9, 10 |
+| **B** | **Thinura** | Frontend – Admin/Cart | Auth pages, admin dashboard UI, cart/checkout/payment pages | 1, 3, 5, 6, 7, 10 |
+| **C** | **Kavindu** | Backend – Products | Product/category/image APIs, admin CRUD APIs, report queries | 1, 4, 7, 9, 10 |
+| **D** | **Mayura** | Backend – Orders | Cart/order/payment/delivery APIs, email notifications | 1, 5, 6, 8, 10 |
+| **E** | **Ranuja** | DevOps + Architecture | Docker, Flyway, scaffolding, auth system (JWT/middleware), deployment, integration | 1, 2, 3, 6, 10 |
 
 ### Database Schema Ownership
 
 Database work is split **equally across all 5 members**. Each member owns one Phase 1 schema subphase and writes the migration SQL, constraints, indexes, **and seed data** for their tables.
 **Single source of truth:** [DB_Schema.md](Database/DB_Schema.md) · **Flyway version map & seed order:** [phase1-project-foundation.md](Phases/Phase1-Project-Foundation/phase1-project-foundation.md#shared-contracts-all-members-must-follow)
 
-| Member | Subphase | Tables Owned |
-|--------|----------|-------------|
-| **A** | [1.5](Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md) | `categories`, `product_categories`, `variant_attributes`, `variant_attribute_values` |
-| **B** | [1.4](Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md) | `customers`, `addresses`, `carts`, `cart_items` |
-| **C** | [1.6](Phases/Phase1-Project-Foundation/phase1.6-product-schema.md) | `products`, `product_variants`, `product_images` (+ heaviest seed: 40 products with images) |
-| **D** | [1.7](Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md) | `orders`, `order_items`, `payments`, `deliveries` |
-| **E** | [1.3](Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md) | `users`, `employees`, `refresh_tokens`, `cities` |
+| Member | Name | Subphase | Tables Owned |
+|--------|------|----------|-------------|
+| **A** | **Rithmi** | [1.5](Phases/Phase1-Project-Foundation/phase1.5-catalog-taxonomy-schema.md) | `categories`, `product_categories`, `variant_attributes`, `variant_attribute_values` |
+| **B** | **Thinura** | [1.4](Phases/Phase1-Project-Foundation/phase1.4-customer-cart-schema.md) | `customers`, `addresses`, `carts`, `cart_items` |
+| **C** | **Kavindu** | [1.6](Phases/Phase1-Project-Foundation/phase1.6-product-schema.md) | `products`, `product_variants`, `product_images` (+ heaviest seed: 40 products with images) |
+| **D** | **Mayura** | [1.7](Phases/Phase1-Project-Foundation/phase1.7-order-payment-delivery-schema.md) | `orders`, `order_items`, `payments`, `deliveries` |
+| **E** | **Ranuja** | [1.3](Phases/Phase1-Project-Foundation/phase1.3-identity-location-schema.md) | `users`, `employees`, `refresh_tokens`, `cities` |
 
 ---
 
