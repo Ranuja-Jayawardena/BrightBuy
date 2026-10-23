@@ -1,9 +1,9 @@
 name: Continuous Deployment (CD)
 
+# Decommissioned on 2026-10-23: AWS EC2 infrastructure was permanently terminated.
+# Converted to manual trigger (workflow_dispatch) to avoid deployment failure on push.
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
