@@ -178,12 +178,9 @@ This will run:
 
 ## 🌐 Production Deployment (AWS EC2)
 
-The live production deployment is self-hosted on **AWS EC2** using a containerized multi-service stack orchestrated by Docker Compose.
+The production deployment previously ran on **AWS EC2** using a containerized multi-service stack orchestrated by Docker Compose.
 
-* **Live Storefront URL:** [http://18.208.53.186](http://18.208.53.186)
-* **Live Health Check:** [http://18.208.53.186/api/health](http://18.208.53.186/api/health)
-* **Elastic IP:** `18.208.53.186` (EC2 `t3.micro`, Region: `us-east-1`)
-* **Infrastructure Registry:** Detailed AWS CLI audit trail and provisioned resources are documented in [Docs/Deployment/aws-infrastructure.md](Docs/Deployment/aws-infrastructure.md).
+> **Status:** **Decommissioned on 2026-10-23.** The cloud EC2 instance was permanently terminated, the Elastic IP released, and cloud media storage deleted to eliminate cloud hosting costs. The complete AWS CLI audit trail and teardown log are documented in [Docs/Deployment/aws-infrastructure.md](Docs/Deployment/aws-infrastructure.md).
 
 ### Architecture Overview
 
